@@ -34,7 +34,8 @@
                     Width="120"
                     Margin="0,0,10,0"/>
             <Button Content="Exit"
-                    Width="80"/>
+                    Width="80"
+                    Click="ExitButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

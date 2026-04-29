@@ -26,5 +26,13 @@ namespace DnDTracker
             CampaignListBox.Items.Add("Lake Mizkagi");
             CampaignListBox.Items.Add("Keep on the Borderlands");
         }
+
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+    
+
     }
 }
