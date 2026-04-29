@@ -20,12 +20,9 @@
                    FontWeight="Bold"
                    Margin="0,0,0,20"/>
 
-        <ListBox Grid.Row="1"
-                 Margin="0,0,0,20">
-            <ListBoxItem>Errae</ListBoxItem>
-            <ListBoxItem>Lake Mizkagi</ListBoxItem>
-            <ListBoxItem>Keep on the Borderlands</ListBoxItem>
-        </ListBox>
+        <ListBox x:Name="CampaignListBox"
+         Grid.Row="1"
+         Margin="0,0,0,20"/>
 
         <StackPanel Grid.Row="2"
                     Orientation="Horizontal"

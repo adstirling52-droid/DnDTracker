@@ -11,14 +11,20 @@ using System.Windows.Shapes;
 
 namespace DnDTracker
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class CampaignListWindow : Window
     {
         public CampaignListWindow()
         {
             InitializeComponent();
+
+            LoadSampleCampaigns();
+        }
+
+        private void LoadSampleCampaigns()
+        {
+            CampaignListBox.Items.Add("Errae");
+            CampaignListBox.Items.Add("Lake Mizkagi");
+            CampaignListBox.Items.Add("Keep on the Borderlands");
         }
     }
 }
