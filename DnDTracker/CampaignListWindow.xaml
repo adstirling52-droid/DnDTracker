@@ -6,12 +6,38 @@
         xmlns:local="clr-namespace:DnDTracker"
         mc:Ignorable="d"
         Title="Campaign List" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="53*"/>
-            <ColumnDefinition Width="582*"/>
-            <ColumnDefinition Width="165*"/>
-        </Grid.ColumnDefinitions>
 
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Text="Campaigns"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <ListBox Grid.Row="1"
+                 Margin="0,0,0,20">
+            <ListBoxItem>Errae</ListBoxItem>
+            <ListBoxItem>Lake Mizkagi</ListBoxItem>
+            <ListBoxItem>Keep on the Borderlands</ListBoxItem>
+        </ListBox>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="New Campaign"
+                    Width="120"
+                    Margin="0,0,10,0"/>
+            <Button Content="Open Campaign"
+                    Width="120"
+                    Margin="0,0,10,0"/>
+            <Button Content="Exit"
+                    Width="80"/>
+        </StackPanel>
     </Grid>
 </Window>
