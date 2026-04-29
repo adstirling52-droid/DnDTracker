@@ -1,0 +1,17 @@
+﻿<Window x:Class="DnDTracker.CampaignListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DnDTracker"
+        mc:Ignorable="d"
+        Title="Campaign List" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="53*"/>
+            <ColumnDefinition Width="582*"/>
+            <ColumnDefinition Width="165*"/>
+        </Grid.ColumnDefinitions>
+
+    </Grid>
+</Window>
