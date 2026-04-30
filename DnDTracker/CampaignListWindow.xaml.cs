@@ -46,9 +46,21 @@ namespace DnDTracker
 
 
             }
+        }
 
-           // newCampaignWindow.ShowDialog();
-        
+        private void OpenCampaignButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CampaignListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a campaign first.", "No Campaign Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            string selectedCampaignName = CampaignListBox.SelectedItem.ToString()!;
+
+            CampaignWindow campaignWindow = new CampaignWindow(selectedCampaignName);
+            campaignWindow.Owner = this;
+            campaignWindow.Show();
         }
 
     }

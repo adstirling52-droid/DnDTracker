@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DnDTracker"
         mc:Ignorable="d"
         Title="New Campaign"
-        Height="200"
+        Height="230"
         Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">

@@ -1,0 +1,119 @@
+﻿<Window x:Class="DnDTracker.CampaignWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DnDTracker"
+        mc:Ignorable="d"
+        Title="Campaign"
+        Height="500"
+        Width="1000"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="CampaignNameTextBlock"
+                   Grid.Row="0"
+                   Text="Campaign Name"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Margin="0,0,0,20"/>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="15"
+                    Margin="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="Characters"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Margin="0,0,0,15"/>
+
+                    <Button Content="Oskar"
+                            Margin="0,0,0,8"/>
+
+                    <Button Content="Lanvor"
+                            Margin="0,0,0,8"/>
+
+                    <Button Content="Thradal"
+                            Margin="0,0,0,8"/>
+
+                    <Button Content="Add Character"
+                            Margin="0,20,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="15"
+                    Margin="0,0,10,0">
+                <StackPanel>
+                    <TextBlock Text="Items"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Margin="0,0,0,15"/>
+
+                    <ListBox Height="250">
+                        <ListBoxItem>Moon-Touched Sword</ListBoxItem>
+                        <ListBoxItem>Silver Key</ListBoxItem>
+                        <ListBoxItem>Potion of Healing</ListBoxItem>
+                    </ListBox>
+
+                    <Button Content="Add Item"
+                            Width="100"
+                            Margin="0,20,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="15">
+                <StackPanel>
+                    <TextBlock Text="Item Provenance"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Moon-Touched Sword"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="0,0,0,10"/>
+
+                    <TextBlock Text="Found in goblin shrine beneath the old watchtower."
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"/>
+
+                    <TextBlock Text="Where: Goblin Shrine"
+                               Margin="0,0,0,5"/>
+
+                    <TextBlock Text="When: Session 4"
+                               Margin="0,0,0,5"/>
+
+                    <TextBlock Text="Current Status: Carried by Oskar"
+                               Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Notes:"
+                               FontWeight="Bold"
+                               Margin="0,0,0,5"/>
+
+                    <TextBlock Text="Blade glows faintly in moonlight. Possibly linked to an older noble line."
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

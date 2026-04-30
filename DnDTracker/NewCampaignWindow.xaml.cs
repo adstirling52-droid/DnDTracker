@@ -33,12 +33,18 @@ namespace DnDTracker
 
         }
 
-        private void SaveButton_Click(Object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            CampaignName = CampaignNameTextBox.Text.Trim();
+            string enteredName = CampaignNameTextBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(enteredName))
+            {
+                MessageBox.Show("Please enter a campaign name.", "Missing Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            CampaignName = enteredName;
             DialogResult = true;
-
-
         }
     }
 }

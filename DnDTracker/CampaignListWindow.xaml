@@ -33,7 +33,8 @@
                     Click="NewCampaignButton_Click"/>
             <Button Content="Open Campaign"
                     Width="120"
-                    Margin="0,0,10,0"/>
+                    Margin="0,0,10,0"
+                    Click="OpenCampaignButton_Click"/>
             <Button Content="Exit"
                     Width="80"
                     Click="ExitButton_Click"/>
