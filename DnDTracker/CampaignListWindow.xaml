@@ -29,7 +29,8 @@
                     HorizontalAlignment="Right">
             <Button Content="New Campaign"
                     Width="120"
-                    Margin="0,0,10,0"/>
+                    Margin="0,0,10,0"
+                    Click="NewCampaignButton_Click"/>
             <Button Content="Open Campaign"
                     Width="120"
                     Margin="0,0,10,0"/>

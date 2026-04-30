@@ -32,7 +32,24 @@ namespace DnDTracker
         {
             Close();
         }
-    
+
+        private void NewCampaignButton_Click(object sender, RoutedEventArgs e) 
+        {
+            NewCampaignWindow newCampaignWindow = new NewCampaignWindow();
+            newCampaignWindow.Owner = this;
+
+            bool? result = newCampaignWindow.ShowDialog();
+
+            if (result == true)
+            {
+                CampaignListBox.Items.Add(newCampaignWindow.CampaignName);
+
+
+            }
+
+           // newCampaignWindow.ShowDialog();
+        
+        }
 
     }
 }
