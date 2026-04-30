@@ -50,7 +50,7 @@
                     <Button Content="Thradal"
                             Margin="0,0,0,8"/>
 
-                    <Button Content="Add Character yes"
+                    <Button Content="Add Character"
                             Margin="0,20,0,0"/>
                 </StackPanel>
             </Border>
