@@ -30,30 +30,30 @@
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0"
-                    BorderBrush="Gray"
-                    BorderThickness="1"
-                    Padding="15"
-                    Margin="0,0,10,0">
-                <StackPanel>
-                    <TextBlock Text="Characters"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Margin="0,0,0,15"/>
+        <Border Grid.Column="0"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Padding="15"
+                Margin="0,0,10,0">
+                
+            <DockPanel>
+                <Button Content="Add Character"
+                        DockPanel.Dock="Bottom"
+                        Margin="0,20,0,0"/>
 
-                    <Button Content="Oskar"
-                            Margin="0,0,0,8"/>
+            <StackPanel>
+                <TextBlock Text="Characters"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Margin="0,0,0,15"/>
 
-                    <Button Content="Lanvor"
-                            Margin="0,0,0,8"/>
+                <StackPanel x:Name="CharacterButtonPanel"/>
+                
+            </StackPanel>
+                
+            </DockPanel>
 
-                    <Button Content="Thradal"
-                            Margin="0,0,0,8"/>
-
-                    <Button Content="Add Character"
-                            Margin="0,20,0,0"/>
-                </StackPanel>
-            </Border>
+        </Border>
 
             <Border Grid.Column="1"
                     BorderBrush="Gray"
@@ -66,11 +66,9 @@
                                FontWeight="Bold"
                                Margin="0,0,0,15"/>
 
-                    <ListBox Height="250">
-                        <ListBoxItem>Moon-Touched Sword</ListBoxItem>
-                        <ListBoxItem>Silver Key</ListBoxItem>
-                        <ListBoxItem>Potion of Healing</ListBoxItem>
-                    </ListBox>
+                    <ListBox x:Name="CharacterItemsListBox"
+                             Height="250"
+                             SelectionChanged="CharacterItemsListBox_SelectionChanged"/>
 
                     <Button Content="Add Item"
                             Width="100"
@@ -82,37 +80,45 @@
                     BorderBrush="Gray"
                     BorderThickness="1"
                     Padding="15">
-                <StackPanel>
-                    <TextBlock Text="Item Provenance"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Margin="0,0,0,15"/>
+                
+                    <StackPanel>
+                        <TextBlock Text="Item Provenance"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
 
-                    <TextBlock Text="Moon-Touched Sword"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               Margin="0,0,0,10"/>
+                        <TextBlock x:Name="SelectedItemNameTextBlock"
+                                   Text="Select an item"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Found in goblin shrine beneath the old watchtower."
-                               TextWrapping="Wrap"
-                               Margin="0,0,0,10"/>
+                        <TextBlock x:Name="SelectedItemDescriptionTextBlock"
+                                   Text="Item description will appear here."
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,10"/>
 
-                    <TextBlock Text="Where: Goblin Shrine"
-                               Margin="0,0,0,5"/>
+                        <TextBlock x:Name="SelectedItemWhereTextBlock"
+                                   Text="Where:"
+                                   Margin="0,0,0,5"/>
 
-                    <TextBlock Text="When: Session 4"
-                               Margin="0,0,0,5"/>
+                        <TextBlock x:Name="SelectedItemWhenTextBlock"
+                                   Text="When:"
+                                   Margin="0,0,0,5"/>
 
-                    <TextBlock Text="Current Status: Carried by Oskar"
-                               Margin="0,0,0,15"/>
+                        <TextBlock x:Name="SelectedItemStatusTextBlock"
+                                   Text="Current Status:"
+                                   Margin="0,0,0,15"/>
 
-                    <TextBlock Text="Notes:"
-                               FontWeight="Bold"
-                               Margin="0,0,0,5"/>
+                        <TextBlock Text="Notes:"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,5"/>
 
-                    <TextBlock Text="Blade glows faintly in moonlight. Possibly linked to an older noble line."
-                               TextWrapping="Wrap"/>
-                </StackPanel>
+                        <TextBlock x:Name="SelectedItemNotesTextBlock"
+                                   Text="Item notes will appear here."
+                                   TextWrapping="Wrap"/>
+                        
+                    </StackPanel>
             </Border>
         </Grid>
     </Grid>
