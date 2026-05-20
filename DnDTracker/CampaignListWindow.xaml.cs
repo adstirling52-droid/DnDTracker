@@ -8,25 +8,46 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using DnDTracker.Models;
+using System.Collections.Generic;
+using System.Linq;
+using DnDTracker.Models;
+using System.Collections.Generic;
+
 
 namespace DnDTracker
 {
     public partial class CampaignListWindow : Window
     {
+
+        private List<Campaign> _campaigns = new List<Campaign>();
+
         public CampaignListWindow()
         {
             InitializeComponent();
 
             LoadSampleCampaigns();
+
+            
         }
 
         private void LoadSampleCampaigns()
         {
-            CampaignListBox.Items.Add("Errae");
-            CampaignListBox.Items.Add("Lake Mizkagi");
-            CampaignListBox.Items.Add("Keep on the Borderlands");
-        }
+            _campaigns.Add(CampaignWindow.CreateSampleCampaign("Errae"));
+            _campaigns.Add(new Campaign { Name = "Lake Mizkagi" });
+            _campaigns.Add(new Campaign { Name = "Keep on the Borderlands" });
 
+            RefreshCampaignList();
+        }
+        private void RefreshCampaignList()
+        {
+            CampaignListBox.Items.Clear();
+
+            foreach (Campaign campaign in _campaigns)
+            {
+                CampaignListBox.Items.Add(campaign);
+            }
+        }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
@@ -42,8 +63,9 @@ namespace DnDTracker
 
             if (result == true)
             {
-                CampaignListBox.Items.Add(newCampaignWindow.CampaignName);
-
+                Campaign newCampaign = new Campaign { Name = newCampaignWindow.CampaignName };
+                _campaigns.Add(newCampaign);
+                RefreshCampaignList();
 
             }
         }
@@ -56,9 +78,9 @@ namespace DnDTracker
                 return;
             }
 
-            string selectedCampaignName = CampaignListBox.SelectedItem.ToString()!;
+            Campaign selectedCampaign = (Campaign)CampaignListBox.SelectedItem;
 
-            CampaignWindow campaignWindow = new CampaignWindow(selectedCampaignName);
+            CampaignWindow campaignWindow = new CampaignWindow(selectedCampaign);
             campaignWindow.Owner = this;
             campaignWindow.Show();
         }
