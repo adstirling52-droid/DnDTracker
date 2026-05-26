@@ -19,6 +19,8 @@ namespace DnDTracker
 
         private Campaign _campaign;
 
+        private Character? _selectedCharacter;
+
         public CampaignWindow(Campaign campaign)
 {
             InitializeComponent();
@@ -32,7 +34,8 @@ namespace DnDTracker
 
             if (_campaign.Characters.Any())
             {
-                LoadItemsForCharacter(_campaign.Characters.First());
+                _selectedCharacter = _campaign.Characters.First();
+                LoadItemsForCharacter(_selectedCharacter);
             }
         }
 
@@ -175,6 +178,7 @@ namespace DnDTracker
             Button clickedButton = (Button)sender;
             Character selectedCharacter = (Character)clickedButton.Tag;
 
+            _selectedCharacter = selectedCharacter;
             LoadItemsForCharacter(selectedCharacter);
         }
 
@@ -218,6 +222,54 @@ namespace DnDTracker
             SelectedItemWhenTextBlock.Text = $"When: {item.WhenFound}";
             SelectedItemStatusTextBlock.Text = $"Current Status: {item.CurrentStatus}";
             SelectedItemNotesTextBlock.Text = item.Notes;
+        }
+
+        private void AddCharacterButton_Click(object sender, RoutedEventArgs e)
+        {
+            NewCharacterWindow newCharacterWindow = new NewCharacterWindow();
+            newCharacterWindow.Owner = this;
+
+            bool? result = newCharacterWindow.ShowDialog();
+
+            if (result == true)
+            {
+                Character newCharacter = new Character
+                {
+                    Name = newCharacterWindow.CharacterName
+                };
+
+                _campaign.Characters.Add(newCharacter);
+                _selectedCharacter = newCharacter;
+                LoadCharacterButtons();
+                LoadItemsForCharacter(newCharacter);
+            }
+        }
+
+        private void AddItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            NewItemWindow newItemWindow = new NewItemWindow();
+            newItemWindow.Owner = this;
+
+            bool? result = newItemWindow.ShowDialog();
+
+            if (result == true)
+            {
+                _selectedCharacter.Items.Add(newItemWindow.NewItem);
+                LoadItemsForCharacter(_selectedCharacter);
+
+                CharacterItemsListBox.SelectedItem = newItemWindow.NewItem;
+               // LoadProvenanceForItem(newItemWindow.NewItem);
+            }
+        }
+        private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

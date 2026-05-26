@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Windows;
+using System;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -11,7 +12,6 @@ using System.Windows.Shapes;
 using DnDTracker.Models;
 using System.Collections.Generic;
 using System.Linq;
-using DnDTracker.Models;
 using System.Collections.Generic;
 
 
@@ -48,6 +48,10 @@ namespace DnDTracker
                 CampaignListBox.Items.Add(campaign);
             }
         }
+        private void CampaignWindow_Closed(object? sender, EventArgs e)
+        {
+            this.Show();
+        }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
@@ -82,6 +86,9 @@ namespace DnDTracker
 
             CampaignWindow campaignWindow = new CampaignWindow(selectedCampaign);
             campaignWindow.Owner = this;
+            campaignWindow.Closed += CampaignWindow_Closed;
+
+            this.Hide();
             campaignWindow.Show();
         }
 

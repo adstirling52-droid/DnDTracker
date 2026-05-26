@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DnDTracker"
         mc:Ignorable="d"
         Title="Campaign"
-        Height="500"
+        Height="540"
         Width="1000"
         WindowStartupLocation="CenterOwner">
 
@@ -14,6 +14,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="CampaignNameTextBlock"
@@ -30,30 +31,27 @@
                 <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0"
-                BorderBrush="Gray"
-                BorderThickness="1"
-                Padding="15"
-                Margin="0,0,10,0">
-                
-            <DockPanel>
-                <Button Content="Add Character"
-                        DockPanel.Dock="Bottom"
-                        Margin="0,20,0,0"/>
+            <Border Grid.Column="0"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Padding="15"
+                    Margin="0,0,10,0">
+                <DockPanel>
+                    <Button Content="Add Character"
+                            DockPanel.Dock="Bottom"
+                            Margin="0,20,0,0"
+                            Click="AddCharacterButton_Click"/>
 
-            <StackPanel>
-                <TextBlock Text="Characters"
-                           FontSize="20"
-                           FontWeight="Bold"
-                           Margin="0,0,0,15"/>
+                    <StackPanel>
+                        <TextBlock Text="Characters"
+                                   FontSize="20"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,15"/>
 
-                <StackPanel x:Name="CharacterButtonPanel"/>
-                
-            </StackPanel>
-                
-            </DockPanel>
-
-        </Border>
+                        <StackPanel x:Name="CharacterButtonPanel"/>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
 
             <Border Grid.Column="1"
                     BorderBrush="Gray"
@@ -72,7 +70,8 @@
 
                     <Button Content="Add Item"
                             Width="100"
-                            Margin="0,20,0,0"/>
+                            Margin="0,20,0,0"
+                            Click="AddItemButton_Click"/>
                 </StackPanel>
             </Border>
 
@@ -80,46 +79,53 @@
                     BorderBrush="Gray"
                     BorderThickness="1"
                     Padding="15">
-                
-                    <StackPanel>
-                        <TextBlock Text="Item Provenance"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   Margin="0,0,0,15"/>
+                <StackPanel>
+                    <TextBlock Text="Item Provenance"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Margin="0,0,0,15"/>
 
-                        <TextBlock x:Name="SelectedItemNameTextBlock"
-                                   Text="Select an item"
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   Margin="0,0,0,10"/>
+                    <TextBlock x:Name="SelectedItemNameTextBlock"
+                               Text="Select an item"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="0,0,0,10"/>
 
-                        <TextBlock x:Name="SelectedItemDescriptionTextBlock"
-                                   Text="Item description will appear here."
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,10"/>
+                    <TextBlock x:Name="SelectedItemDescriptionTextBlock"
+                               Text="Item description will appear here."
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,10"/>
 
-                        <TextBlock x:Name="SelectedItemWhereTextBlock"
-                                   Text="Where:"
-                                   Margin="0,0,0,5"/>
+                    <TextBlock x:Name="SelectedItemWhereTextBlock"
+                               Text="Where:"
+                               Margin="0,0,0,5"/>
 
-                        <TextBlock x:Name="SelectedItemWhenTextBlock"
-                                   Text="When:"
-                                   Margin="0,0,0,5"/>
+                    <TextBlock x:Name="SelectedItemWhenTextBlock"
+                               Text="When:"
+                               Margin="0,0,0,5"/>
 
-                        <TextBlock x:Name="SelectedItemStatusTextBlock"
-                                   Text="Current Status:"
-                                   Margin="0,0,0,15"/>
+                    <TextBlock x:Name="SelectedItemStatusTextBlock"
+                               Text="Current Status:"
+                               Margin="0,0,0,15"/>
 
-                        <TextBlock Text="Notes:"
-                                   FontWeight="Bold"
-                                   Margin="0,0,0,5"/>
+                    <TextBlock Text="Notes:"
+                               FontWeight="Bold"
+                               Margin="0,0,0,5"/>
 
-                        <TextBlock x:Name="SelectedItemNotesTextBlock"
-                                   Text="Item notes will appear here."
-                                   TextWrapping="Wrap"/>
-                        
-                    </StackPanel>
+                    <TextBlock x:Name="SelectedItemNotesTextBlock"
+                               Text="Item notes will appear here."
+                               TextWrapping="Wrap"/>
+                </StackPanel>
             </Border>
         </Grid>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,20,0,0">
+            <Button Content="Close Campaign"
+                    Width="120"
+                    Click="CloseCampaignButton_Click"/>
+        </StackPanel>
     </Grid>
 </Window>
