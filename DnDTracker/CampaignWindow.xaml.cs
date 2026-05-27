@@ -291,6 +291,7 @@ namespace DnDTracker
                // LoadProvenanceForItem(newItemWindow.NewItem);
             }
         }
+        
         private void EditItemButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedCharacter == null)
@@ -325,6 +326,7 @@ namespace DnDTracker
                 }
             }
         }
+        
         private void RemoveItemButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedCharacter == null)
@@ -355,6 +357,7 @@ namespace DnDTracker
             _selectedCharacter.Items.Remove(selectedItem);
             LoadItemsForCharacter(_selectedCharacter);
         }
+        
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
