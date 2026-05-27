@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DnDTracker.Models;
+using System.Windows;
 
 namespace DnDTracker
 {
@@ -9,6 +10,19 @@ namespace DnDTracker
         public NewCharacterWindow()
         {
             InitializeComponent();
+
+            Title = "New Character";
+            WindowHeadingTextBlock.Text = "Create New Character";
+        }
+
+        public NewCharacterWindow(Character existingCharacter)
+        {
+            InitializeComponent();
+
+            Title = "Edit Character";
+            WindowHeadingTextBlock.Text = "Edit Character";
+
+            CharacterNameTextBox.Text = existingCharacter.Name;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

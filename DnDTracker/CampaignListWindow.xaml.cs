@@ -92,5 +92,57 @@ namespace DnDTracker
             campaignWindow.Show();
         }
 
+        private void EditCampaignButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CampaignListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a campaign first.", "No Campaign Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Campaign selectedCampaign = (Campaign)CampaignListBox.SelectedItem;
+
+            NewCampaignWindow editCampaignWindow = new NewCampaignWindow(selectedCampaign);
+            editCampaignWindow.Owner = this;
+
+            bool? result = editCampaignWindow.ShowDialog();
+
+            if (result == true)
+            {
+                selectedCampaign.Name = editCampaignWindow.CampaignName;
+                RefreshCampaignList();
+                CampaignListBox.SelectedItem = selectedCampaign;
+            }
+        }
+        
+        private void RemoveCampaignButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CampaignListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a campaign first.", "No Campaign Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Campaign selectedCampaign = (Campaign)CampaignListBox.SelectedItem;
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Remove campaign '{selectedCampaign.Name}'?",
+                "Confirm Remove Campaign",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            _campaigns.Remove(selectedCampaign);
+            RefreshCampaignList();
+
+            if (CampaignListBox.Items.Count > 0)
+            {
+                CampaignListBox.SelectedIndex = 0;
+            }
+        }
     }
 }

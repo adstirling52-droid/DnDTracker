@@ -37,10 +37,24 @@
                     Padding="15"
                     Margin="0,0,10,0">
                 <DockPanel>
-                    <Button Content="Add Character"
-                            DockPanel.Dock="Bottom"
-                            Margin="0,20,0,0"
-                            Click="AddCharacterButton_Click"/>
+                    <StackPanel DockPanel.Dock="Bottom"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,20,0,0">
+                        <Button Content="Add"
+                                Width="50"
+                                Margin="0,0,4,0"
+                                Click="AddCharacterButton_Click"/>
+
+                        <Button Content="Edit"
+                                Width="50"
+                                Margin="0,0,4,0"
+                                Click="EditCharacterButton_Click"/>
+
+                        <Button Content="Remove"
+                                Width="60"
+                                Click="RemoveCharacterButton_Click"/>
+                    </StackPanel>
 
                     <StackPanel>
                         <TextBlock Text="Characters"

@@ -269,6 +269,76 @@ namespace DnDTracker
             }
         }
 
+        private void EditCharacterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            NewCharacterWindow editCharacterWindow = new NewCharacterWindow(_selectedCharacter);
+            editCharacterWindow.Owner = this;
+
+            bool? result = editCharacterWindow.ShowDialog();
+
+            if (result == true)
+            {
+                _selectedCharacter.Name = editCharacterWindow.CharacterName;
+
+                LoadCharacterButtons();
+
+                foreach (Button button in CharacterButtonPanel.Children)
+                {
+                    Character character = (Character)button.Tag;
+
+                    if (character == _selectedCharacter)
+                    {
+                        SelectCharacter(_selectedCharacter, button);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        private void RemoveCharacterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Remove character '{_selectedCharacter.Name}'?",
+                "Confirm Remove Character",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            _campaign.Characters.Remove(_selectedCharacter);
+
+            LoadCharacterButtons();
+
+            if (_campaign.Characters.Any() && CharacterButtonPanel.Children.Count > 0)
+            {
+                Button firstButton = (Button)CharacterButtonPanel.Children[0];
+                Character firstCharacter = (Character)firstButton.Tag;
+
+                SelectCharacter(firstCharacter, firstButton);
+            }
+            else
+            {
+                _selectedCharacter = null;
+                CharacterItemsListBox.Items.Clear();
+                ClearItemDetails();
+            }
+        }
+        
         private void AddItemButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedCharacter == null)

@@ -20,7 +20,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0"
+        <TextBlock x:Name="WindowHeadingTextBlock"
+                   Grid.Row="0"
                    Text="Create New Campaign"
                    FontSize="20"
                    FontWeight="Bold"

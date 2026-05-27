@@ -1,37 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DnDTracker.Models;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace DnDTracker
 {
-    /// <summary>
-    /// Interaction logic for NewCampaignWindow.xaml
-    /// </summary>
     public partial class NewCampaignWindow : Window
     {
-
         public string CampaignName { get; private set; } = "";
-
 
         public NewCampaignWindow()
         {
             InitializeComponent();
+
+            Title = "New Campaign";
+            WindowHeadingTextBlock.Text = "Create New Campaign";
         }
 
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        public NewCampaignWindow(Campaign existingCampaign)
         {
-            Close();
+            InitializeComponent();
 
+            Title = "Edit Campaign";
+            WindowHeadingTextBlock.Text = "Edit Campaign";
+
+            CampaignNameTextBox.Text = existingCampaign.Name;
         }
+
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -45,6 +38,11 @@ namespace DnDTracker
 
             CampaignName = enteredName;
             DialogResult = true;
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }
