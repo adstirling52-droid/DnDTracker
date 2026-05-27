@@ -1,7 +1,9 @@
 ﻿using DnDTracker.Models;
+using DnDTracker.Services;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
 using System.Windows.Media;
 
 
@@ -13,12 +15,16 @@ namespace DnDTracker
         private Campaign _campaign;
         private Character? _selectedCharacter;
         private Button? _selectedCharacterButton;
+        private List<Campaign> _allCampaigns;
+        private CampaignDataService _campaignDataService;
 
-        public CampaignWindow(Campaign campaign)
-{
+        public CampaignWindow(Campaign campaign, List<Campaign> allCampaigns, CampaignDataService campaignDataService)
+        {
             InitializeComponent();
 
             _campaign = campaign;
+            _allCampaigns = allCampaigns;
+            _campaignDataService = campaignDataService;
 
             CampaignNameTextBlock.Text = _campaign.Name;
             Title = _campaign.Name;
@@ -31,12 +37,6 @@ namespace DnDTracker
                 Character firstCharacter = (Character)firstButton.Tag;
 
                 SelectCharacter(firstCharacter, firstButton);
-            }
-
-            if (_campaign.Characters.Any())
-            {
-                _selectedCharacter = _campaign.Characters.First();
-                LoadItemsForCharacter(_selectedCharacter);
             }
         }
 
@@ -266,6 +266,8 @@ namespace DnDTracker
 
                 Button newCharacterButton = (Button)CharacterButtonPanel.Children[CharacterButtonPanel.Children.Count - 1];
                 SelectCharacter(newCharacter, newCharacterButton);
+
+                SaveCampaigns();
             }
         }
 
@@ -298,6 +300,8 @@ namespace DnDTracker
                         break;
                     }
                 }
+
+                SaveCampaigns();
             }
         }
         
@@ -337,6 +341,8 @@ namespace DnDTracker
                 CharacterItemsListBox.Items.Clear();
                 ClearItemDetails();
             }
+
+            SaveCampaigns();
         }
         
         private void AddItemButton_Click(object sender, RoutedEventArgs e)
@@ -358,7 +364,8 @@ namespace DnDTracker
                 LoadItemsForCharacter(_selectedCharacter);
 
                 CharacterItemsListBox.SelectedItem = newItemWindow.NewItem;
-               // LoadProvenanceForItem(newItemWindow.NewItem);
+                // LoadProvenanceForItem(newItemWindow.NewItem);
+                SaveCampaigns();
             }
         }
         
@@ -393,6 +400,8 @@ namespace DnDTracker
 
                     LoadItemsForCharacter(_selectedCharacter);
                     CharacterItemsListBox.SelectedItem = editItemWindow.NewItem;
+
+                    SaveCampaigns();
                 }
             }
         }
@@ -426,11 +435,18 @@ namespace DnDTracker
 
             _selectedCharacter.Items.Remove(selectedItem);
             LoadItemsForCharacter(_selectedCharacter);
+            SaveCampaigns();
         }
         
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+        private void SaveCampaigns()
+        {
+            _campaignDataService.SaveCampaigns(_allCampaigns);
+        }
     }
+
+
 }

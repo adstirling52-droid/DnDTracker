@@ -1,18 +1,8 @@
-﻿using System.Text;
-using System.Windows;
+﻿using DnDTracker.Models;
+using DnDTracker.Services;
 using System;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using DnDTracker.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Collections.Generic;
+using System.Windows;
 
 
 namespace DnDTracker
@@ -22,22 +12,45 @@ namespace DnDTracker
 
         private List<Campaign> _campaigns = new List<Campaign>();
 
+        private CampaignDataService _campaignDataService = new CampaignDataService();
+
         public CampaignListWindow()
         {
             InitializeComponent();
 
-            LoadSampleCampaigns();
+            LoadCampaigns();
 
             
         }
 
         private void LoadSampleCampaigns()
         {
+
+            _campaigns.Clear();
+
             _campaigns.Add(CampaignWindow.CreateSampleCampaign("Errae"));
             _campaigns.Add(new Campaign { Name = "Lake Mizkagi" });
             _campaigns.Add(new Campaign { Name = "Keep on the Borderlands" });
 
             RefreshCampaignList();
+        }
+        private void LoadCampaigns()
+        {
+            _campaigns = _campaignDataService.LoadCampaigns();
+
+            if (_campaigns.Count == 0)
+            {
+                LoadSampleCampaigns();
+                SaveCampaigns();
+            }
+            else
+            {
+                RefreshCampaignList();
+            }
+        }
+        private void SaveCampaigns()
+        {
+            _campaignDataService.SaveCampaigns(_campaigns);
         }
         private void RefreshCampaignList()
         {
@@ -70,7 +83,8 @@ namespace DnDTracker
                 Campaign newCampaign = new Campaign { Name = newCampaignWindow.CampaignName };
                 _campaigns.Add(newCampaign);
                 RefreshCampaignList();
-
+                CampaignListBox.SelectedItem = newCampaign;
+                SaveCampaigns();
             }
         }
 
@@ -84,7 +98,7 @@ namespace DnDTracker
 
             Campaign selectedCampaign = (Campaign)CampaignListBox.SelectedItem;
 
-            CampaignWindow campaignWindow = new CampaignWindow(selectedCampaign);
+            CampaignWindow campaignWindow = new CampaignWindow(selectedCampaign, _campaigns, _campaignDataService);
             campaignWindow.Owner = this;
             campaignWindow.Closed += CampaignWindow_Closed;
 
@@ -112,6 +126,7 @@ namespace DnDTracker
                 selectedCampaign.Name = editCampaignWindow.CampaignName;
                 RefreshCampaignList();
                 CampaignListBox.SelectedItem = selectedCampaign;
+                SaveCampaigns();
             }
         }
         
@@ -143,6 +158,8 @@ namespace DnDTracker
             {
                 CampaignListBox.SelectedIndex = 0;
             }
+
+            SaveCampaigns();
         }
     }
 }
