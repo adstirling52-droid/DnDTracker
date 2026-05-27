@@ -10,6 +10,24 @@ namespace DnDTracker
         public NewItemWindow()
         {
             InitializeComponent();
+
+            Title = "New Item";
+            WindowHeadingTextBlock.Text = "Create New Item";
+        }
+
+        public NewItemWindow(Item existingItem)
+        {
+            InitializeComponent();
+
+            Title = "Edit Item";
+            WindowHeadingTextBlock.Text = "Edit Item";
+
+            ItemNameTextBox.Text = existingItem.Name;
+            DescriptionTextBox.Text = existingItem.Description;
+            WhereFoundTextBox.Text = existingItem.WhereFound;
+            WhenFoundTextBox.Text = existingItem.WhenFound;
+            CurrentStatusTextBox.Text = existingItem.CurrentStatus;
+            NotesTextBox.Text = existingItem.Notes;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

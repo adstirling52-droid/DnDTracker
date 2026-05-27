@@ -1,16 +1,9 @@
 ﻿using DnDTracker.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Linq;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace DnDTracker
 {
@@ -18,8 +11,8 @@ namespace DnDTracker
     {
 
         private Campaign _campaign;
-
         private Character? _selectedCharacter;
+        private Button? _selectedCharacterButton;
 
         public CampaignWindow(Campaign campaign)
 {
@@ -32,10 +25,29 @@ namespace DnDTracker
 
             LoadCharacterButtons();
 
+            if (CharacterButtonPanel.Children.Count > 0)
+            {
+                Button firstButton = (Button)CharacterButtonPanel.Children[0];
+                Character firstCharacter = (Character)firstButton.Tag;
+
+                SelectCharacter(firstCharacter, firstButton);
+            }
+
             if (_campaign.Characters.Any())
             {
                 _selectedCharacter = _campaign.Characters.First();
                 LoadItemsForCharacter(_selectedCharacter);
+            }
+        }
+
+        private void LoadCharacterButtons()
+        {
+            CharacterButtonPanel.Children.Clear();
+            _selectedCharacterButton = null;
+
+            foreach (Character character in _campaign.Characters)
+            {
+                AddCharacterButton(character);
             }
         }
 
@@ -152,16 +164,6 @@ namespace DnDTracker
             };
         }
 
-        private void LoadCharacterButtons()
-        {
-            CharacterButtonPanel.Children.Clear();
-
-            foreach (Character character in _campaign.Characters)
-            {
-                AddCharacterButton(character);
-            }
-        }
-
         private void AddCharacterButton(Character character)
         {
             Button characterButton = new Button();
@@ -178,10 +180,26 @@ namespace DnDTracker
             Button clickedButton = (Button)sender;
             Character selectedCharacter = (Character)clickedButton.Tag;
 
-            _selectedCharacter = selectedCharacter;
-            LoadItemsForCharacter(selectedCharacter);
+            SelectCharacter(selectedCharacter, clickedButton);
         }
 
+        private void SelectCharacter(Character character, Button selectedButton)
+        {
+            _selectedCharacter = character;
+
+            if (_selectedCharacterButton != null)
+            {
+                _selectedCharacterButton.ClearValue(Button.BackgroundProperty);
+                _selectedCharacterButton.ClearValue(Button.BorderBrushProperty);
+            }
+
+            _selectedCharacterButton = selectedButton;
+            _selectedCharacterButton.Background = Brushes.LightBlue;
+            _selectedCharacterButton.BorderBrush = Brushes.SteelBlue;
+
+            LoadItemsForCharacter(character);
+        }
+        
         private void LoadItemsForCharacter(Character character)
         {
             CharacterItemsListBox.Items.Clear();
@@ -191,8 +209,13 @@ namespace DnDTracker
             {
                 CharacterItemsListBox.Items.Add(item);
             }
-        }
 
+            if (character.Items.Count > 0)
+            {
+                CharacterItemsListBox.SelectedIndex = 0;
+            }
+        }
+        
         private void ClearItemDetails()
         {
             SelectedItemNameTextBlock.Text = "Select an item";
@@ -239,9 +262,10 @@ namespace DnDTracker
                 };
 
                 _campaign.Characters.Add(newCharacter);
-                _selectedCharacter = newCharacter;
                 LoadCharacterButtons();
-                LoadItemsForCharacter(newCharacter);
+
+                Button newCharacterButton = (Button)CharacterButtonPanel.Children[CharacterButtonPanel.Children.Count - 1];
+                SelectCharacter(newCharacter, newCharacterButton);
             }
         }
 
@@ -266,6 +290,70 @@ namespace DnDTracker
                 CharacterItemsListBox.SelectedItem = newItemWindow.NewItem;
                // LoadProvenanceForItem(newItemWindow.NewItem);
             }
+        }
+        private void EditItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an item to edit.", "No Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+
+            NewItemWindow editItemWindow = new NewItemWindow(selectedItem);
+            editItemWindow.Owner = this;
+
+            bool? result = editItemWindow.ShowDialog();
+
+            if (result == true)
+            {
+                int itemIndex = _selectedCharacter.Items.IndexOf(selectedItem);
+
+                if (itemIndex >= 0)
+                {
+                    _selectedCharacter.Items[itemIndex] = editItemWindow.NewItem;
+
+                    LoadItemsForCharacter(_selectedCharacter);
+                    CharacterItemsListBox.SelectedItem = editItemWindow.NewItem;
+                }
+            }
+        }
+        private void RemoveItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an item to remove.", "No Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Remove '{selectedItem.Name}' from {_selectedCharacter.Name}?",
+                "Confirm Remove Item",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            _selectedCharacter.Items.Remove(selectedItem);
+            LoadItemsForCharacter(_selectedCharacter);
         }
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
         {

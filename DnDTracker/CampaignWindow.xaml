@@ -68,10 +68,28 @@
                              Height="250"
                              SelectionChanged="CharacterItemsListBox_SelectionChanged"/>
 
-                    <Button Content="Add Item"
-                            Width="100"
-                            Margin="0,20,0,0"
-                            Click="AddItemButton_Click"/>
+                    
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,20,0,0">
+                        
+                        <Button Content="Add Item"
+                                Width="80"
+                                Margin="0,0,8,0"
+                                Click="AddItemButton_Click"/>
+
+                        <Button Content="Edit Item"
+                                Width="80"
+                                Margin="0,0,8,0"
+                                Click="EditItemButton_Click"/>
+
+                        <Button Content="Remove Item"
+                                Width="95"
+                                Click="RemoveItemButton_Click"/>
+                    </StackPanel>
+
+
+
                 </StackPanel>
             </Border>
 
