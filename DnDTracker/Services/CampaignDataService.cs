@@ -60,5 +60,19 @@ namespace DnDTracker.Services
             string json = JsonSerializer.Serialize(campaign, options);
             File.WriteAllText(filePath, json);
         }
+
+        public Campaign? ImportCampaign(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return null;
+            }
+
+            string json = File.ReadAllText(filePath);
+
+            Campaign? campaign = JsonSerializer.Deserialize<Campaign>(json);
+
+            return campaign;
+        }
     }
 }

@@ -161,6 +161,34 @@ namespace DnDTracker
             }
         }
 
+        private void ImportCampaignButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Import Campaign";
+            openFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+            openFileDialog.DefaultExt = "json";
+
+            bool? result = openFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                Campaign? importedCampaign = _campaignDataService.ImportCampaign(openFileDialog.FileName);
+
+                if (importedCampaign == null)
+                {
+                    MessageBox.Show("The selected campaign file could not be imported.", "Import Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                _campaigns.Add(importedCampaign);
+                RefreshCampaignList();
+                CampaignListBox.SelectedItem = importedCampaign;
+                SaveCampaigns();
+
+                MessageBox.Show("Campaign imported successfully.", "Import Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
         private void RemoveCampaignButton_Click(object sender, RoutedEventArgs e)
         {
             if (CampaignListBox.SelectedItem == null)
