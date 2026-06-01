@@ -28,6 +28,7 @@
             Orientation="Horizontal"
             HorizontalAlignment="Center">
             <Button Content="Open Campaign"
+                    Background="Aqua"
             Width="100"
             Margin="0,0,8,0"
             Click="OpenCampaignButton_Click"/>
@@ -58,6 +59,7 @@
             Click="RemoveCampaignButton_Click"/>
 
             <Button Content="Exit"
+                    Background="Red"
             Width="80"
             Click="ExitButton_Click"/>
         </StackPanel>
