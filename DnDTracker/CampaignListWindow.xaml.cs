@@ -85,6 +85,12 @@ namespace DnDTracker
 
             if (result == true)
             {
+                if (CampaignNameExists(newCampaignWindow.CampaignName))
+                {
+                    MessageBox.Show("A campaign with that name already exists.", "Duplicate Campaign Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 Campaign newCampaign = new Campaign { Name = newCampaignWindow.CampaignName };
                 _campaigns.Add(newCampaign);
                 RefreshCampaignList();
@@ -128,6 +134,12 @@ namespace DnDTracker
 
             if (result == true)
             {
+                if (CampaignNameExists(editCampaignWindow.CampaignName, selectedCampaign))
+                {
+                    MessageBox.Show("A campaign with that name already exists.", "Duplicate Campaign Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 selectedCampaign.Name = editCampaignWindow.CampaignName;
                 RefreshCampaignList();
                 CampaignListBox.SelectedItem = selectedCampaign;
@@ -180,6 +192,12 @@ namespace DnDTracker
                     return;
                 }
 
+                if (CampaignNameExists(importedCampaign.Name))
+                {
+                    MessageBox.Show("A campaign with that name already exists.", "Duplicate Campaign Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 _campaigns.Add(importedCampaign);
                 RefreshCampaignList();
                 CampaignListBox.SelectedItem = importedCampaign;
@@ -219,6 +237,25 @@ namespace DnDTracker
             }
 
             SaveCampaigns();
+        }
+
+
+        private bool CampaignNameExists(string campaignName, Campaign? campaignToIgnore = null)
+        {
+            foreach (Campaign campaign in _campaigns)
+            {
+                if (campaign == campaignToIgnore)
+                {
+                    continue;
+                }
+
+                if (string.Equals(campaign.Name, campaignName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
