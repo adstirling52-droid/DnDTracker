@@ -239,7 +239,6 @@ namespace DnDTracker
             SaveCampaigns();
         }
 
-
         private bool CampaignNameExists(string campaignName, Campaign? campaignToIgnore = null)
         {
             foreach (Campaign campaign in _campaigns)
