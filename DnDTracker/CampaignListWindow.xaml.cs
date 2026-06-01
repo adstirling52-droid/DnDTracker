@@ -3,6 +3,7 @@ using DnDTracker.Services;
 using System;
 using System.Collections.Generic;
 using System.Windows;
+using Microsoft.Win32;
 
 
 namespace DnDTracker
@@ -34,6 +35,7 @@ namespace DnDTracker
 
             RefreshCampaignList();
         }
+
         private void LoadCampaigns()
         {
             _campaigns = _campaignDataService.LoadCampaigns();
@@ -48,10 +50,12 @@ namespace DnDTracker
                 RefreshCampaignList();
             }
         }
+
         private void SaveCampaigns()
         {
             _campaignDataService.SaveCampaigns(_campaigns);
         }
+
         private void RefreshCampaignList()
         {
             CampaignListBox.Items.Clear();
@@ -61,6 +65,7 @@ namespace DnDTracker
                 CampaignListBox.Items.Add(campaign);
             }
         }
+
         private void CampaignWindow_Closed(object? sender, EventArgs e)
         {
             this.Show();
@@ -129,7 +134,33 @@ namespace DnDTracker
                 SaveCampaigns();
             }
         }
-        
+
+        private void ExportCampaignButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CampaignListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a campaign first.", "No Campaign Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Campaign selectedCampaign = (Campaign)CampaignListBox.SelectedItem;
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Export Campaign";
+            saveFileDialog.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+            saveFileDialog.DefaultExt = "json";
+            saveFileDialog.FileName = selectedCampaign.Name + ".json";
+
+            bool? result = saveFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                _campaignDataService.ExportCampaign(selectedCampaign, saveFileDialog.FileName);
+
+                MessageBox.Show("Campaign exported successfully.", "Export Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
         private void RemoveCampaignButton_Click(object sender, RoutedEventArgs e)
         {
             if (CampaignListBox.SelectedItem == null)

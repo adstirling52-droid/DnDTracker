@@ -49,5 +49,16 @@ namespace DnDTracker.Services
             string json = JsonSerializer.Serialize(campaigns, options);
             File.WriteAllText(_dataFilePath, json);
         }
+
+        public void ExportCampaign(Campaign campaign, string filePath)
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            string json = JsonSerializer.Serialize(campaign, options);
+            File.WriteAllText(filePath, json);
+        }
     }
 }

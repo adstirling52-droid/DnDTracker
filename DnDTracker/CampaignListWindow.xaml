@@ -25,33 +25,36 @@
          Margin="0,0,0,20"/>
 
         <StackPanel Grid.Row="2"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right">
+            Orientation="Horizontal"
+            HorizontalAlignment="Right">
             <Button Content="Open Campaign"
-                    Width="110"
-                    Margin="0,0,8,0"
-                    Click="OpenCampaignButton_Click"/>
-            <Button Content="Edit Campaign"
-                    Width="110"
-                    Margin="0,0,8,0"
-                    Click="EditCampaignButton_Click"/>
-            
-            <Button Content="New Campaign"
-                    Width="110"
-                    Margin="0,0,8,0"
-                    Click="NewCampaignButton_Click"/>
+            Width="110"
+            Margin="0,0,8,0"
+            Click="OpenCampaignButton_Click"/>
 
+            <Button Content="Edit Campaign"
+            Width="110"
+            Margin="0,0,8,0"
+            Click="EditCampaignButton_Click"/>
+
+            <Button Content="New Campaign"
+            Width="110"
+            Margin="0,0,8,0"
+            Click="NewCampaignButton_Click"/>
+
+            <Button Content="Export Campaign"
+            Width="120"
+            Margin="0,0,8,0"
+            Click="ExportCampaignButton_Click"/>
 
             <Button Content="Remove Campaign"
-                    Width="120"
-                    Margin="0,0,8,0"
-                    Click="RemoveCampaignButton_Click"/>
-
-            
+            Width="120"
+            Margin="0,0,8,0"
+            Click="RemoveCampaignButton_Click"/>
 
             <Button Content="Exit"
-                    Width="80"
-                    Click="ExitButton_Click"/>
+            Width="80"
+            Click="ExitButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
