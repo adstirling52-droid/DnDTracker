@@ -46,12 +46,14 @@
                                 Margin="0,0,4,0"
                                 Click="AddCharacterButton_Click"/>
 
-                        <Button Content="Edit"
+                        <Button x:Name="EditCharacterButton"
+                                Content="Edit"
                                 Width="50"
                                 Margin="0,0,4,0"
                                 Click="EditCharacterButton_Click"/>
 
-                        <Button Content="Remove"
+                        <Button x:Name="RemoveCharacterButton"
+                                Content="Remove"
                                 Width="60"
                                 Click="RemoveCharacterButton_Click"/>
                     </StackPanel>
@@ -82,22 +84,24 @@
                              Height="250"
                              SelectionChanged="CharacterItemsListBox_SelectionChanged"/>
 
-                    
+
                     <StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 Margin="0,20,0,0">
-                        
-                        <Button Content="Add Item"
+                        <Button x:Name="AddItemButton"
+                                Content="Add Item"
                                 Width="80"
                                 Margin="0,0,8,0"
                                 Click="AddItemButton_Click"/>
 
-                        <Button Content="Edit Item"
+                        <Button x:Name="EditItemButton"
+                                Content="Edit Item"
                                 Width="80"
                                 Margin="0,0,8,0"
                                 Click="EditItemButton_Click"/>
 
-                        <Button Content="Remove Item"
+                        <Button x:Name="RemoveItemButton"
+                                Content="Remove Item"
                                 Width="95"
                                 Click="RemoveItemButton_Click"/>
                     </StackPanel>

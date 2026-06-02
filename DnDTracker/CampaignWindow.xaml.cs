@@ -38,6 +38,21 @@ namespace DnDTracker
 
                 SelectCharacter(firstCharacter, firstButton);
             }
+
+            UpdateCampaignWindowButtonStates();
+        }
+
+        private void UpdateCampaignWindowButtonStates()
+        {
+            bool characterSelected = _selectedCharacter != null;
+            bool itemSelected = CharacterItemsListBox.SelectedItem != null;
+
+            EditCharacterButton.IsEnabled = characterSelected;
+            RemoveCharacterButton.IsEnabled = characterSelected;
+            AddItemButton.IsEnabled = characterSelected;
+
+            EditItemButton.IsEnabled = characterSelected && itemSelected;
+            RemoveItemButton.IsEnabled = characterSelected && itemSelected;
         }
 
         private void LoadCharacterButtons()
@@ -198,6 +213,7 @@ namespace DnDTracker
             _selectedCharacterButton.BorderBrush = Brushes.SteelBlue;
 
             LoadItemsForCharacter(character);
+            UpdateCampaignWindowButtonStates();
         }
         
         private void LoadItemsForCharacter(Character character)
@@ -230,11 +246,14 @@ namespace DnDTracker
         {
             if (CharacterItemsListBox.SelectedItem == null)
             {
+                ClearItemDetails();
+                UpdateCampaignWindowButtonStates();
                 return;
             }
 
             Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
             LoadProvenanceForItem(selectedItem);
+            UpdateCampaignWindowButtonStates();
         }
 
         private void LoadProvenanceForItem(Item item)
@@ -338,8 +357,10 @@ namespace DnDTracker
             else
             {
                 _selectedCharacter = null;
+                _selectedCharacterButton = null;
                 CharacterItemsListBox.Items.Clear();
                 ClearItemDetails();
+                UpdateCampaignWindowButtonStates();
             }
 
             SaveCampaigns();
