@@ -22,46 +22,49 @@
 
         <ListBox x:Name="CampaignListBox"
          Grid.Row="1"
-         Margin="0,0,0,20"/>
+         Margin="0,0,0,20"
+         SelectionChanged="CampaignListBox_SelectionChanged"/>
 
         <StackPanel Grid.Row="2"
             Orientation="Horizontal"
             HorizontalAlignment="Center">
-            <Button Content="Open Campaign"
-                    Background="Aqua"
-            Width="100"
-            Margin="0,0,8,0"
-            Click="OpenCampaignButton_Click"/>
+            <Button x:Name="OpenCampaignButton"
+                    Content="Open Campaign"
+                    Width="100"
+                    Margin="0,0,8,0"
+                    Click="OpenCampaignButton_Click"/>
 
-            <Button Content="Edit Campaign"
-            Width="95"
-            Margin="0,0,8,0"
-            Click="EditCampaignButton_Click"/>
+            <Button x:Name="EditCampaignButton"
+                    Content="Edit Campaign"
+                    Width="95"
+                    Margin="0,0,8,0"
+                    Click="EditCampaignButton_Click"/>
 
             <Button Content="New Campaign"
-            Width="100"
-            Margin="0,0,8,0"
-            Click="NewCampaignButton_Click"/>
+                    Width="100"
+                    Margin="0,0,8,0"
+                    Click="NewCampaignButton_Click"/>
 
             <Button Content="Import Campaign"
-            Width="105"
-            Margin="0,0,8,0"
-            Click="ImportCampaignButton_Click"/>
+                    Width="105"
+                    Margin="0,0,8,0"
+                    Click="ImportCampaignButton_Click"/>
 
-            <Button Content="Export Campaign"
-            Width="105"
-            Margin="0,0,8,0"
-            Click="ExportCampaignButton_Click"/>
+            <Button x:Name="ExportCampaignButton"
+                    Content="Export Campaign"
+                    Width="105"
+                    Margin="0,0,8,0"
+                    Click="ExportCampaignButton_Click"/>
 
-            <Button Content="Remove Campaign"
-            Width="110"
-            Margin="0,0,8,0"
-            Click="RemoveCampaignButton_Click"/>
+            <Button x:Name="RemoveCampaignButton"
+                    Content="Remove Campaign"
+                    Width="110"
+                    Margin="0,0,8,0"
+                    Click="RemoveCampaignButton_Click"/>
 
             <Button Content="Exit"
-                    Background="Red"
-            Width="80"
-            Click="ExitButton_Click"/>
+                    Width="80"
+                    Click="ExitButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

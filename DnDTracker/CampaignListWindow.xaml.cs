@@ -21,9 +21,23 @@ namespace DnDTracker
 
             LoadCampaigns();
 
-            
+            UpdateCampaignButtonStates();
         }
 
+        private void UpdateCampaignButtonStates()
+        {
+            bool campaignSelected = CampaignListBox.SelectedItem != null;
+
+            OpenCampaignButton.IsEnabled = campaignSelected;
+            EditCampaignButton.IsEnabled = campaignSelected;
+            ExportCampaignButton.IsEnabled = campaignSelected;
+            RemoveCampaignButton.IsEnabled = campaignSelected;
+        }
+
+        private void CampaignListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            UpdateCampaignButtonStates();
+        }
         private void LoadSampleCampaigns()
         {
 
@@ -64,6 +78,8 @@ namespace DnDTracker
             {
                 CampaignListBox.Items.Add(campaign);
             }
+
+            UpdateCampaignButtonStates();
         }
 
         private void CampaignWindow_Closed(object? sender, EventArgs e)
