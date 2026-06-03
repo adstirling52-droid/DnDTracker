@@ -231,7 +231,25 @@ namespace DnDTracker
                 CharacterItemsListBox.SelectedIndex = 0;
             }
         }
-        
+
+        private bool CharacterNameExists(string characterName, Character? characterToIgnore = null)
+        {
+            foreach (Character character in _campaign.Characters)
+            {
+                if (character == characterToIgnore)
+                {
+                    continue;
+                }
+
+                if (string.Equals(character.Name, characterName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void ClearItemDetails()
         {
             SelectedItemNameTextBlock.Text = "Select an item";
@@ -275,6 +293,12 @@ namespace DnDTracker
 
             if (result == true)
             {
+                if (CharacterNameExists(newCharacterWindow.CharacterName))
+                {
+                    MessageBox.Show("A character with that name already exists in this campaign.", "Duplicate Character Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 Character newCharacter = new Character
                 {
                     Name = newCharacterWindow.CharacterName
@@ -305,6 +329,12 @@ namespace DnDTracker
 
             if (result == true)
             {
+                if (CharacterNameExists(editCharacterWindow.CharacterName, _selectedCharacter))
+                {
+                    MessageBox.Show("A character with that name already exists in this campaign.", "Duplicate Character Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 _selectedCharacter.Name = editCharacterWindow.CharacterName;
 
                 LoadCharacterButtons();
@@ -365,7 +395,30 @@ namespace DnDTracker
 
             SaveCampaigns();
         }
-        
+
+        private bool ItemNameExists(string itemName, Item? itemToIgnore = null)
+        {
+            if (_selectedCharacter == null)
+            {
+                return false;
+            }
+
+            foreach (Item item in _selectedCharacter.Items)
+            {
+                if (item == itemToIgnore)
+                {
+                    continue;
+                }
+
+                if (string.Equals(item.Name, itemName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void AddItemButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedCharacter == null)
@@ -381,11 +434,15 @@ namespace DnDTracker
 
             if (result == true)
             {
+                if (ItemNameExists(newItemWindow.NewItem.Name))
+                {
+                    MessageBox.Show("An item with that name already exists for this character.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 _selectedCharacter.Items.Add(newItemWindow.NewItem);
                 LoadItemsForCharacter(_selectedCharacter);
-
                 CharacterItemsListBox.SelectedItem = newItemWindow.NewItem;
-                // LoadProvenanceForItem(newItemWindow.NewItem);
                 SaveCampaigns();
             }
         }
@@ -413,6 +470,12 @@ namespace DnDTracker
 
             if (result == true)
             {
+                if (ItemNameExists(editItemWindow.NewItem.Name, selectedItem))
+                {
+                    MessageBox.Show("An item with that name already exists for this character.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 int itemIndex = _selectedCharacter.Items.IndexOf(selectedItem);
 
                 if (itemIndex >= 0)
@@ -421,7 +484,6 @@ namespace DnDTracker
 
                     LoadItemsForCharacter(_selectedCharacter);
                     CharacterItemsListBox.SelectedItem = editItemWindow.NewItem;
-
                     SaveCampaigns();
                 }
             }
