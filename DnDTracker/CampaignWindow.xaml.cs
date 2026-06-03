@@ -85,7 +85,17 @@ namespace DnDTracker
                                 WhereFound = "Goblin Shrine",
                                 WhenFound = "Session 4",
                                 CurrentStatus = "Carried by Oskar",
-                                Notes = "Found beneath the old watchtower. Possibly linked to a forgotten noble line."
+                                Notes = "Found beneath the old watchtower. Possibly linked to a forgotten noble line.",
+                                ProvenanceEntries = new List<ProvenanceEntry>
+                                {
+                                    new ProvenanceEntry
+                                    {
+                                        What = "Found",
+                                        Where = "Goblin Shrine",
+                                        When = "Session 4",
+                                        Notes = "Found beneath the old watchtower. Possibly linked to a forgotten noble line."
+                                    }
+                                }
                             },
                             new Item
                             {
@@ -94,7 +104,17 @@ namespace DnDTracker
                                 WhereFound = "Hunter's Barrow",
                                 WhenFound = "Session 5",
                                 CurrentStatus = "Carried by Oskar",
-                                Notes = "Recovered from a barrow guardian. Still bears deep claw marks."
+                                Notes = "Recovered from a barrow guardian. Still bears deep claw marks.",
+                                ProvenanceEntries = new List<ProvenanceEntry>
+                                {
+                                    new ProvenanceEntry
+                                    {
+                                        What = "Found",
+                                        Where = "Hunter's Barrow",
+                                        When = "Session 5",
+                                        Notes = "Recovered from a barrow guardian. Still bears deep claw marks."
+                                    }
+                                }
                             },
                             new Item
                             {
@@ -103,7 +123,17 @@ namespace DnDTracker
                                 WhereFound = "Starter Supplies",
                                 WhenFound = "Session 1",
                                 CurrentStatus = "In party gear",
-                                Notes = "Common but valuable enough that everyone keeps forgetting who last had it."
+                                Notes = "Common but valuable enough that everyone keeps forgetting who last had it.",
+                                ProvenanceEntries = new List<ProvenanceEntry>
+                                {
+                                    new ProvenanceEntry
+                                    {
+                                        What = "Found",
+                                        Where = "Starter Supplies",
+                                        When = "Session 1",
+                                        Notes = "Common but valuable enough that everyone keeps forgetting who last had it.."
+                                    }
+                                }
                             }
                         }
                     },
@@ -254,10 +284,8 @@ namespace DnDTracker
         {
             SelectedItemNameTextBlock.Text = "Select an item";
             SelectedItemDescriptionTextBlock.Text = "Item description will appear here.";
-            SelectedItemWhereTextBlock.Text = "Where:";
-            SelectedItemWhenTextBlock.Text = "When:";
             SelectedItemStatusTextBlock.Text = "Current Status:";
-            SelectedItemNotesTextBlock.Text = "Item notes will appear here.";
+            ProvenanceHistoryItemsControl.ItemsSource = null;
         }
 
         private void CharacterItemsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -278,10 +306,25 @@ namespace DnDTracker
         {
             SelectedItemNameTextBlock.Text = item.Name;
             SelectedItemDescriptionTextBlock.Text = item.Description;
-            SelectedItemWhereTextBlock.Text = $"Where: {item.WhereFound}";
-            SelectedItemWhenTextBlock.Text = $"When: {item.WhenFound}";
             SelectedItemStatusTextBlock.Text = $"Current Status: {item.CurrentStatus}";
-            SelectedItemNotesTextBlock.Text = item.Notes;
+
+            if (item.ProvenanceEntries != null && item.ProvenanceEntries.Count > 0)
+            {
+                ProvenanceHistoryItemsControl.ItemsSource = item.ProvenanceEntries;
+            }
+            else
+            {
+                ProvenanceHistoryItemsControl.ItemsSource = new List<ProvenanceEntry>
+                {
+                    new ProvenanceEntry
+                    {
+                        What = "Legacy Entry",
+                        Where = item.WhereFound,
+                        When = item.WhenFound,
+                        Notes = item.Notes
+                    }
+                };
+            }
         }
 
         private void AddCharacterButton_Click(object sender, RoutedEventArgs e)
@@ -525,6 +568,7 @@ namespace DnDTracker
         {
             Close();
         }
+
         private void SaveCampaigns()
         {
             _campaignDataService.SaveCampaigns(_allCampaigns);

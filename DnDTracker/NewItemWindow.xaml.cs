@@ -1,5 +1,6 @@
 ﻿using DnDTracker.Models;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace DnDTracker
 {
@@ -47,7 +48,17 @@ namespace DnDTracker
                 WhereFound = WhereFoundTextBox.Text.Trim(),
                 WhenFound = WhenFoundTextBox.Text.Trim(),
                 CurrentStatus = CurrentStatusTextBox.Text.Trim(),
-                Notes = NotesTextBox.Text.Trim()
+                Notes = NotesTextBox.Text.Trim(),
+                ProvenanceEntries = new List<ProvenanceEntry>
+                {
+                    new ProvenanceEntry
+                    {
+                        What = "Found",
+                        Where = WhereFoundTextBox.Text.Trim(),
+                        When = WhenFoundTextBox.Text.Trim(),
+                        Notes = NotesTextBox.Text.Trim()
+                    }
+                }
             };
 
             DialogResult = true;

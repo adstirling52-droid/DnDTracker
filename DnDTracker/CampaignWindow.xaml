@@ -84,7 +84,6 @@
                              Height="250"
                              SelectionChanged="CharacterItemsListBox_SelectionChanged"/>
 
-
                     <StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 Margin="0,20,0,0">
@@ -105,9 +104,6 @@
                                 Width="95"
                                 Click="RemoveItemButton_Click"/>
                     </StackPanel>
-
-
-
                 </StackPanel>
             </Border>
 
@@ -132,25 +128,39 @@
                                TextWrapping="Wrap"
                                Margin="0,0,0,10"/>
 
-                    <TextBlock x:Name="SelectedItemWhereTextBlock"
-                               Text="Where:"
-                               Margin="0,0,0,5"/>
-
-                    <TextBlock x:Name="SelectedItemWhenTextBlock"
-                               Text="When:"
-                               Margin="0,0,0,5"/>
-
                     <TextBlock x:Name="SelectedItemStatusTextBlock"
                                Text="Current Status:"
                                Margin="0,0,0,15"/>
 
-                    <TextBlock Text="Notes:"
+                    <TextBlock Text="Provenance History"
                                FontWeight="Bold"
-                               Margin="0,0,0,5"/>
+                               Margin="0,0,0,10"/>
 
-                    <TextBlock x:Name="SelectedItemNotesTextBlock"
-                               Text="Item notes will appear here."
-                               TextWrapping="Wrap"/>
+                    <ItemsControl x:Name="ProvenanceHistoryItemsControl">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="LightGray"
+                                        BorderThickness="1"
+                                        Padding="8"
+                                        Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding What}"
+                                                   FontWeight="Bold"
+                                                   Margin="0,0,0,4"/>
+
+                                        <TextBlock Text="{Binding Where, StringFormat=Where: {0}}"
+                                                   Margin="0,0,0,2"/>
+
+                                        <TextBlock Text="{Binding When, StringFormat=When: {0}}"
+                                                   Margin="0,0,0,4"/>
+
+                                        <TextBlock Text="{Binding Notes}"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </Border>
         </Grid>
