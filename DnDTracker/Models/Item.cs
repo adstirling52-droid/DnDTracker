@@ -12,6 +12,7 @@ namespace DnDTracker.Models
         public string WhenFound { get; set; } = "";
         public string CurrentStatus { get; set; } = "";
         public string Notes { get; set; } = "";
+        public string ImagePath { get; set; } = "";
         public List<ProvenanceEntry> ProvenanceEntries { get; set; } = new List<ProvenanceEntry>();
 
         public override string ToString()

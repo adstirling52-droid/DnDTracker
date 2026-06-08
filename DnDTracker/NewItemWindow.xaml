@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DnDTracker"
         mc:Ignorable="d"
         Title="New Item"
-        Height="580"
+        Height="750"
         Width="500"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
@@ -64,6 +64,30 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Auto"/>
+            <TextBlock Text="Item Image"
+           Margin="0,12,0,5"/>
+
+            <Border BorderBrush="LightGray"
+                    BorderThickness="1"
+                    Height="120"
+                    Margin="0,0,0,8">
+                <Image x:Name="ItemPreviewImage"
+                              Stretch="Uniform"/>
+            </Border>
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,12">
+                <Button Content="Choose Image"
+                        Width="100"
+                        Margin="0,0,8,0"
+                        Click="ChooseImageButton_Click"/>
+
+                <Button Content="Clear Image"
+                        Width="90"
+                        Click="ClearImageButton_Click"/>
+            </StackPanel>
+            
         </StackPanel>
 
         <StackPanel Grid.Row="2"

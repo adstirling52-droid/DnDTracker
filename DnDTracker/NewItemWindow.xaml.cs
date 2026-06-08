@@ -1,12 +1,19 @@
 ﻿using DnDTracker.Models;
+using DnDTracker.Services;
 using System.Windows;
 using System.Collections.Generic;
+using Microsoft.Win32;
+using System;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace DnDTracker
 {
     public partial class NewItemWindow : Window
     {
         public Item NewItem { get; private set; } = new Item();
+        private string _selectedImagePath = "";
+        private CampaignDataService _campaignDataService = new CampaignDataService();
 
         public NewItemWindow()
         {
@@ -29,6 +36,13 @@ namespace DnDTracker
             WhenFoundTextBox.Text = existingItem.WhenFound;
             CurrentStatusTextBox.Text = existingItem.CurrentStatus;
             NotesTextBox.Text = existingItem.Notes;
+
+            _selectedImagePath = existingItem.ImagePath;
+
+            if (!string.IsNullOrWhiteSpace(_selectedImagePath) && File.Exists(_selectedImagePath))
+            {
+                ItemPreviewImage.Source = new BitmapImage(new Uri(_selectedImagePath, UriKind.Absolute));
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -49,7 +63,8 @@ namespace DnDTracker
                 WhenFound = WhenFoundTextBox.Text.Trim(),
                 CurrentStatus = CurrentStatusTextBox.Text.Trim(),
                 Notes = NotesTextBox.Text.Trim(),
-                ProvenanceEntries = new List<ProvenanceEntry>
+                ImagePath = _selectedImagePath,
+                ProvenanceEntries = new System.Collections.Generic.List<ProvenanceEntry>
                 {
                     new ProvenanceEntry
                     {
@@ -67,6 +82,32 @@ namespace DnDTracker
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void ChooseImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Choose Item Image";
+            openFileDialog.Filter = "Image files (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp|All files (*.*)|*.*";
+
+            bool? result = openFileDialog.ShowDialog();
+
+            if (result == true)
+            {
+                string copiedImagePath = _campaignDataService.CopyItemImageToAppFolder(openFileDialog.FileName);
+
+                if (!string.IsNullOrWhiteSpace(copiedImagePath) && File.Exists(copiedImagePath))
+                {
+                    _selectedImagePath = copiedImagePath;
+                    ItemPreviewImage.Source = new BitmapImage(new Uri(_selectedImagePath, UriKind.Absolute));
+                }
+            }
+        }
+
+        private void ClearImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            _selectedImagePath = "";
+            ItemPreviewImage.Source = null;
         }
     }
 }

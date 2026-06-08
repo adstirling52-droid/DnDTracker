@@ -5,6 +5,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System;
+using System.IO;
 
 
 
@@ -287,6 +290,7 @@ namespace DnDTracker
             SelectedItemDescriptionTextBlock.Text = "Item description will appear here.";
             SelectedItemStatusTextBlock.Text = "Current Status:";
             LatestItemNotesTextBlock.Text = "Latest item note will appear here.";
+            SelectedItemImage.Source = null;
             ProvenanceHistoryItemsControl.ItemsSource = null;
         }
 
@@ -303,8 +307,6 @@ namespace DnDTracker
             LoadProvenanceForItem(selectedItem);
             UpdateCampaignWindowButtonStates();
         }
-
-        
 
         private void AddCharacterButton_Click(object sender, RoutedEventArgs e)
         {
@@ -557,6 +559,15 @@ namespace DnDTracker
             SelectedItemDescriptionTextBlock.Text = item.Description;
             SelectedItemStatusTextBlock.Text = $"Current Status: {item.CurrentStatus}";
             LatestItemNotesTextBlock.Text = item.Notes;
+
+            if (!string.IsNullOrWhiteSpace(item.ImagePath) && File.Exists(item.ImagePath))
+            {
+                SelectedItemImage.Source = new BitmapImage(new Uri(item.ImagePath, UriKind.Absolute));
+            }
+            else
+            {
+                SelectedItemImage.Source = null;
+            }
 
             if (item.ProvenanceEntries != null && item.ProvenanceEntries.Count > 0)
             {

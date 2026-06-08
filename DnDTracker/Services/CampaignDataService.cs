@@ -10,6 +10,7 @@ namespace DnDTracker.Services
     {
         private readonly string _dataFolder;
         private readonly string _dataFilePath;
+        private readonly string _imagesFolder;
 
         public CampaignDataService()
         {
@@ -18,6 +19,7 @@ namespace DnDTracker.Services
                 "DnDTracker");
 
             _dataFilePath = Path.Combine(_dataFolder, "campaigns.json");
+            _imagesFolder = Path.Combine(_dataFolder, "Images");
         }
 
         public List<Campaign> LoadCampaigns()
@@ -73,6 +75,26 @@ namespace DnDTracker.Services
             Campaign? campaign = JsonSerializer.Deserialize<Campaign>(json);
 
             return campaign;
+        }
+        public string CopyItemImageToAppFolder(string sourceImagePath)
+        {
+            if (string.IsNullOrWhiteSpace(sourceImagePath) || !File.Exists(sourceImagePath))
+            {
+                return "";
+            }
+
+            if (!Directory.Exists(_imagesFolder))
+            {
+                Directory.CreateDirectory(_imagesFolder);
+            }
+
+            string fileExtension = Path.GetExtension(sourceImagePath);
+            string uniqueFileName = Guid.NewGuid().ToString() + fileExtension;
+            string destinationPath = Path.Combine(_imagesFolder, uniqueFileName);
+
+            File.Copy(sourceImagePath, destinationPath, true);
+
+            return destinationPath;
         }
     }
 }
