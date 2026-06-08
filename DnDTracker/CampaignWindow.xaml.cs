@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 
 
+
 namespace DnDTracker
 {
     public partial class CampaignWindow : Window
@@ -285,6 +286,7 @@ namespace DnDTracker
             SelectedItemNameTextBlock.Text = "Select an item";
             SelectedItemDescriptionTextBlock.Text = "Item description will appear here.";
             SelectedItemStatusTextBlock.Text = "Current Status:";
+            LatestItemNotesTextBlock.Text = "Latest item note will appear here.";
             ProvenanceHistoryItemsControl.ItemsSource = null;
         }
 
@@ -302,30 +304,7 @@ namespace DnDTracker
             UpdateCampaignWindowButtonStates();
         }
 
-        private void LoadProvenanceForItem(Item item)
-        {
-            SelectedItemNameTextBlock.Text = item.Name;
-            SelectedItemDescriptionTextBlock.Text = item.Description;
-            SelectedItemStatusTextBlock.Text = $"Current Status: {item.CurrentStatus}";
-
-            if (item.ProvenanceEntries != null && item.ProvenanceEntries.Count > 0)
-            {
-                ProvenanceHistoryItemsControl.ItemsSource = item.ProvenanceEntries;
-            }
-            else
-            {
-                ProvenanceHistoryItemsControl.ItemsSource = new List<ProvenanceEntry>
-                {
-                    new ProvenanceEntry
-                    {
-                        What = "Legacy Entry",
-                        Where = item.WhereFound,
-                        When = item.WhenFound,
-                        Notes = item.Notes
-                    }
-                };
-            }
-        }
+        
 
         private void AddCharacterButton_Click(object sender, RoutedEventArgs e)
         {
@@ -523,6 +502,14 @@ namespace DnDTracker
 
                 if (itemIndex >= 0)
                 {
+                    editItemWindow.NewItem.ProvenanceEntries = new List<ProvenanceEntry>(selectedItem.ProvenanceEntries);
+
+                    if (ItemProvenanceFieldsChanged(selectedItem, editItemWindow.NewItem))
+                    {
+                        ProvenanceEntry updatedEntry = BuildUpdatedProvenanceEntry(selectedItem, editItemWindow.NewItem);
+                        editItemWindow.NewItem.ProvenanceEntries.Add(updatedEntry);
+                    }
+
                     _selectedCharacter.Items[itemIndex] = editItemWindow.NewItem;
 
                     LoadItemsForCharacter(_selectedCharacter);
@@ -563,7 +550,102 @@ namespace DnDTracker
             LoadItemsForCharacter(_selectedCharacter);
             SaveCampaigns();
         }
-        
+
+        private void LoadProvenanceForItem(Item item)
+        {
+            SelectedItemNameTextBlock.Text = item.Name;
+            SelectedItemDescriptionTextBlock.Text = item.Description;
+            SelectedItemStatusTextBlock.Text = $"Current Status: {item.CurrentStatus}";
+            LatestItemNotesTextBlock.Text = item.Notes;
+
+            if (item.ProvenanceEntries != null && item.ProvenanceEntries.Count > 0)
+            {
+                List<ProvenanceEntry> reversedEntries = new List<ProvenanceEntry>(item.ProvenanceEntries);
+                reversedEntries.Reverse();
+
+                ProvenanceHistoryItemsControl.ItemsSource = reversedEntries;
+            }
+            else
+            {
+                ProvenanceHistoryItemsControl.ItemsSource = new List<ProvenanceEntry>
+        {
+            new ProvenanceEntry
+            {
+                What = "Legacy Entry",
+                Where = item.WhereFound,
+                When = item.WhenFound,
+                Notes = item.Notes
+            }
+        };
+            }
+        }
+
+        private bool ItemProvenanceFieldsChanged(Item originalItem, Item editedItem)
+        {
+            return !string.Equals(originalItem.Description, editedItem.Description, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(originalItem.CurrentStatus, editedItem.CurrentStatus, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(originalItem.Notes, editedItem.Notes, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private ProvenanceEntry BuildUpdatedProvenanceEntry(Item originalItem, Item editedItem)
+        {
+            List<string> changeNotes = new List<string>();
+
+            bool descriptionChanged = !string.Equals(originalItem.Description, editedItem.Description, StringComparison.OrdinalIgnoreCase);
+            bool statusChanged = !string.Equals(originalItem.CurrentStatus, editedItem.CurrentStatus, StringComparison.OrdinalIgnoreCase);
+            bool notesChanged = !string.Equals(originalItem.Notes, editedItem.Notes, StringComparison.OrdinalIgnoreCase);
+
+            if (descriptionChanged)
+            {
+                changeNotes.Add($"Description changed from '{originalItem.Description}' to '{editedItem.Description}'.");
+            }
+
+            if (statusChanged)
+            {
+                changeNotes.Add($"Current Status changed from '{originalItem.CurrentStatus}' to '{editedItem.CurrentStatus}'.");
+            }
+
+            if (notesChanged)
+            {
+                changeNotes.Add($"Notes changed from '{originalItem.Notes}' to '{editedItem.Notes}'.");
+            }
+
+            string what;
+
+            int changeCount = 0;
+            if (descriptionChanged) changeCount++;
+            if (statusChanged) changeCount++;
+            if (notesChanged) changeCount++;
+
+            if (changeCount == 1)
+            {
+                if (descriptionChanged)
+                {
+                    what = "Description Updated";
+                }
+                else if (statusChanged)
+                {
+                    what = "Status Updated";
+                }
+                else
+                {
+                    what = "Notes Updated";
+                }
+            }
+            else
+            {
+                what = "Item Updated";
+            }
+
+            return new ProvenanceEntry
+            {
+                What = what,
+                Where = originalItem.WhereFound,
+                When = originalItem.WhenFound,
+                Notes = string.Join(" ", changeNotes)
+            };
+        }
+
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
         {
             Close();

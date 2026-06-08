@@ -131,36 +131,48 @@
                     <TextBlock x:Name="SelectedItemStatusTextBlock"
                                Text="Current Status:"
                                Margin="0,0,0,15"/>
+                    
+                    <TextBlock Text="Latest Note"
+                               FontWeight="Bold"
+                               Margin="0,0,0,5"/>
 
+                    <TextBlock x:Name="LatestItemNotesTextBlock"
+                               Text="Latest item note will appear here."
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,15"/>
+
+                   
                     <TextBlock Text="Provenance History"
                                FontWeight="Bold"
                                Margin="0,0,0,10"/>
 
-                    <ItemsControl x:Name="ProvenanceHistoryItemsControl">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="LightGray"
-                                        BorderThickness="1"
-                                        Padding="8"
-                                        Margin="0,0,0,8">
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding What}"
-                                                   FontWeight="Bold"
-                                                   Margin="0,0,0,4"/>
+                    <ScrollViewer Height="100"
+                                  VerticalScrollBarVisibility="Auto">
+                                    <ItemsControl x:Name="ProvenanceHistoryItemsControl">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="LightGray"
+                                                        BorderThickness="1"
+                                                        Padding="8"
+                                                        Margin="0,0,0,8">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding What}"
+                                                                       FontWeight="Bold"
+                                                                       Margin="0,0,0,4"/>
+                                                             <TextBlock Text="{Binding Where, StringFormat=Where: {0}}"
+                                                                        Margin="0,0,0,2"/>
 
-                                        <TextBlock Text="{Binding Where, StringFormat=Where: {0}}"
-                                                   Margin="0,0,0,2"/>
+                                                            <TextBlock Text="{Binding When, StringFormat=When: {0}}"
+                                                                        Margin="0,0,0,4"/>
 
-                                        <TextBlock Text="{Binding When, StringFormat=When: {0}}"
-                                                   Margin="0,0,0,4"/>
-
-                                        <TextBlock Text="{Binding Notes}"
-                                                   TextWrapping="Wrap"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                                            <TextBlock Text="{Binding Notes}"
+                                                            TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </StackPanel>
             </Border>
         </Grid>
