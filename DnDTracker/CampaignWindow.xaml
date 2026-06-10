@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DnDTracker"
         mc:Ignorable="d"
         Title="Campaign"
-        Height="675"
+        Height="720"
         Width="1000"
         WindowStartupLocation="CenterOwner">
 
@@ -28,19 +28,20 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="4.2*"/>
             </Grid.ColumnDefinitions>
 
+            <!-- LEFT PANEL -->
             <Border Grid.Column="0"
                     BorderBrush="Gray"
                     BorderThickness="1"
                     Padding="15"
                     Margin="0,0,10,0">
-                <DockPanel>
+                <DockPanel LastChildFill="True">
                     <StackPanel DockPanel.Dock="Bottom"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center"
-                                Margin="0,20,0,0">
+                                Margin="0,15,0,0">
                         <Button Content="Add"
                                 Width="50"
                                 Margin="0,0,4,0"
@@ -69,24 +70,35 @@
                 </DockPanel>
             </Border>
 
+            <!-- MIDDLE PANEL -->
             <Border Grid.Column="1"
                     BorderBrush="Gray"
                     BorderThickness="1"
                     Padding="15"
                     Margin="0,0,10,0">
-                <StackPanel>
-                    <TextBlock Text="Items"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Items"
                                FontSize="20"
                                FontWeight="Bold"
                                Margin="0,0,0,15"/>
 
                     <ListBox x:Name="CharacterItemsListBox"
-                             Height="250"
+                             Grid.Row="1"
+                             Margin="0,0,0,15"
                              SelectionChanged="CharacterItemsListBox_SelectionChanged"/>
 
-                    <StackPanel Orientation="Horizontal"
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
                                 HorizontalAlignment="Center"
-                                Margin="0,20,0,0">
+                                Margin="0,0,0,10">
                         <Button x:Name="AddItemButton"
                                 Content="Add Item"
                                 Width="80"
@@ -104,85 +116,141 @@
                                 Width="95"
                                 Click="RemoveItemButton_Click"/>
                     </StackPanel>
-                </StackPanel>
+
+                    <Button x:Name="AddProvenanceButton"
+                            Grid.Row="3"
+                            Content="Add Provenance"
+                            Width="130"
+                            HorizontalAlignment="Center"
+                            Click="AddProvenanceButton_Click"/>
+                </Grid>
             </Border>
 
+            <!-- RIGHT PANEL -->
             <Border Grid.Column="2"
                     BorderBrush="Gray"
                     BorderThickness="1"
                     Padding="15">
-                <StackPanel>
-                    <TextBlock Text="Item Provenance"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Item Provenance"
                                FontSize="20"
                                FontWeight="Bold"
                                Margin="0,0,0,15"/>
 
                     <TextBlock x:Name="SelectedItemNameTextBlock"
+                               Grid.Row="1"
                                Text="Select an item"
                                FontSize="16"
                                FontWeight="Bold"
                                Margin="0,0,0,10"/>
-                   
-                    <Border BorderBrush="LightGray"
+
+                    <Border Grid.Row="2"
+                            BorderBrush="LightGray"
                             BorderThickness="1"
-                            Height="120"
-                            Margin="0,0,0,10">
-                        <Image x:Name="SelectedItemImage"
-                               Stretch="Uniform"
-                               MouseLeftButtonDown="SelectedItemImage_MouseLeftButtonDown"/>
+                            Height="130"
+                            Margin="0,0,0,12"
+                            HorizontalAlignment="Stretch">
+                        <Grid>
+                            <Image x:Name="SelectedItemImage"
+                                   Stretch="Uniform"
+                                   Cursor="Hand"
+                                   ToolTip="Double-click to view larger image"
+                                   MouseLeftButtonDown="SelectedItemImage_MouseLeftButtonDown"/>
+
+                            <TextBlock x:Name="NoImagePlaceholderTextBlock"
+                                       Text="No image selected"
+                                       Foreground="Gray"
+                                       FontStyle="Italic"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"/>
+                        </Grid>
                     </Border>
 
                     <TextBlock x:Name="SelectedItemDescriptionTextBlock"
+                               Grid.Row="3"
                                Text="Item description will appear here."
                                TextWrapping="Wrap"
                                Margin="0,0,0,10"/>
 
                     <TextBlock x:Name="SelectedItemStatusTextBlock"
+                               Grid.Row="4"
                                Text="Current Status:"
-                               Margin="0,0,0,15"/>
-                    
-                    <TextBlock Text="Latest Note"
-                               FontWeight="Bold"
-                               Margin="0,0,0,5"/>
-
-                    <TextBlock x:Name="LatestItemNotesTextBlock"
-                               Text="Latest item note will appear here."
-                               TextWrapping="Wrap"
-                               Margin="0,0,0,15"/>
-
-                   
-                    <TextBlock Text="Provenance History"
-                               FontWeight="Bold"
                                Margin="0,0,0,10"/>
 
-                    <ScrollViewer Height="100"
-                                  VerticalScrollBarVisibility="Auto">
-                                    <ItemsControl x:Name="ProvenanceHistoryItemsControl">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border BorderBrush="LightGray"
-                                                        BorderThickness="1"
-                                                        Padding="8"
-                                                        Margin="0,0,0,8">
-                                                        <StackPanel>
-                                                            <TextBlock Text="{Binding What}"
-                                                                       FontWeight="Bold"
-                                                                       Margin="0,0,0,4"/>
-                                                             <TextBlock Text="{Binding Where, StringFormat=Where: {0}}"
-                                                                        Margin="0,0,0,2"/>
+                    <StackPanel Grid.Row="5"
+                                Margin="0,0,0,12">
+                        <TextBlock Text="Latest Note"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,5"/>
 
-                                                            <TextBlock Text="{Binding When, StringFormat=When: {0}}"
-                                                                        Margin="0,0,0,4"/>
+                        <TextBlock x:Name="LatestItemNotesTextBlock"
+                                   Text="Latest item note will appear here."
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
 
-                                                            <TextBlock Text="{Binding Notes}"
-                                                            TextWrapping="Wrap"/>
+                    <StackPanel Grid.Row="6">
+                        <TextBlock Text="Provenance History"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,8"/>
+
+                        <ListBox x:Name="ProvenanceHistoryListBox"
+                                 Height="140"
+                                 Margin="0,0,0,10"
+                                 SelectionChanged="ProvenanceHistoryListBox_SelectionChanged">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="LightGray"
+                                            BorderThickness="1"
+                                            Padding="8"
+                                            Margin="0,0,0,8">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding What}"
+                                                       FontWeight="Bold"
+                                                       Margin="0,0,0,4"/>
+
+                                            <TextBlock Text="{Binding Where, StringFormat=Where: {0}}"
+                                                       Margin="0,0,0,2"/>
+
+                                            <TextBlock Text="{Binding When, StringFormat=When: {0}}"
+                                                       Margin="0,0,0,4"/>
+
+                                            <TextBlock Text="{Binding Notes}"
+                                                       TextWrapping="Wrap"/>
                                         </StackPanel>
                                     </Border>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </StackPanel>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="7"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <Button x:Name="EditProvenanceButton"
+                                Content="Edit Provenance"
+                                Width="110"
+                                Margin="0,0,8,0"
+                                Click="EditProvenanceButton_Click"/>
+
+                        <Button x:Name="DeleteProvenanceButton"
+                                Content="Delete Provenance"
+                                Width="115"
+                                Click="DeleteProvenanceButton_Click"/>
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
 

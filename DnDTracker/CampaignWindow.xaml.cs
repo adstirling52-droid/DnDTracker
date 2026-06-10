@@ -51,6 +51,7 @@ namespace DnDTracker
         {
             bool characterSelected = _selectedCharacter != null;
             bool itemSelected = CharacterItemsListBox.SelectedItem != null;
+            bool provenanceSelected = ProvenanceHistoryListBox.SelectedItem != null;
 
             EditCharacterButton.IsEnabled = characterSelected;
             RemoveCharacterButton.IsEnabled = characterSelected;
@@ -58,6 +59,9 @@ namespace DnDTracker
 
             EditItemButton.IsEnabled = characterSelected && itemSelected;
             RemoveItemButton.IsEnabled = characterSelected && itemSelected;
+            AddProvenanceButton.IsEnabled = characterSelected && itemSelected;
+            EditProvenanceButton.IsEnabled = characterSelected && itemSelected && provenanceSelected;
+            DeleteProvenanceButton.IsEnabled = characterSelected && itemSelected && provenanceSelected;
         }
 
         private void LoadCharacterButtons()
@@ -292,7 +296,8 @@ namespace DnDTracker
             SelectedItemStatusTextBlock.Text = "Current Status:";
             LatestItemNotesTextBlock.Text = "Latest item note will appear here.";
             SelectedItemImage.Source = null;
-            ProvenanceHistoryItemsControl.ItemsSource = null;
+            NoImagePlaceholderTextBlock.Visibility = Visibility.Visible;
+            ProvenanceHistoryListBox.ItemsSource = null;
         }
 
         private void CharacterItemsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -564,10 +569,12 @@ namespace DnDTracker
             if (!string.IsNullOrWhiteSpace(item.ImagePath) && File.Exists(item.ImagePath))
             {
                 SelectedItemImage.Source = new BitmapImage(new Uri(item.ImagePath, UriKind.Absolute));
+                NoImagePlaceholderTextBlock.Visibility = Visibility.Collapsed;
             }
             else
             {
                 SelectedItemImage.Source = null;
+                NoImagePlaceholderTextBlock.Visibility = Visibility.Visible;
             }
 
             if (item.ProvenanceEntries != null && item.ProvenanceEntries.Count > 0)
@@ -575,11 +582,11 @@ namespace DnDTracker
                 List<ProvenanceEntry> reversedEntries = new List<ProvenanceEntry>(item.ProvenanceEntries);
                 reversedEntries.Reverse();
 
-                ProvenanceHistoryItemsControl.ItemsSource = reversedEntries;
+                ProvenanceHistoryListBox.ItemsSource = reversedEntries;
             }
             else
             {
-                ProvenanceHistoryItemsControl.ItemsSource = new List<ProvenanceEntry>
+                ProvenanceHistoryListBox.ItemsSource = new List<ProvenanceEntry>
         {
             new ProvenanceEntry
             {
@@ -656,6 +663,121 @@ namespace DnDTracker
                 When = originalItem.WhenFound,
                 Notes = string.Join(" ", changeNotes)
             };
+        }
+
+        private void AddProvenanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an item first.", "No Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+
+            NewProvenanceEntryWindow provenanceWindow = new NewProvenanceEntryWindow();
+            provenanceWindow.Owner = this;
+
+            bool? result = provenanceWindow.ShowDialog();
+
+            if (result == true)
+            {
+                selectedItem.ProvenanceEntries.Add(provenanceWindow.NewProvenanceEntry);
+
+                LoadProvenanceForItem(selectedItem);
+                SaveCampaigns();
+            }
+        }
+
+        private void ProvenanceHistoryListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            UpdateCampaignWindowButtonStates();
+        }
+
+        private ProvenanceEntry? GetSelectedProvenanceEntry()
+        {
+            if (ProvenanceHistoryListBox.SelectedItem == null)
+            {
+                return null;
+            }
+
+            return (ProvenanceEntry)ProvenanceHistoryListBox.SelectedItem;
+        }
+
+        private void EditProvenanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an item first.", "No Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+            ProvenanceEntry? selectedEntry = GetSelectedProvenanceEntry();
+
+            if (selectedEntry == null)
+            {
+                MessageBox.Show("Please select a provenance entry first.", "No Provenance Entry Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            NewProvenanceEntryWindow editWindow = new NewProvenanceEntryWindow(selectedEntry);
+            editWindow.Owner = this;
+
+            bool? result = editWindow.ShowDialog();
+
+            if (result == true)
+            {
+                int entryIndex = selectedItem.ProvenanceEntries.IndexOf(selectedEntry);
+
+                if (entryIndex >= 0)
+                {
+                    selectedItem.ProvenanceEntries[entryIndex] = editWindow.NewProvenanceEntry;
+
+                    LoadProvenanceForItem(selectedItem);
+                    SaveCampaigns();
+                }
+            }
+        }
+
+        private void DeleteProvenanceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an item first.", "No Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+            ProvenanceEntry? selectedEntry = GetSelectedProvenanceEntry();
+
+            if (selectedEntry == null)
+            {
+                MessageBox.Show("Please select a provenance entry first.", "No Provenance Entry Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Delete provenance entry '{selectedEntry.What}'?",
+                "Confirm Delete Provenance Entry",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            selectedItem.ProvenanceEntries.Remove(selectedEntry);
+
+            LoadProvenanceForItem(selectedItem);
+            SaveCampaigns();
         }
 
         private void SelectedItemImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
