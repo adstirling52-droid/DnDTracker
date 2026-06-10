@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Campaign"
         Height="720"
-        Width="1000"
+        Width="1050"
         WindowStartupLocation="CenterOwner">
 
     <Grid Margin="20">
