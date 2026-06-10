@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System;
 using System.IO;
+using System.Windows.Input;
 
 
 
@@ -655,6 +656,30 @@ namespace DnDTracker
                 When = originalItem.WhenFound,
                 Notes = string.Join(" ", changeNotes)
             };
+        }
+
+        private void SelectedItemImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount != 2)
+            {
+                return;
+            }
+
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+
+            if (string.IsNullOrWhiteSpace(selectedItem.ImagePath))
+            {
+                return;
+            }
+
+            ItemImageWindow itemImageWindow = new ItemImageWindow(selectedItem.ImagePath, selectedItem.Name);
+            itemImageWindow.Owner = this;
+            itemImageWindow.ShowDialog();
         }
 
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
