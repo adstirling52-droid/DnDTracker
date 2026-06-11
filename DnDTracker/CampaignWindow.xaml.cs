@@ -270,7 +270,7 @@ namespace DnDTracker
 
             if (UnassignedTab.IsSelected)
             {
-                ItemsTab.IsSelected = true;
+                SkillsTab.IsSelected = true;
             }
 
             RefreshSelectedTabItemDetails();
