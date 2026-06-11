@@ -35,6 +35,7 @@ namespace DnDTracker
             Title = _campaign.Name;
 
             LoadCharacterButtons();
+            LoadUnassignedItems();
 
             if (CharacterButtonPanel.Children.Count > 0)
             {
@@ -50,18 +51,26 @@ namespace DnDTracker
         private void UpdateCampaignWindowButtonStates()
         {
             bool characterSelected = _selectedCharacter != null;
-            bool itemSelected = CharacterItemsListBox.SelectedItem != null;
+            bool characterItemSelected = CharacterItemsListBox.SelectedItem != null;
+            bool unassignedItemSelected = UnassignedItemsListBox.SelectedItem != null;
+            bool anyItemSelected = characterItemSelected || unassignedItemSelected;
             bool provenanceSelected = ProvenanceHistoryListBox.SelectedItem != null;
 
             EditCharacterButton.IsEnabled = characterSelected;
             RemoveCharacterButton.IsEnabled = characterSelected;
             AddItemButton.IsEnabled = characterSelected;
 
-            EditItemButton.IsEnabled = characterSelected && itemSelected;
-            RemoveItemButton.IsEnabled = characterSelected && itemSelected;
-            AddProvenanceButton.IsEnabled = characterSelected && itemSelected;
-            EditProvenanceButton.IsEnabled = characterSelected && itemSelected && provenanceSelected;
-            DeleteProvenanceButton.IsEnabled = characterSelected && itemSelected && provenanceSelected;
+            EditItemButton.IsEnabled = characterSelected && characterItemSelected;
+            RemoveItemButton.IsEnabled = characterSelected && characterItemSelected;
+            UnassignItemButton.IsEnabled = characterSelected && characterItemSelected;
+            AddProvenanceButton.IsEnabled = anyItemSelected;
+
+            EditProvenanceButton.IsEnabled = anyItemSelected && provenanceSelected;
+            DeleteProvenanceButton.IsEnabled = anyItemSelected && provenanceSelected;
+
+            EditUnassignedItemButton.IsEnabled = unassignedItemSelected;
+            RemoveUnassignedItemButton.IsEnabled = unassignedItemSelected;
+            AssignUnassignedItemButton.IsEnabled = characterSelected && unassignedItemSelected;
         }
 
         private void LoadCharacterButtons()
@@ -308,6 +317,8 @@ namespace DnDTracker
                 UpdateCampaignWindowButtonStates();
                 return;
             }
+
+            UnassignedItemsListBox.SelectedItem = null;
 
             Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
             LoadProvenanceForItem(selectedItem);
@@ -802,6 +813,222 @@ namespace DnDTracker
             ItemImageWindow itemImageWindow = new ItemImageWindow(selectedItem.ImagePath, selectedItem.Name);
             itemImageWindow.Owner = this;
             itemImageWindow.ShowDialog();
+        }
+
+        private void LoadUnassignedItems()
+        {
+            UnassignedItemsListBox.Items.Clear();
+
+            foreach (Item item in _campaign.UnassignedItems)
+            {
+                UnassignedItemsListBox.Items.Add(item);
+            }
+
+            UnassignedItemsPlaceholderTextBlock.Visibility =
+                _campaign.UnassignedItems.Count == 0
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+        }
+
+        private void AddUnassignedItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            NewItemWindow newItemWindow = new NewItemWindow();
+            newItemWindow.Owner = this;
+
+            bool? result = newItemWindow.ShowDialog();
+
+            if (result == true)
+            {
+                if (_campaign.UnassignedItems.Any(item =>
+                    string.Equals(item.Name, newItemWindow.NewItem.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageBox.Show("An unassigned item with that name already exists.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _campaign.UnassignedItems.Add(newItemWindow.NewItem);
+                LoadUnassignedItems();
+                SaveCampaigns();
+            }
+        }
+
+        private void UnassignedItemsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (UnassignedItemsListBox.SelectedItem == null)
+            {
+                UpdateCampaignWindowButtonStates();
+                return;
+            }
+
+            CharacterItemsListBox.SelectedItem = null;
+
+            Item selectedItem = (Item)UnassignedItemsListBox.SelectedItem;
+            LoadProvenanceForItem(selectedItem);
+            UpdateCampaignWindowButtonStates();
+        }
+
+        private void EditUnassignedItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (UnassignedItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an unassigned item first.", "No Unassigned Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)UnassignedItemsListBox.SelectedItem;
+
+            NewItemWindow editItemWindow = new NewItemWindow(selectedItem);
+            editItemWindow.Owner = this;
+
+            bool? result = editItemWindow.ShowDialog();
+
+            if (result == true)
+            {
+                if (_campaign.UnassignedItems.Any(item =>
+                    item != selectedItem &&
+                    string.Equals(item.Name, editItemWindow.NewItem.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageBox.Show("An unassigned item with that name already exists.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                int itemIndex = _campaign.UnassignedItems.IndexOf(selectedItem);
+
+                if (itemIndex >= 0)
+                {
+                    editItemWindow.NewItem.ProvenanceEntries = new List<ProvenanceEntry>(selectedItem.ProvenanceEntries);
+
+                    if (ItemProvenanceFieldsChanged(selectedItem, editItemWindow.NewItem))
+                    {
+                        ProvenanceEntry updatedEntry = BuildUpdatedProvenanceEntry(selectedItem, editItemWindow.NewItem);
+                        editItemWindow.NewItem.ProvenanceEntries.Add(updatedEntry);
+                    }
+
+                    _campaign.UnassignedItems[itemIndex] = editItemWindow.NewItem;
+
+                    LoadUnassignedItems();
+                    UnassignedItemsListBox.SelectedItem = editItemWindow.NewItem;
+                    SaveCampaigns();
+                }
+            }
+        }
+
+        private void RemoveUnassignedItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (UnassignedItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an unassigned item first.", "No Unassigned Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)UnassignedItemsListBox.SelectedItem;
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Remove unassigned item '{selectedItem.Name}'?",
+                "Confirm Remove Unassigned Item",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            _campaign.UnassignedItems.Remove(selectedItem);
+            LoadUnassignedItems();
+            ClearItemDetails();
+            SaveCampaigns();
+            UpdateCampaignWindowButtonStates();
+        }
+
+        private void AssignUnassignedItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (UnassignedItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an unassigned item first.", "No Unassigned Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)UnassignedItemsListBox.SelectedItem;
+
+            if (_selectedCharacter.Items.Any(item =>
+                string.Equals(item.Name, selectedItem.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                MessageBox.Show("That character already has an item with that name.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            selectedItem.CurrentStatus = $"Carried by {_selectedCharacter.Name}";
+            selectedItem.Notes = $"Assigned to {_selectedCharacter.Name} from the unassigned pool.";
+
+            selectedItem.ProvenanceEntries.Add(new ProvenanceEntry
+            {
+                What = "Assigned to Character",
+                Where = selectedItem.WhereFound,
+                When = selectedItem.WhenFound,
+                Notes = $"Assigned to {_selectedCharacter.Name} from the unassigned pool."
+            });
+
+            _campaign.UnassignedItems.Remove(selectedItem);
+            _selectedCharacter.Items.Add(selectedItem);
+
+            LoadUnassignedItems();
+            LoadItemsForCharacter(_selectedCharacter);
+            CharacterItemsListBox.SelectedItem = selectedItem;
+
+            SaveCampaigns();
+            UpdateCampaignWindowButtonStates();
+        }
+
+        private void UnassignItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (CharacterItemsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a character item first.", "No Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
+
+            if (_campaign.UnassignedItems.Any(item =>
+                string.Equals(item.Name, selectedItem.Name, StringComparison.OrdinalIgnoreCase)))
+            {
+                MessageBox.Show("An unassigned item with that name already exists.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            selectedItem.CurrentStatus = "Unassigned";
+            selectedItem.Notes = $"Moved to the unassigned item pool from {_selectedCharacter.Name}.";
+
+            selectedItem.ProvenanceEntries.Add(new ProvenanceEntry
+            {
+                What = "Moved to Unassigned",
+                Where = selectedItem.WhereFound,
+                When = selectedItem.WhenFound,
+                Notes = $"Moved to the unassigned item pool from {_selectedCharacter.Name}."
+            });
+
+            _selectedCharacter.Items.Remove(selectedItem);
+            _campaign.UnassignedItems.Add(selectedItem);
+
+            LoadItemsForCharacter(_selectedCharacter);
+            LoadUnassignedItems();
+            UnassignedItemsListBox.SelectedItem = selectedItem;
+
+            SaveCampaigns();
+            UpdateCampaignWindowButtonStates();
         }
 
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)

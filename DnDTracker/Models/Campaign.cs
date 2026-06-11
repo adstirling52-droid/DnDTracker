@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace DnDTracker.Models
 {
@@ -8,6 +6,7 @@ namespace DnDTracker.Models
     {
         public string Name { get; set; } = "";
         public List<Character> Characters { get; set; } = new List<Character>();
+        public List<Item> UnassignedItems { get; set; } = new List<Item>();
 
         public override string ToString()
         {
