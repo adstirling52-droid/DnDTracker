@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-
 namespace DnDTracker.Models
 {
-    public class Character
+    public class Skill
     {
         public string Name { get; set; } = "";
-        public List<Item> Items { get; set; } = new List<Item>();
-        public List<Skill> Skills { get; set; } = new List<Skill>();
+        public string Description { get; set; } = "";
+        public string Notes { get; set; } = "";
 
         public override string ToString()
         {

@@ -1,14 +1,14 @@
-﻿using DnDTracker.Models;
-using DnDTracker.Services;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System;
-using System.IO;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using DnDTracker.Models;
+using DnDTracker.Services;
+
 
 
 
@@ -55,6 +55,7 @@ namespace DnDTracker
             bool unassignedItemSelected = UnassignedItemsListBox.SelectedItem != null;
             bool anyItemSelected = characterItemSelected || unassignedItemSelected;
             bool provenanceSelected = ProvenanceHistoryListBox.SelectedItem != null;
+            bool skillSelected = CharacterSkillsListBox.SelectedItem != null;
 
             EditCharacterButton.IsEnabled = characterSelected;
             RemoveCharacterButton.IsEnabled = characterSelected;
@@ -71,6 +72,10 @@ namespace DnDTracker
             EditUnassignedItemButton.IsEnabled = unassignedItemSelected;
             RemoveUnassignedItemButton.IsEnabled = unassignedItemSelected;
             AssignUnassignedItemButton.IsEnabled = characterSelected && unassignedItemSelected;
+
+            AddSkillButton.IsEnabled = characterSelected;
+            EditSkillButton.IsEnabled = characterSelected && skillSelected;
+            RemoveSkillButton.IsEnabled = characterSelected && skillSelected;
         }
 
         private void LoadCharacterButtons()
@@ -261,6 +266,7 @@ namespace DnDTracker
             _selectedCharacterButton.BorderBrush = System.Windows.Media.Brushes.SteelBlue;
 
             LoadItemsForCharacter(character);
+            LoadSkillsForCharacter(character);
 
             if (UnassignedTab.IsSelected)
             {
@@ -313,6 +319,11 @@ namespace DnDTracker
 
         private void ClearItemDetails()
         {
+            DetailsPanelTitleTextBlock.Text = "Item Provenance";
+
+            SkillDetailsPanel.Visibility = Visibility.Collapsed;
+            ItemDetailsPanel.Visibility = Visibility.Visible;
+
             SelectedItemNameTextBlock.Text = "Select an item";
             SelectedItemDescriptionTextBlock.Text = "Item description will appear here.";
             SelectedItemStatusTextBlock.Text = "Current Status:";
@@ -326,12 +337,17 @@ namespace DnDTracker
         {
             if (CharacterItemsListBox.SelectedItem == null)
             {
-                ClearItemDetails();
+                if (ItemsTab.IsSelected)
+                {
+                    ClearItemDetails();
+                }
+
                 UpdateCampaignWindowButtonStates();
                 return;
             }
 
             UnassignedItemsListBox.SelectedItem = null;
+            CharacterSkillsListBox.SelectedItem = null;
 
             Item selectedItem = (Item)CharacterItemsListBox.SelectedItem;
             LoadProvenanceForItem(selectedItem);
@@ -585,6 +601,10 @@ namespace DnDTracker
 
         private void LoadProvenanceForItem(Item item)
         {
+            DetailsPanelTitleTextBlock.Text = "Item Provenance";
+            SkillDetailsPanel.Visibility = Visibility.Collapsed;
+            ItemDetailsPanel.Visibility = Visibility.Visible;
+
             SelectedItemNameTextBlock.Text = item.Name;
             SelectedItemDescriptionTextBlock.Text = item.Description;
             SelectedItemStatusTextBlock.Text = $"Current Status: {item.CurrentStatus}";
@@ -1091,6 +1111,187 @@ namespace DnDTracker
                     UpdateCampaignWindowButtonStates();
                 }
             }
+            else if (SkillsTab.IsSelected)
+            {
+                if (CharacterSkillsListBox.Items.Count > 0)
+                {
+                    CharacterSkillsListBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    DetailsPanelTitleTextBlock.Text = "Skill Details";
+                    ItemDetailsPanel.Visibility = Visibility.Collapsed;
+                    SkillDetailsPanel.Visibility = Visibility.Visible;
+                    ClearSkillDetails();
+                    UpdateCampaignWindowButtonStates();
+                }
+            }
+        }
+
+        private void LoadSkillsForCharacter(Character character)
+        {
+            CharacterSkillsListBox.Items.Clear();
+
+            foreach (Skill skill in character.Skills)
+            {
+                CharacterSkillsListBox.Items.Add(skill);
+            }
+
+            SkillsPlaceholderTextBlock.Visibility =
+                character.Skills.Count == 0
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+        }
+
+        private void AddSkillButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            NewSkillWindow newSkillWindow = new NewSkillWindow();
+            newSkillWindow.Owner = this;
+
+            bool? result = newSkillWindow.ShowDialog();
+
+            if (result == true)
+            {
+                if (_selectedCharacter.Skills.Any(skill =>
+                    string.Equals(skill.Name, newSkillWindow.NewSkill.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageBox.Show("That character already has a skill with that name.", "Duplicate Skill Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _selectedCharacter.Skills.Add(newSkillWindow.NewSkill);
+                LoadSkillsForCharacter(_selectedCharacter);
+                CharacterSkillsListBox.SelectedItem = newSkillWindow.NewSkill;
+                SaveCampaigns();
+                UpdateCampaignWindowButtonStates();
+            }
+        }
+
+        private void EditSkillButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (CharacterSkillsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a skill first.", "No Skill Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Skill selectedSkill = (Skill)CharacterSkillsListBox.SelectedItem;
+
+            NewSkillWindow editSkillWindow = new NewSkillWindow(selectedSkill);
+            editSkillWindow.Owner = this;
+
+            bool? result = editSkillWindow.ShowDialog();
+
+            if (result == true)
+            {
+                if (_selectedCharacter.Skills.Any(skill =>
+                    skill != selectedSkill &&
+                    string.Equals(skill.Name, editSkillWindow.NewSkill.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    MessageBox.Show("That character already has a skill with that name.", "Duplicate Skill Name", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                int skillIndex = _selectedCharacter.Skills.IndexOf(selectedSkill);
+
+                if (skillIndex >= 0)
+                {
+                    _selectedCharacter.Skills[skillIndex] = editSkillWindow.NewSkill;
+                    LoadSkillsForCharacter(_selectedCharacter);
+                    CharacterSkillsListBox.SelectedItem = editSkillWindow.NewSkill;
+                    SaveCampaigns();
+                    UpdateCampaignWindowButtonStates();
+                }
+            }
+        }
+
+        private void RemoveSkillButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedCharacter == null)
+            {
+                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (CharacterSkillsListBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a skill first.", "No Skill Selected", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Skill selectedSkill = (Skill)CharacterSkillsListBox.SelectedItem;
+
+            MessageBoxResult result = MessageBox.Show(
+                $"Remove skill '{selectedSkill.Name}'?",
+                "Confirm Remove Skill",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            _selectedCharacter.Skills.Remove(selectedSkill);
+            LoadSkillsForCharacter(_selectedCharacter);
+            SaveCampaigns();
+            UpdateCampaignWindowButtonStates();
+        }
+
+           
+        private void LoadSkillDetails(Skill skill)
+        {
+            DetailsPanelTitleTextBlock.Text = "Skill Details";
+
+            ItemDetailsPanel.Visibility = Visibility.Collapsed;
+            SkillDetailsPanel.Visibility = Visibility.Visible;
+
+            SelectedSkillNameTextBlock.Text = skill.Name;
+            SelectedSkillDescriptionTextBlock.Text = skill.Description;
+            SelectedSkillNotesTextBlock.Text = skill.Notes;
+        }
+
+        private void ClearSkillDetails()
+        {
+            SelectedSkillNameTextBlock.Text = "Select a skill";
+            SelectedSkillDescriptionTextBlock.Text = "Skill description will appear here.";
+            SelectedSkillNotesTextBlock.Text = "Skill notes will appear here.";
+        }
+
+        private void CharacterSkillsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CharacterSkillsListBox.SelectedItem == null)
+            {
+                if (SkillsTab.IsSelected)
+                {
+                    DetailsPanelTitleTextBlock.Text = "Skill Details";
+                    ItemDetailsPanel.Visibility = Visibility.Collapsed;
+                    SkillDetailsPanel.Visibility = Visibility.Visible;
+                    ClearSkillDetails();
+                }
+
+                UpdateCampaignWindowButtonStates();
+                return;
+            }
+
+            CharacterItemsListBox.SelectedItem = null;
+            UnassignedItemsListBox.SelectedItem = null;
+
+            Skill selectedSkill = (Skill)CharacterSkillsListBox.SelectedItem;
+            LoadSkillDetails(selectedSkill);
+            UpdateCampaignWindowButtonStates();
         }
 
         private void MiddleTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
