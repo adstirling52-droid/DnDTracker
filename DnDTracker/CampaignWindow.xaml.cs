@@ -1250,7 +1250,6 @@ namespace DnDTracker
             UpdateCampaignWindowButtonStates();
         }
 
-           
         private void LoadSkillDetails(Skill skill)
         {
             DetailsPanelTitleTextBlock.Text = "Skill Details";
