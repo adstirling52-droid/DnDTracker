@@ -257,26 +257,39 @@ namespace DnDTracker
             }
 
             _selectedCharacterButton = selectedButton;
-            _selectedCharacterButton.Background = Brushes.LightBlue;
-            _selectedCharacterButton.BorderBrush = Brushes.SteelBlue;
+            _selectedCharacterButton.Background = System.Windows.Media.Brushes.LightBlue;
+            _selectedCharacterButton.BorderBrush = System.Windows.Media.Brushes.SteelBlue;
 
             LoadItemsForCharacter(character);
+
+            if (UnassignedTab.IsSelected)
+            {
+                ItemsTab.IsSelected = true;
+            }
+
+            RefreshSelectedTabItemDetails();
             UpdateCampaignWindowButtonStates();
         }
-        
+
         private void LoadItemsForCharacter(Character character)
         {
             CharacterItemsListBox.Items.Clear();
-            ClearItemDetails();
 
             foreach (Item item in character.Items)
             {
                 CharacterItemsListBox.Items.Add(item);
             }
 
-            if (character.Items.Count > 0)
+            if (ItemsTab.IsSelected)
             {
-                CharacterItemsListBox.SelectedIndex = 0;
+                if (character.Items.Count > 0)
+                {
+                    CharacterItemsListBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    ClearItemDetails();
+                }
             }
         }
 
@@ -828,6 +841,11 @@ namespace DnDTracker
                 _campaign.UnassignedItems.Count == 0
                     ? Visibility.Visible
                     : Visibility.Collapsed;
+           
+            if (UnassignedTab.IsSelected)
+            {
+                RefreshSelectedTabItemDetails();
+            }
         }
 
         private void AddUnassignedItemButton_Click(object sender, RoutedEventArgs e)
@@ -943,44 +961,60 @@ namespace DnDTracker
 
         private void AssignUnassignedItemButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCharacter == null)
-            {
-                MessageBox.Show("Please select a character first.", "No Character Selected", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
             if (UnassignedItemsListBox.SelectedItem == null)
             {
                 MessageBox.Show("Please select an unassigned item first.", "No Unassigned Item Selected", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
+            if (_campaign.Characters.Count == 0)
+            {
+                MessageBox.Show("There are no characters in this campaign.", "No Characters Available", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             Item selectedItem = (Item)UnassignedItemsListBox.SelectedItem;
 
-            if (_selectedCharacter.Items.Any(item =>
+            SelectCharacterWindow selectCharacterWindow = new SelectCharacterWindow(_campaign.Characters);
+            selectCharacterWindow.Owner = this;
+
+            bool? result = selectCharacterWindow.ShowDialog();
+
+            if (result != true || selectCharacterWindow.SelectedCharacter == null)
+            {
+                return;
+            }
+
+            Character targetCharacter = selectCharacterWindow.SelectedCharacter;
+
+            if (targetCharacter.Items.Any(item =>
                 string.Equals(item.Name, selectedItem.Name, StringComparison.OrdinalIgnoreCase)))
             {
                 MessageBox.Show("That character already has an item with that name.", "Duplicate Item Name", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            selectedItem.CurrentStatus = $"Carried by {_selectedCharacter.Name}";
-            selectedItem.Notes = $"Assigned to {_selectedCharacter.Name} from the unassigned pool.";
+            selectedItem.CurrentStatus = $"Carried by {targetCharacter.Name}";
+            selectedItem.Notes = $"Assigned to {targetCharacter.Name} from the unassigned pool.";
 
             selectedItem.ProvenanceEntries.Add(new ProvenanceEntry
             {
                 What = "Assigned to Character",
                 Where = selectedItem.WhereFound,
                 When = selectedItem.WhenFound,
-                Notes = $"Assigned to {_selectedCharacter.Name} from the unassigned pool."
+                Notes = $"Assigned to {targetCharacter.Name} from the unassigned pool."
             });
 
             _campaign.UnassignedItems.Remove(selectedItem);
-            _selectedCharacter.Items.Add(selectedItem);
+            targetCharacter.Items.Add(selectedItem);
 
             LoadUnassignedItems();
-            LoadItemsForCharacter(_selectedCharacter);
-            CharacterItemsListBox.SelectedItem = selectedItem;
+
+            if (_selectedCharacter == targetCharacter)
+            {
+                LoadItemsForCharacter(targetCharacter);
+                CharacterItemsListBox.SelectedItem = selectedItem;
+            }
 
             SaveCampaigns();
             UpdateCampaignWindowButtonStates();
@@ -1029,6 +1063,44 @@ namespace DnDTracker
 
             SaveCampaigns();
             UpdateCampaignWindowButtonStates();
+        }
+
+        private void RefreshSelectedTabItemDetails()
+        {
+            if (ItemsTab.IsSelected)
+            {
+                if (CharacterItemsListBox.Items.Count > 0)
+                {
+                    CharacterItemsListBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    ClearItemDetails();
+                    UpdateCampaignWindowButtonStates();
+                }
+            }
+            else if (UnassignedTab.IsSelected)
+            {
+                if (UnassignedItemsListBox.Items.Count > 0)
+                {
+                    UnassignedItemsListBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    ClearItemDetails();
+                    UpdateCampaignWindowButtonStates();
+                }
+            }
+        }
+
+        private void MiddleTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.Source != MiddleTabControl)
+            {
+                return;
+            }
+
+            RefreshSelectedTabItemDetails();
         }
 
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)

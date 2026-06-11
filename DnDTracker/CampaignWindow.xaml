@@ -76,8 +76,13 @@
                         BorderThickness="1"
                         Padding="15"
                         Margin="0,0,10,0">
-                <TabControl>
-                    <TabItem Header="Items">
+                
+                <TabControl x:Name="MiddleTabControl"
+                            SelectionChanged="MiddleTabControl_SelectionChanged">
+
+                    <TabItem x:Name="ItemsTab"
+                             Header="Items">
+                        
                         <Grid Margin="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -134,7 +139,9 @@
                         </Grid>
                     </TabItem>
 
-                    <TabItem Header="Unassigned">
+                    <TabItem x:Name="UnassignedTab"
+                             Header="Unassigned">
+                        
                         <Grid Margin="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
