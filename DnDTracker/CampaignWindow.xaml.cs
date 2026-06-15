@@ -1303,6 +1303,16 @@ namespace DnDTracker
             RefreshSelectedTabItemDetails();
         }
 
+
+        //Rollabel Tables
+
+        private void OpenRollTablesButton_Click(object sender, RoutedEventArgs e)
+        {
+            RollTablesWindow rollTablesWindow = new RollTablesWindow();
+            rollTablesWindow.Owner = this;
+            rollTablesWindow.ShowDialog();
+        }
+
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
         {
             Close();

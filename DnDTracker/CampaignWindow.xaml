@@ -32,44 +32,80 @@
             </Grid.ColumnDefinitions>
 
             <!-- LEFT PANEL -->
-            <Border Grid.Column="0"
-                    BorderBrush="Gray"
-                    BorderThickness="1"
-                    Padding="15"
-                    Margin="0,0,10,0">
-                <DockPanel LastChildFill="True">
-                    <StackPanel DockPanel.Dock="Bottom"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="0,15,0,0">
-                        <Button Content="Add"
-                                Width="50"
-                                Margin="0,0,4,0"
-                                Click="AddCharacterButton_Click"/>
+            <Grid Grid.Column="0"
+      Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
 
-                        <Button x:Name="EditCharacterButton"
-                                Content="Edit"
-                                Width="50"
-                                Margin="0,0,4,0"
-                                Click="EditCharacterButton_Click"/>
+                <!-- CHARACTERS BOX -->
+                <Border Grid.Row="0"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            Padding="15"
+            Margin="0,0,0,10">
+                    <DockPanel LastChildFill="True">
+                        <StackPanel DockPanel.Dock="Bottom"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="0,15,0,0">
+                            <Button Content="Add"
+                        Width="50"
+                        Margin="0,0,4,0"
+                        Click="AddCharacterButton_Click"/>
 
-                        <Button x:Name="RemoveCharacterButton"
-                                Content="Remove"
-                                Width="60"
-                                Click="RemoveCharacterButton_Click"/>
-                    </StackPanel>
+                            <Button x:Name="EditCharacterButton"
+                        Content="Edit"
+                        Width="50"
+                        Margin="0,0,4,0"
+                        Click="EditCharacterButton_Click"/>
 
-                    <StackPanel>
-                        <TextBlock Text="Characters"
-                                   FontSize="20"
-                                   FontWeight="Bold"
-                                   Margin="0,0,0,15"/>
+                            <Button x:Name="RemoveCharacterButton"
+                        Content="Remove"
+                        Width="60"
+                        Click="RemoveCharacterButton_Click"/>
+                        </StackPanel>
 
-                        <StackPanel x:Name="CharacterButtonPanel"/>
-                    </StackPanel>
-                </DockPanel>
-            </Border>
+                        <StackPanel>
+                            <TextBlock Text="Characters"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Margin="0,0,0,15"/>
 
+                            <StackPanel x:Name="CharacterButtonPanel"/>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+
+                <!-- MODULES BOX -->
+                <Border Grid.Row="1"
+            BorderBrush="Gray"
+            BorderThickness="1"
+            Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                       Text="Modules"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="0,0,0,15"/>
+
+                        <StackPanel Grid.Row="1"
+                        VerticalAlignment="Top">
+                            <Button x:Name="OpenRollTablesButton"
+                        Content="Rollable Tables"
+                        Width="120"
+                        HorizontalAlignment="Center"
+                        Click="OpenRollTablesButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
             <!-- MIDDLE PANEL -->
             <Border Grid.Column="1"
                     BorderBrush="Gray"
@@ -435,6 +471,7 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,20,0,0">
+           
             <Button Content="Close Campaign"
                     Width="120"
                     Click="CloseCampaignButton_Click"/>
