@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DnDTracker"
         mc:Ignorable="d"
         Title="Rollable Tables"
-        Height="650"
+        Height="700"
         Width="1100"
         WindowStartupLocation="CenterOwner">
 
@@ -47,10 +47,11 @@
                                FontWeight="Bold"
                                Margin="0,0,0,15"/>
 
-                    <Grid Grid.Row="1">
-                        <ListBox x:Name="RollTablesListBox"/>
+                    <ListBox x:Name="RollTablesListBox"
+                             SelectionChanged="RollTablesListBox_SelectionChanged"/>
 
-                        <TextBlock x:Name="NoTablesPlaceholderTextBlock"
+
+                    <TextBlock x:Name="NoTablesPlaceholderTextBlock"
                                    Text="No rollable tables imported."
                                    Foreground="Gray"
                                    FontStyle="Italic"
@@ -58,25 +59,31 @@
                                    VerticalAlignment="Center"
                                    IsHitTestVisible="False"/>
                     </Grid>
-                </Grid>
+                
             </Border>
 
             <!-- RIGHT PANEL -->
             <Border Grid.Column="1"
-                    BorderBrush="Gray"
-                    BorderThickness="1"
-                    Padding="15">
+        BorderBrush="Gray"
+        BorderThickness="1"
+        Padding="15">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
-                               Text="Table Contents"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Margin="0,0,0,15"/>
+                   Text="Table Contents"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Margin="0,0,0,15"/>
 
                     <DataGrid x:Name="RollTableRowsDataGrid"
                               Grid.Row="1"
@@ -85,25 +92,98 @@
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               HeadersVisibility="Column"
-                              Margin="0,0,0,0">
+                              SelectionUnit="FullRow"
+                              SelectionMode="Single"
+                              Margin="0,0,0,15">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="Yellow"/>
+                                        <Setter Property="Foreground" Value="Black"/>
+                                        <Setter Property="BorderBrush" Value="Goldenrod"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Number"
-                                                Binding="{Binding Number}"
-                                                Width="80"/>
+                            Binding="{Binding Number}"
+                            Width="80"/>
 
                             <DataGridTextColumn Header="Name"
-                                                Binding="{Binding Name}"
-                                                Width="160"/>
+                            Binding="{Binding Name}"
+                            Width="160"/>
 
                             <DataGridTextColumn Header="Physical Description"
-                                                Binding="{Binding PhysicalDescription}"
-                                                Width="*"/>
+                            Binding="{Binding PhysicalDescription}"
+                            Width="*"/>
 
                             <DataGridTextColumn Header="Special Characteristics"
-                                                Binding="{Binding SpecialCharacteristics}"
-                                                Width="*"/>
+                            Binding="{Binding SpecialCharacteristics}"
+                            Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
+
+                    <TextBlock Grid.Row="2"
+                   Text="Roll Result"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Margin="0,0,0,10"/>
+
+                    <TextBlock x:Name="RolledResultNameTextBlock"
+                   Grid.Row="3"
+                   Text="No result rolled yet."
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="0,0,0,8"/>
+
+                    <TextBlock x:Name="RolledResultDescriptionTextBlock"
+                   Grid.Row="4"
+                   Text=""
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,8"/>
+
+                    <TextBlock x:Name="RolledResultSpecialTextBlock"
+                   Grid.Row="5"
+                   Text=""
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,8"/>
+
+                    <TextBlock x:Name="RolledResultMetaTextBlock"
+                   Grid.Row="6"
+                   Text=""
+                   Foreground="Gray"
+                   TextWrapping="Wrap"/>
+
+                    <StackPanel Grid.Row="7"
+            Orientation="Horizontal"
+            HorizontalAlignment="Center"
+            Margin="0,12,0,0">
+                        <Button x:Name="AddRolledItemToCharacterButton"
+            Content="Add to Character"
+            Width="120"
+            Margin="0,0,10,0"
+            Click="AddRolledItemToCharacterButton_Click"/>
+
+                        <Button x:Name="AddRolledItemToUnassignedButton"
+            Content="Add to Unassigned"
+            Width="130"
+            Margin="0,0,10,0"
+            Click="AddRolledItemToUnassignedButton_Click"/>
+
+                        <Button x:Name="AddRolledSkillToCharacterButton"
+            Content="Add Skill"
+            Width="100"
+            Click="AddRolledSkillToCharacterButton_Click"/>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>
@@ -117,6 +197,18 @@
                     Width="100"
                     Margin="0,0,10,0"
                     Click="ImportCsvButton_Click"/>
+
+            <Button x:Name="RemoveTableButton"
+                    Content="Remove Table"
+                    Width="110"
+                    Margin="0,0,10,0"
+                    Click="RemoveTableButton_Click"/>
+
+            <Button x:Name="RollButton"
+                    Content="Roll"
+                    Width="80"
+                    Margin="0,0,10,0"
+                    Click="RollButton_Click"/>
 
             <Button Content="Close"
                     Width="90"

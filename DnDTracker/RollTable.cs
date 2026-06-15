@@ -6,6 +6,7 @@ namespace DnDTracker.Models
     {
         public string Name { get; set; } = "";
         public string Category { get; set; } = "";
+        public string TableType { get; set; } = "Generic";
         public List<RollTableRow> Rows { get; set; } = new List<RollTableRow>();
 
         public override string ToString()

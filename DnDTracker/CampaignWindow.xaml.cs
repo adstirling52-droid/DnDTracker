@@ -1303,14 +1303,26 @@ namespace DnDTracker
             RefreshSelectedTabItemDetails();
         }
 
-
         //Rollabel Tables
 
         private void OpenRollTablesButton_Click(object sender, RoutedEventArgs e)
         {
-            RollTablesWindow rollTablesWindow = new RollTablesWindow();
+            RollTablesWindow rollTablesWindow = new RollTablesWindow(_campaign, SaveCampaigns, RefreshCampaignItemViews);
             rollTablesWindow.Owner = this;
-            rollTablesWindow.ShowDialog();
+            rollTablesWindow.Show();
+        }
+
+        private void RefreshCampaignItemViews()
+        {
+            if (_selectedCharacter != null)
+            {
+                LoadItemsForCharacter(_selectedCharacter);
+                LoadSkillsForCharacter(_selectedCharacter);
+            }
+
+            LoadUnassignedItems();
+            RefreshSelectedTabItemDetails();
+            UpdateCampaignWindowButtonStates();
         }
 
         private void CloseCampaignButton_Click(object sender, RoutedEventArgs e)
