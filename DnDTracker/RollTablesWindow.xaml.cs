@@ -1,4 +1,5 @@
 ﻿using DnDTracker.Models;
+using DnDTracker.Services;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -12,7 +13,9 @@ namespace DnDTracker
         private readonly Campaign _campaign;
         private readonly Action _saveCampaigns;
         private readonly Action _refreshCampaignViews;
+        private readonly RollTableDataService _rollTableDataService = new RollTableDataService();
         private readonly Random _random = new Random();
+        private List<RollTable> _rollTables = new List<RollTable>();
         private RollTableRow? _lastRolledRow;
         private RollTable? _lastRolledTable;
 
@@ -24,6 +27,8 @@ namespace DnDTracker
             _saveCampaigns = saveCampaigns;
             _refreshCampaignViews = refreshCampaignViews;
 
+            _rollTables = _rollTableDataService.LoadRollTables();
+
             RefreshRollTablesList();
             ClearRollResult();
             UpdateRollResultActionButtons(null);
@@ -33,13 +38,13 @@ namespace DnDTracker
         {
             RollTablesListBox.Items.Clear();
 
-            foreach (RollTable table in _campaign.RollTables)
+            foreach (RollTable table in _rollTables)
             {
                 RollTablesListBox.Items.Add(table);
             }
 
             NoTablesPlaceholderTextBlock.Visibility =
-                _campaign.RollTables.Count == 0
+                _rollTables.Count == 0
                     ? Visibility.Visible
                     : Visibility.Collapsed;
         }
@@ -73,20 +78,20 @@ namespace DnDTracker
                     openFileDialog.FileName,
                     selectTableTypeWindow.SelectedTableType);
 
-                if (_campaign.RollTables.Any(table =>
+                if (_rollTables.Any(table =>
                     string.Equals(table.Name, importedTable.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     MessageBox.Show("A rollable table with that name already exists.", "Duplicate Table Name", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                _campaign.RollTables.Add(importedTable);
+                _rollTables.Add(importedTable);
                 RefreshRollTablesList();
 
                 RollTablesListBox.SelectedItem = importedTable;
                 RollTableRowsDataGrid.ItemsSource = importedTable.Rows;
 
-                _saveCampaigns();
+                _rollTableDataService.SaveRollTables(_rollTables);
             }
             catch (Exception ex)
             {
@@ -208,10 +213,11 @@ namespace DnDTracker
                 return;
             }
 
-            _campaign.RollTables.Remove(selectedTable);
+            _rollTables.Remove(selectedTable);
+            _rollTableDataService.SaveRollTables(_rollTables);
             RefreshRollTablesList();
             RollTableRowsDataGrid.ItemsSource = null;
-            _saveCampaigns();
+            ClearRollResult();
         }
 
         private void UpdateRollResultActionButtons(RollTable? table)
