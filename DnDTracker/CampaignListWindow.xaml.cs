@@ -56,7 +56,7 @@ namespace DnDTracker
 
             if (_campaigns.Count == 0)
             {
-                LoadSampleCampaigns();
+                //LoadSampleCampaigns();
                 SaveCampaigns();
             }
             else
