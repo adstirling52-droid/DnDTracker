@@ -23,7 +23,7 @@
             <div class="text-danger" role="alert">@message</div>
         }
 
-        <EditForm Model="Input" FormName="register" OnValidSubmit="RegisterUser" method="post">
+        <EditForm Model="Input" FormName="register" OnValidSubmit="RegisterUser">
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" role="alert" />
 
@@ -60,6 +60,7 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
+    [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
 
     private async Task RegisterUser()
