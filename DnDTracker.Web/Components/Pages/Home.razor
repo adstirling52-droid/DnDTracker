@@ -1,7 +1,16 @@
 ﻿@page "/"
+@attribute [AllowAnonymous]
 
 <PageTitle>Alan's DnD Tracker (Web)</PageTitle>
 
 <h1>Alan's DnD Tracker (Web)</h1>
 
-Welcome to your new app.
+<AuthorizeView>
+    <Authorized>
+        <p>Welcome back, @context.User.Identity?.Name.</p>
+        <p>You are logged in and ready to track campaigns.</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Please <a href="Account/Login">log in</a> or <a href="Account/Register">register</a> to use DnD Tracker.</p>
+    </NotAuthorized>
+</AuthorizeView>

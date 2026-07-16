@@ -1,4 +1,5 @@
 using DnDTracker.Web.Components;
+using DnDTracker.Web.Components.Account;
 using DnDTracker.Web.Data;
 using DnDTracker.Web.Models;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<DnDTrackerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {

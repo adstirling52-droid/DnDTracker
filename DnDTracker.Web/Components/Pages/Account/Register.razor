@@ -1,0 +1,103 @@
+@page "/Account/Register"
+@rendermode InteractiveServer
+
+@using System.ComponentModel.DataAnnotations
+@using DnDTracker.Web.Models
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [AllowAnonymous]
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+@inject ILogger<Register> Logger
+
+<PageTitle>Register</PageTitle>
+
+<h1>Register</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div class="text-danger" role="alert">@message</div>
+        }
+
+        <EditForm Model="Input" FormName="register" OnValidSubmit="RegisterUser" method="post">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert" />
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label for="Input.Email">Email</label>
+                <ValidationMessage For="() => Input.Email" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="Input.Password">Password</label>
+                <ValidationMessage For="() => Input.Password" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Input.ConfirmPassword" id="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label for="Input.ConfirmPassword">Confirm password</label>
+                <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+        </EditForm>
+    </div>
+</div>
+
+<p>
+    <a href="Account/Login">Already have an account? Log in</a>
+</p>
+
+@code {
+    private string? message;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private InputModel Input { get; set; } = new();
+
+    private async Task RegisterUser()
+    {
+        var user = new ApplicationUser
+        {
+            UserName = Input.Email,
+            Email = Input.Email
+        };
+
+        var result = await UserManager.CreateAsync(user, Input.Password);
+
+        if (!result.Succeeded)
+        {
+            message = string.Join(" ", result.Errors.Select(error => error.Description));
+            return;
+        }
+
+        Logger.LogInformation("User created a new account with password.");
+
+        await SignInManager.SignInAsync(user, isPersistent: false);
+        NavigationManager.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [StringLength(100, MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Compare(nameof(Password))]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}
