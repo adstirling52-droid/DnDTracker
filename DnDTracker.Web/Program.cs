@@ -1,8 +1,13 @@
 using DnDTracker.Web.Components;
+using DnDTracker.Web.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<DnDTrackerDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
