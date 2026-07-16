@@ -1,5 +1,4 @@
 @page "/Account/Login"
-@rendermode InteractiveServer
 
 @using System.ComponentModel.DataAnnotations
 @using DnDTracker.Web.Models
@@ -22,7 +21,7 @@
                 <div class="text-danger" role="alert">@errorMessage</div>
             }
 
-            <EditForm Model="Input" FormName="login" OnValidSubmit="LoginUser">
+            <EditForm Model="Input" FormName="login" OnValidSubmit="LoginUser" method="post">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
 
