@@ -44,7 +44,7 @@ public class DnDTrackerDbContext : DbContext
             entity.HasMany(c => c.Items)
                 .WithOne(i => i.Character)
                 .HasForeignKey(i => i.CharacterId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.NoAction);
             entity.HasMany(c => c.Skills)
                 .WithOne(s => s.Character)
                 .HasForeignKey(s => s.CharacterId)
