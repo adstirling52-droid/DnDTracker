@@ -22,7 +22,7 @@
                 <div class="text-danger" role="alert">@errorMessage</div>
             }
 
-            <EditForm Model="Input" FormName="login" OnValidSubmit="LoginUser" method="post">
+            <EditForm Model="Input" FormName="login" OnValidSubmit="LoginUser">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
 
@@ -54,6 +54,7 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
+    [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
 
     private async Task LoginUser()
