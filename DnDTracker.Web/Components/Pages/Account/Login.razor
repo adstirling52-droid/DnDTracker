@@ -55,10 +55,20 @@
     private string? ReturnUrl { get; set; }
 
     [SupplyParameterFromForm]
-    private InputModel Input { get; set; } = new();
+    private InputModel? Input { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Input ??= new();
+    }
 
     private async Task LoginUser()
     {
+        if (Input is null)
+        {
+            return;
+        }
+
         var result = await SignInManager.PasswordSignInAsync(
             Input.Email,
             Input.Password,
