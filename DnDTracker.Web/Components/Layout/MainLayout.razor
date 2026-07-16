@@ -6,8 +6,17 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div class="top-row px-4 auth-links">
+            <AuthorizeView>
+                <Authorized>
+                    <span class="me-3">Hello, @context.User.Identity?.Name</span>
+                    <a href="Account/Logout">Log out</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="Account/Register" class="me-3">Register</a>
+                    <a href="Account/Login">Log in</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
