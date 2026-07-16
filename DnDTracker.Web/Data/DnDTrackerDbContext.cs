@@ -1,9 +1,10 @@
 using DnDTracker.Web.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DnDTracker.Web.Data;
 
-public class DnDTrackerDbContext : DbContext
+public class DnDTrackerDbContext : IdentityDbContext<ApplicationUser>
 {
     public DnDTrackerDbContext(DbContextOptions<DnDTrackerDbContext> options)
         : base(options)
