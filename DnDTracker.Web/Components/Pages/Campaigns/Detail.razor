@@ -1,0 +1,54 @@
+@page "/campaigns/{CampaignId:guid}"
+@rendermode InteractiveServer
+
+@using System.Security.Claims
+@using DnDTracker.Web.Models
+@using DnDTracker.Web.Services
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject CampaignService CampaignService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>@pageTitle</PageTitle>
+
+@if (campaign is null)
+{
+    <h1>Campaign not found</h1>
+    <p>The campaign may have been removed or you do not have access to it.</p>
+    <a class="btn btn-secondary" href="campaigns">Back to campaigns</a>
+}
+else
+{
+    <h1>@campaign.Name</h1>
+    <p class="text-muted">Campaign detail (characters, items, and skills) will be added in the next phase.</p>
+    <a class="btn btn-secondary" href="campaigns">Back to campaigns</a>
+}
+
+@code {
+    [Parameter]
+    public Guid CampaignId { get; set; }
+
+    private Campaign? campaign;
+    private string pageTitle = "Campaign";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await GetUserIdAsync();
+        if (userId is null)
+        {
+            return;
+        }
+
+        campaign = await CampaignService.GetCampaignAsync(userId, CampaignId);
+        pageTitle = campaign?.Name ?? "Campaign not found";
+    }
+
+    private async Task<string?> GetUserIdAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        return authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+}
