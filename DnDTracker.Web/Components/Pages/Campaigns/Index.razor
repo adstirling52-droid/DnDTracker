@@ -1,0 +1,304 @@
+@page "/campaigns"
+@rendermode InteractiveServer
+
+@using System.Security.Claims
+@using DnDTracker.Web.Models
+@using DnDTracker.Web.Services
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject CampaignService CampaignService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Campaigns</PageTitle>
+
+<h1>Campaigns</h1>
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <div class="alert alert-info" role="status">@statusMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        @if (campaigns.Count == 0)
+        {
+            <p class="text-muted">No campaigns yet. Create your first campaign to get started.</p>
+        }
+        else
+        {
+            <div class="list-group mb-3">
+                @foreach (var campaign in campaigns)
+                {
+                    <button type="button"
+                            class="list-group-item list-group-item-action @(selectedCampaignId == campaign.Id ? "active" : "")"
+                            @onclick="() => SelectCampaign(campaign.Id)">
+                        @campaign.Name
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2">
+    <button class="btn btn-primary" @onclick="ShowCreateDialog">New Campaign</button>
+    <button class="btn btn-secondary" disabled="@(!HasSelection)" @onclick="ShowEditDialog">Edit Campaign</button>
+    <button class="btn btn-outline-primary" disabled="@(!HasSelection)" @onclick="OpenSelectedCampaign">Open Campaign</button>
+    <button class="btn btn-danger" disabled="@(!HasSelection)" @onclick="ShowDeleteDialog">Remove Campaign</button>
+</div>
+
+@if (showNameDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@nameDialogTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseNameDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+
+                    <div class="form-floating">
+                        <input id="campaignName"
+                               class="form-control"
+                               @bind="campaignNameInput"
+                               @bind:event="oninput"
+                               placeholder="Campaign name" />
+                        <label for="campaignName">Campaign name</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseNameDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveCampaignName">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Remove Campaign</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDeleteDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Remove campaign '@SelectedCampaignName'?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDeleteDialog">No</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Campaign> campaigns = [];
+    private Guid? selectedCampaignId;
+    private string? userId;
+    private string? statusMessage;
+    private string? errorMessage;
+
+    private bool showNameDialog;
+    private bool isEditing;
+    private string nameDialogTitle = "";
+    private string campaignNameInput = "";
+    private string? dialogErrorMessage;
+
+    private bool showDeleteDialog;
+
+    private bool HasSelection => selectedCampaignId.HasValue;
+
+    private string? SelectedCampaignName =>
+        campaigns.FirstOrDefault(c => c.Id == selectedCampaignId)?.Name;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userId = await GetUserIdAsync();
+        if (userId is null)
+        {
+            errorMessage = "Unable to determine the current user.";
+            return;
+        }
+
+        await LoadCampaignsAsync();
+    }
+
+    private async Task LoadCampaignsAsync()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        campaigns = await CampaignService.GetCampaignsAsync(userId);
+
+        if (selectedCampaignId.HasValue &&
+            campaigns.All(c => c.Id != selectedCampaignId.Value))
+        {
+            selectedCampaignId = campaigns.FirstOrDefault()?.Id;
+        }
+    }
+
+    private void SelectCampaign(Guid campaignId)
+    {
+        selectedCampaignId = campaignId;
+        ClearMessages();
+    }
+
+    private void ShowCreateDialog()
+    {
+        isEditing = false;
+        nameDialogTitle = "Create New Campaign";
+        campaignNameInput = "";
+        dialogErrorMessage = null;
+        showNameDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowEditDialog()
+    {
+        if (!HasSelection)
+        {
+            statusMessage = "Please select a campaign first.";
+            return;
+        }
+
+        isEditing = true;
+        nameDialogTitle = "Edit Campaign";
+        campaignNameInput = SelectedCampaignName ?? "";
+        dialogErrorMessage = null;
+        showNameDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseNameDialog()
+    {
+        showNameDialog = false;
+        dialogErrorMessage = null;
+    }
+
+    private async Task SaveCampaignName()
+    {
+        if (userId is null)
+        {
+            dialogErrorMessage = "Unable to determine the current user.";
+            return;
+        }
+
+        if (isEditing)
+        {
+            if (!selectedCampaignId.HasValue)
+            {
+                dialogErrorMessage = "Please select a campaign first.";
+                return;
+            }
+
+            var updateError = await CampaignService.UpdateAsync(userId, selectedCampaignId.Value, campaignNameInput);
+            if (updateError is not null)
+            {
+                dialogErrorMessage = updateError;
+                return;
+            }
+
+            showNameDialog = false;
+            await LoadCampaignsAsync();
+            selectedCampaignId = campaigns
+                .FirstOrDefault(c => string.Equals(c.Name, campaignNameInput.Trim(), StringComparison.OrdinalIgnoreCase))
+                ?.Id;
+            statusMessage = "Campaign updated.";
+            return;
+        }
+
+        var (campaign, createError) = await CampaignService.CreateAsync(userId, campaignNameInput);
+        if (createError is not null)
+        {
+            dialogErrorMessage = createError;
+            return;
+        }
+
+        showNameDialog = false;
+        await LoadCampaignsAsync();
+        selectedCampaignId = campaign?.Id;
+        statusMessage = "Campaign created.";
+    }
+
+    private void ShowDeleteDialog()
+    {
+        if (!HasSelection)
+        {
+            statusMessage = "Please select a campaign first.";
+            return;
+        }
+
+        showDeleteDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseDeleteDialog()
+    {
+        showDeleteDialog = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (userId is null || !selectedCampaignId.HasValue)
+        {
+            return;
+        }
+
+        var deleted = await CampaignService.DeleteAsync(userId, selectedCampaignId.Value);
+        showDeleteDialog = false;
+
+        if (!deleted)
+        {
+            errorMessage = "Campaign not found.";
+            return;
+        }
+
+        selectedCampaignId = null;
+        await LoadCampaignsAsync();
+        selectedCampaignId = campaigns.FirstOrDefault()?.Id;
+        statusMessage = "Campaign removed.";
+    }
+
+    private void OpenSelectedCampaign()
+    {
+        if (!HasSelection)
+        {
+            statusMessage = "Please select a campaign first.";
+            return;
+        }
+
+        NavigationManager.NavigateTo($"campaigns/{selectedCampaignId}");
+    }
+
+    private void ClearMessages()
+    {
+        statusMessage = null;
+        errorMessage = null;
+    }
+
+    private async Task<string?> GetUserIdAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        return authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+}
