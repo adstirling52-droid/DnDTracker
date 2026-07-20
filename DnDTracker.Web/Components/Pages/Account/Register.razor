@@ -80,10 +80,22 @@
             return;
         }
 
+        var email = string.IsNullOrWhiteSpace(Input.Email) ? null : Input.Email.Trim();
+
+        if (email is not null)
+        {
+            var existingUser = await UserManager.FindByEmailAsync(email);
+            if (existingUser is not null)
+            {
+                message = "A user with that email address already exists.";
+                return;
+            }
+        }
+
         var user = new ApplicationUser
         {
             UserName = Input.Username.Trim(),
-            Email = string.IsNullOrWhiteSpace(Input.Email) ? null : Input.Email.Trim()
+            Email = email
         };
 
         var result = await UserManager.CreateAsync(user, Input.Password);
