@@ -64,10 +64,7 @@ else
                 </div>
             }
             <div class="d-flex flex-wrap gap-1">
-                <label class="btn btn-sm btn-primary mb-0">
-                    Import CSV
-                    <InputFile class="d-none" OnChange="OnImportFileSelected" accept=".csv" />
-                </label>
+                <button type="button" class="btn btn-sm btn-primary" @onclick="ShowImportDialog">Import CSV</button>
                 <button class="btn btn-sm btn-danger" disabled="@(!HasTableSelection)" @onclick="ShowDeleteTableDialog">Remove Table</button>
             </div>
         </div>
@@ -130,21 +127,20 @@ else
     </div>
 }
 
-@if (showImportTypeDialog)
+@if (showImportDialog)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Select table type</h5>
-                    <button type="button" class="btn-close" @onclick="CloseImportTypeDialog" aria-label="Close"></button>
+                    <h5 class="modal-title">Import rollable table</h5>
+                    <button type="button" class="btn-close" @onclick="CloseImportDialog" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     @if (!string.IsNullOrEmpty(dialogErrorMessage))
                     {
                         <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
                     }
-                    <p>Importing table: <strong>@pendingImportTableName</strong></p>
                     <div class="mb-3">
                         <label class="form-label" for="importTableType">Table type</label>
                         <select id="importTableType" class="form-select" @bind="importTableType">
@@ -153,10 +149,18 @@ else
                             <option value="Generic">Generic</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">CSV file</label>
+                        <InputFile OnChange="OnImportFileSelected" accept=".csv" class="form-control" />
+                        @if (!string.IsNullOrEmpty(pendingImportTableName))
+                        {
+                            <div class="form-text">Selected: @pendingImportTableName</div>
+                        }
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseImportTypeDialog">Cancel</button>
-                    <button type="button" class="btn btn-primary" @onclick="ConfirmImport">Import</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseImportDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" disabled="@(!CanConfirmImport)" @onclick="ConfirmImport">Import</button>
                 </div>
             </div>
         </div>
@@ -251,10 +255,11 @@ else
     private string? errorMessage;
     private string? dialogErrorMessage;
 
-    private bool showImportTypeDialog;
+    private bool showImportDialog;
     private string pendingImportTableName = "";
     private string pendingImportCsv = "";
     private string importTableType = "Item";
+    private bool CanConfirmImport => !string.IsNullOrWhiteSpace(pendingImportCsv);
 
     private bool showDeleteTableDialog;
     private bool showAddCharacterDialog;
@@ -333,11 +338,19 @@ else
         selectedRows = table?.Rows ?? [];
     }
 
+    private void ShowImportDialog()
+    {
+        pendingImportTableName = "";
+        pendingImportCsv = "";
+        importTableType = "Item";
+        dialogErrorMessage = null;
+        showImportDialog = true;
+        ClearMessages();
+    }
+
     private async Task OnImportFileSelected(InputFileChangeEventArgs e)
     {
         var file = e.File;
-        pendingImportTableName = Path.GetFileNameWithoutExtension(file.Name);
-        importTableType = "Item";
         dialogErrorMessage = null;
 
         try
@@ -345,18 +358,19 @@ else
             await using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
             using var reader = new StreamReader(stream);
             pendingImportCsv = await reader.ReadToEndAsync();
-            showImportTypeDialog = true;
-            ClearMessages();
+            pendingImportTableName = Path.GetFileNameWithoutExtension(file.Name);
         }
         catch (Exception ex)
         {
-            errorMessage = $"Failed to read CSV file: {ex.Message}";
+            pendingImportTableName = "";
+            pendingImportCsv = "";
+            dialogErrorMessage = $"Failed to read CSV file: {ex.Message}";
         }
     }
 
-    private void CloseImportTypeDialog()
+    private void CloseImportDialog()
     {
-        showImportTypeDialog = false;
+        showImportDialog = false;
         pendingImportTableName = "";
         pendingImportCsv = "";
         dialogErrorMessage = null;
@@ -364,8 +378,9 @@ else
 
     private async Task ConfirmImport()
     {
-        if (userId is null)
+        if (userId is null || !CanConfirmImport)
         {
+            dialogErrorMessage = "Please choose a CSV file to import.";
             return;
         }
 
@@ -381,9 +396,7 @@ else
             return;
         }
 
-        showImportTypeDialog = false;
-        pendingImportTableName = "";
-        pendingImportCsv = "";
+        CloseImportDialog();
         await LoadDataAsync();
         selectedTableId = table?.Id;
         await LoadSelectedTableRowsAsync();
