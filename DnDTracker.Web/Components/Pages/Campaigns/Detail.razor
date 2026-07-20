@@ -143,6 +143,7 @@ else
                 <div class="d-flex flex-wrap gap-1">
                     <button class="btn btn-sm btn-primary" disabled="@(!HasCharacterSelection)" @onclick="ShowCreateCharacterItemDialog">Add</button>
                     <button class="btn btn-sm btn-secondary" disabled="@(!HasCharacterItemSelection)" @onclick="ShowEditCharacterItemDialog">Edit</button>
+                    <button class="btn btn-sm btn-outline-secondary" disabled="@(!HasCharacterItemSelection)" @onclick="ShowCopyItemDialog">Copy</button>
                     <button class="btn btn-sm btn-warning" disabled="@(!HasCharacterItemSelection)" @onclick="UnassignSelectedItem">Unassign</button>
                     <button class="btn btn-sm btn-danger" disabled="@(!HasCharacterItemSelection)" @onclick="ShowDeleteCharacterItemDialog">Remove</button>
                 </div>
@@ -170,6 +171,7 @@ else
                 <div class="d-flex flex-wrap gap-1">
                     <button class="btn btn-sm btn-primary" @onclick="ShowCreateUnassignedItemDialog">Add</button>
                     <button class="btn btn-sm btn-secondary" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowEditUnassignedItemDialog">Edit</button>
+                    <button class="btn btn-sm btn-outline-secondary" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowCopyItemDialog">Copy</button>
                     <button class="btn btn-sm btn-outline-primary" disabled="@(!CanAssignItem)" @onclick="ShowAssignDialog">Assign</button>
                     <button class="btn btn-sm btn-danger" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowDeleteUnassignedItemDialog">Remove</button>
                 </div>
@@ -391,6 +393,59 @@ else
     </div>
 }
 
+@if (showCopyDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Copy item</h5>
+                    <button type="button" class="btn-close" @onclick="CloseCopyDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+
+                    <p>Where should the copy of '@copySourceItemName' go?</p>
+
+                    <div class="list-group mb-3">
+                        <button type="button"
+                                class="list-group-item list-group-item-action @(copyToUnassigned ? "active" : "")"
+                                @onclick="SelectCopyToUnassigned">
+                            Unassigned items
+                        </button>
+                    </div>
+
+                    @if (characters.Count == 0)
+                    {
+                        <p class="text-muted small">No characters in this campaign. The copy can only go to unassigned items.</p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-2">Or assign the copy to a character:</p>
+                        <div class="list-group">
+                            @foreach (var character in characters)
+                            {
+                                <button type="button"
+                                        class="list-group-item list-group-item-action @(copyTargetCharacterId == character.Id ? "active" : "")"
+                                        @onclick="() => SelectCopyToCharacter(character.Id)">
+                                    @character.Name
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseCopyDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" disabled="@(!CanConfirmCopy)" @onclick="ConfirmCopyItem">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @if (showAssignDialog)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
@@ -529,6 +584,12 @@ else
     private bool showAssignDialog;
     private Guid? assignTargetCharacterId;
 
+    private bool showCopyDialog;
+    private Guid? copySourceItemId;
+    private string copySourceItemName = "";
+    private bool copyToUnassigned;
+    private Guid? copyTargetCharacterId;
+
     private bool showDeleteDialog;
     private DeleteTarget deleteTarget;
     private string deleteDialogTitle = "";
@@ -539,6 +600,7 @@ else
     private bool HasCharacterItemSelection => selectedItemId.HasValue;
     private bool HasUnassignedItemSelection => selectedUnassignedItemId.HasValue;
     private bool CanAssignItem => HasUnassignedItemSelection && characters.Count > 0;
+    private bool CanConfirmCopy => copyToUnassigned || copyTargetCharacterId.HasValue;
 
     private Skill? SelectedSkill => skills.FirstOrDefault(s => s.Id == selectedSkillId);
     private Item? SelectedCharacterItem => characterItems.FirstOrDefault(i => i.Id == selectedItemId);
@@ -977,6 +1039,104 @@ else
         deleteDialogMessage = $"Remove item '{item.Name}'?";
         showDeleteDialog = true;
         ClearMessages();
+    }
+
+    private void ShowCopyItemDialog()
+    {
+        if (activeTab == DetailTab.Items && SelectedCharacterItem is { } characterItem)
+        {
+            copySourceItemId = characterItem.Id;
+            copySourceItemName = characterItem.Name;
+        }
+        else if (activeTab == DetailTab.Unassigned && SelectedUnassignedItem is { } unassignedItem)
+        {
+            copySourceItemId = unassignedItem.Id;
+            copySourceItemName = unassignedItem.Name;
+        }
+        else
+        {
+            errorMessage = "Please select an item first.";
+            return;
+        }
+
+        copyToUnassigned = false;
+        copyTargetCharacterId = null;
+        dialogErrorMessage = null;
+        showCopyDialog = true;
+        ClearMessages();
+    }
+
+    private void SelectCopyToUnassigned()
+    {
+        copyToUnassigned = true;
+        copyTargetCharacterId = null;
+    }
+
+    private void SelectCopyToCharacter(Guid characterId)
+    {
+        copyToUnassigned = false;
+        copyTargetCharacterId = characterId;
+    }
+
+    private void CloseCopyDialog()
+    {
+        showCopyDialog = false;
+        copySourceItemId = null;
+        copySourceItemName = "";
+        copyToUnassigned = false;
+        copyTargetCharacterId = null;
+        dialogErrorMessage = null;
+    }
+
+    private async Task ConfirmCopyItem()
+    {
+        if (userId is null || !copySourceItemId.HasValue || !CanConfirmCopy)
+        {
+            return;
+        }
+
+        var targetCharacterId = copyToUnassigned ? null : copyTargetCharacterId;
+        var (copy, error) = await ItemService.CopyAsync(
+            userId,
+            CampaignId,
+            copySourceItemId.Value,
+            targetCharacterId);
+
+        if (error is not null)
+        {
+            dialogErrorMessage = error;
+            return;
+        }
+
+        showCopyDialog = false;
+        copySourceItemId = null;
+        copySourceItemName = "";
+        copyToUnassigned = false;
+        copyTargetCharacterId = null;
+
+        await LoadAllDataAsync();
+
+        if (copy is null)
+        {
+            return;
+        }
+
+        if (copy.CharacterId.HasValue)
+        {
+            selectedCharacterId = copy.CharacterId;
+            activeTab = DetailTab.Items;
+            selectedItemId = copy.Id;
+            selectedUnassignedItemId = null;
+        }
+        else
+        {
+            activeTab = DetailTab.Unassigned;
+            selectedUnassignedItemId = copy.Id;
+            selectedItemId = null;
+        }
+
+        imageCacheVersion++;
+        statusMessage = $"Item copied as '{copy.Name}'.";
     }
 
     private void ShowAssignDialog()
