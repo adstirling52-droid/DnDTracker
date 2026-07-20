@@ -15,6 +15,7 @@
 @inject RollTableService RollTableService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <PageTitle>Rollable Tables</PageTitle>
 
@@ -90,7 +91,7 @@ else
                         <tbody>
                             @foreach (var row in selectedRows)
                             {
-                                <tr class="@(lastRolledRowId == row.Id ? "table-primary" : "")">
+                                <tr id="roll-table-row-@row.Id" class="@(lastRolledRowId == row.Id ? "table-primary" : "")">
                                     <td>@row.Number</td>
                                     <td>@row.Name</td>
                                     <td>@row.PhysicalDescription</td>
@@ -250,6 +251,7 @@ else
     private RollTable? lastRolledTable;
     private RollTableRow? lastRolledRow;
     private Guid? lastRolledRowId;
+    private Guid? scrollToRolledRowId;
 
     private string? statusMessage;
     private string? errorMessage;
@@ -466,7 +468,20 @@ else
         lastRolledTable = table;
         lastRolledRow = row;
         lastRolledRowId = row.Id;
+        scrollToRolledRowId = row.Id;
         ClearMessages();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!scrollToRolledRowId.HasValue)
+        {
+            return;
+        }
+
+        var rowId = scrollToRolledRowId.Value;
+        scrollToRolledRowId = null;
+        await JS.InvokeVoidAsync("dndScrollRollRowIntoView", $"roll-table-row-{rowId}");
     }
 
     private void ClearRollResult()
