@@ -37,6 +37,7 @@ builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SkillService>();
 builder.Services.AddScoped<ItemImageService>();
+builder.Services.AddScoped<RollTableService>();
 
 builder.Services.Configure<FormOptions>(options =>
 {

@@ -66,6 +66,9 @@ else
                 <button class="btn btn-sm btn-secondary" disabled="@(!HasCharacterSelection)" @onclick="ShowEditCharacterDialog">Edit</button>
                 <button class="btn btn-sm btn-danger" disabled="@(!HasCharacterSelection)" @onclick="ShowDeleteCharacterDialog">Remove</button>
             </div>
+
+            <h2 class="h6 mt-4">Modules</h2>
+            <a class="btn btn-sm btn-outline-primary" href="campaigns/@CampaignId/roll-tables">Rollable Tables</a>
         </div>
 
         <div class="col-lg-5">
