@@ -404,6 +404,9 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 **/.ionide/
 
+# Uploaded item images (web app runtime data)
+DnDTracker.Web/Data/item-images/
+
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 

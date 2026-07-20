@@ -5,12 +5,14 @@
 @using DnDTracker.Web.Models
 @using DnDTracker.Web.Services
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 
 @attribute [Authorize]
 
 @inject CampaignService CampaignService
 @inject CharacterService CharacterService
 @inject ItemService ItemService
+@inject ItemImageService ItemImageService
 @inject SkillService SkillService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
@@ -191,6 +193,28 @@ else
                      (activeTab == DetailTab.Unassigned && SelectedUnassignedItem is not null))
             {
                 var item = activeTab == DetailTab.Items ? SelectedCharacterItem! : SelectedUnassignedItem!;
+                <div class="mb-3">
+                    @if (HasItemImage(item))
+                    {
+                        <button type="button" class="btn btn-link p-0 border-0" @onclick="() => ShowLargeImageDialog(item.Id, item.Name)">
+                            <img src="@GetItemImageUrl(item.Id)"
+                                 alt="@item.Name"
+                                 class="img-fluid rounded border"
+                                 style="max-height: 180px;" />
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="text-muted border rounded p-4 text-center small">No image</div>
+                    }
+                </div>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <label class="btn btn-sm btn-outline-primary mb-0">
+                        Choose image
+                        <InputFile class="d-none" OnChange="OnDetailsImageSelected" accept=".png,.jpg,.jpeg,.bmp" />
+                    </label>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled="@(!HasItemImage(item))" @onclick="() => ClearDetailsImage(item.Id)">Clear image</button>
+                </div>
                 <dl class="row mb-0">
                     <dt class="col-sm-4">Name</dt>
                     <dd class="col-sm-8">@item.Name</dd>
@@ -210,6 +234,23 @@ else
             {
                 <p class="text-muted small">Select a skill or item to view details.</p>
             }
+        </div>
+    </div>
+}
+
+@if (showLargeImageDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.75);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@largeImageTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseLargeImageDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="@largeImageUrl" alt="@largeImageTitle" class="img-fluid" />
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -317,6 +358,28 @@ else
                     <div class="mb-3">
                         <label class="form-label" for="itemNotes">Notes</label>
                         <textarea id="itemNotes" class="form-control" rows="3" @bind="itemNotesInput"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Item image</label>
+                        @if (!string.IsNullOrEmpty(itemImagePreviewUrl))
+                        {
+                            <img src="@itemImagePreviewUrl" alt="Item preview" class="img-fluid rounded border mb-2" style="max-height: 160px;" />
+                        }
+                        else if (editingItem && HasItemImagePath(editingItemImagePath) && !clearItemImagePending)
+                        {
+                            <img src="@GetItemImageUrl(GetEditingItemId())" alt="Item preview" class="img-fluid rounded border mb-2" style="max-height: 160px;" />
+                        }
+                        else
+                        {
+                            <div class="text-muted border rounded p-3 text-center small mb-2">No image selected</div>
+                        }
+                        <div class="d-flex flex-wrap gap-2">
+                            <label class="btn btn-sm btn-outline-primary mb-0">
+                                Choose image
+                                <InputFile class="d-none" OnChange="OnDialogImageSelected" accept=".png,.jpg,.jpeg,.bmp" />
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="MarkItemImageForClear">Clear image</button>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -453,6 +516,15 @@ else
     private string itemWhenFoundInput = "";
     private string itemStatusInput = "";
     private string itemNotesInput = "";
+    private IBrowserFile? pendingImageFile;
+    private string? itemImagePreviewUrl;
+    private bool clearItemImagePending;
+    private string editingItemImagePath = "";
+    private long imageCacheVersion;
+
+    private bool showLargeImageDialog;
+    private string largeImageUrl = "";
+    private string largeImageTitle = "";
 
     private bool showAssignDialog;
     private Guid? assignTargetCharacterId;
@@ -764,6 +836,7 @@ else
         itemDialogForUnassigned = forUnassigned;
         itemDialogTitle = "Create New Item";
         ClearItemInputs();
+        ResetItemImageState();
         dialogErrorMessage = null;
         showItemDialog = true;
         ClearMessages();
@@ -790,6 +863,8 @@ else
         itemWhenFoundInput = item.WhenFound;
         itemStatusInput = item.CurrentStatus;
         itemNotesInput = item.Notes;
+        editingItemImagePath = item.ImagePath;
+        ResetItemImageState();
         dialogErrorMessage = null;
         showItemDialog = true;
         ClearMessages();
@@ -799,6 +874,7 @@ else
     {
         showItemDialog = false;
         dialogErrorMessage = null;
+        ResetItemImageState();
     }
 
     private async Task SaveItem()
@@ -809,24 +885,19 @@ else
         }
 
         var input = BuildItemInput();
+        Guid? savedItemId = null;
 
         if (editingItem)
         {
-            var itemId = itemDialogForUnassigned ? selectedUnassignedItemId!.Value : selectedItemId!.Value;
-            var error = await ItemService.UpdateAsync(userId, CampaignId, itemId, input);
+            savedItemId = itemDialogForUnassigned ? selectedUnassignedItemId!.Value : selectedItemId!.Value;
+            var error = await ItemService.UpdateAsync(userId, CampaignId, savedItemId.Value, input);
             if (error is not null)
             {
                 dialogErrorMessage = error;
                 return;
             }
-
-            showItemDialog = false;
-            await LoadAllDataAsync();
-            statusMessage = "Item updated.";
-            return;
         }
-
-        if (itemDialogForUnassigned)
+        else if (itemDialogForUnassigned)
         {
             var (item, createError) = await ItemService.CreateUnassignedAsync(userId, CampaignId, input);
             if (createError is not null)
@@ -835,35 +906,58 @@ else
                 return;
             }
 
-            showItemDialog = false;
-            await LoadAllDataAsync();
-            selectedUnassignedItemId = item?.Id;
-            statusMessage = "Item created.";
-            return;
+            savedItemId = item?.Id;
+        }
+        else
+        {
+            if (!HasCharacterSelection)
+            {
+                dialogErrorMessage = "Please select a character first.";
+                return;
+            }
+
+            var (characterItem, characterCreateError) = await ItemService.CreateForCharacterAsync(
+                userId,
+                CampaignId,
+                selectedCharacterId!.Value,
+                input);
+
+            if (characterCreateError is not null)
+            {
+                dialogErrorMessage = characterCreateError;
+                return;
+            }
+
+            savedItemId = characterItem?.Id;
         }
 
-        if (!HasCharacterSelection)
+        if (savedItemId.HasValue)
         {
-            dialogErrorMessage = "Please select a character first.";
-            return;
-        }
-
-        var (characterItem, characterCreateError) = await ItemService.CreateForCharacterAsync(
-            userId,
-            CampaignId,
-            selectedCharacterId!.Value,
-            input);
-
-        if (characterCreateError is not null)
-        {
-            dialogErrorMessage = characterCreateError;
-            return;
+            var imageError = await ApplyPendingItemImageAsync(savedItemId.Value);
+            if (imageError is not null)
+            {
+                dialogErrorMessage = imageError;
+                return;
+            }
         }
 
         showItemDialog = false;
+        ResetItemImageState();
         await LoadAllDataAsync();
-        selectedItemId = characterItem?.Id;
-        statusMessage = "Item created.";
+
+        if (savedItemId.HasValue)
+        {
+            if (itemDialogForUnassigned)
+            {
+                selectedUnassignedItemId = savedItemId;
+            }
+            else
+            {
+                selectedItemId = savedItemId;
+            }
+        }
+
+        statusMessage = editingItem ? "Item updated." : "Item created.";
     }
 
     private void ShowDeleteCharacterItemDialog() => ShowDeleteItemDialog(forUnassigned: false);
@@ -1024,6 +1118,185 @@ else
         itemWhenFoundInput = "";
         itemStatusInput = "";
         itemNotesInput = "";
+        editingItemImagePath = "";
+    }
+
+    private void ResetItemImageState()
+    {
+        pendingImageFile = null;
+        itemImagePreviewUrl = null;
+        clearItemImagePending = false;
+    }
+
+    private Guid GetEditingItemId() =>
+        itemDialogForUnassigned ? selectedUnassignedItemId!.Value : selectedItemId!.Value;
+
+    private string GetItemImageUrl(Guid itemId) =>
+        ItemImageService.GetImageUrl(itemId, imageCacheVersion);
+
+    private static bool HasItemImagePath(string? imagePath) =>
+        !string.IsNullOrWhiteSpace(imagePath);
+
+    private static bool HasItemImage(Item item) =>
+        HasItemImagePath(item.ImagePath);
+
+    private Guid? GetSelectedDetailsItemId() =>
+        activeTab == DetailTab.Items ? selectedItemId : selectedUnassignedItemId;
+
+    private async Task OnDialogImageSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file.Size > ItemImageService.MaxFileSizeBytes)
+        {
+            dialogErrorMessage = "Image must be 5 MB or smaller.";
+            return;
+        }
+
+        if (!ItemImageService.IsAllowedExtension(Path.GetExtension(file.Name)))
+        {
+            dialogErrorMessage = "Only PNG, JPG, JPEG, and BMP images are supported.";
+            return;
+        }
+
+        pendingImageFile = file;
+        clearItemImagePending = false;
+        itemImagePreviewUrl = await CreatePreviewUrlAsync(file);
+        dialogErrorMessage = null;
+    }
+
+    private void MarkItemImageForClear()
+    {
+        pendingImageFile = null;
+        itemImagePreviewUrl = null;
+        clearItemImagePending = true;
+    }
+
+    private async Task<string?> ApplyPendingItemImageAsync(Guid itemId)
+    {
+        if (userId is null)
+        {
+            return "Unable to determine the current user.";
+        }
+
+        if (clearItemImagePending)
+        {
+            var clearError = await ItemImageService.ClearForItemAsync(userId, CampaignId, itemId);
+            if (clearError is null)
+            {
+                imageCacheVersion++;
+            }
+
+            return clearError;
+        }
+
+        if (pendingImageFile is null)
+        {
+            return null;
+        }
+
+        await using var stream = pendingImageFile.OpenReadStream(ItemImageService.MaxFileSizeBytes);
+        var (_, saveError) = await ItemImageService.SaveForItemAsync(
+            userId,
+            CampaignId,
+            itemId,
+            stream,
+            pendingImageFile.Name);
+
+        if (saveError is null)
+        {
+            imageCacheVersion++;
+        }
+
+        return saveError;
+    }
+
+    private async Task OnDetailsImageSelected(InputFileChangeEventArgs e)
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var itemId = GetSelectedDetailsItemId();
+        if (!itemId.HasValue)
+        {
+            errorMessage = "Please select an item first.";
+            return;
+        }
+
+        var file = e.File;
+        if (file.Size > ItemImageService.MaxFileSizeBytes)
+        {
+            errorMessage = "Image must be 5 MB or smaller.";
+            return;
+        }
+
+        if (!ItemImageService.IsAllowedExtension(Path.GetExtension(file.Name)))
+        {
+            errorMessage = "Only PNG, JPG, JPEG, and BMP images are supported.";
+            return;
+        }
+
+        await using var stream = file.OpenReadStream(ItemImageService.MaxFileSizeBytes);
+        var (_, saveError) = await ItemImageService.SaveForItemAsync(
+            userId,
+            CampaignId,
+            itemId.Value,
+            stream,
+            file.Name);
+
+        if (saveError is not null)
+        {
+            errorMessage = saveError;
+            return;
+        }
+
+        imageCacheVersion++;
+        await LoadAllDataAsync();
+        statusMessage = "Item image updated.";
+    }
+
+    private async Task ClearDetailsImage(Guid itemId)
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var clearError = await ItemImageService.ClearForItemAsync(userId, CampaignId, itemId);
+        if (clearError is not null)
+        {
+            errorMessage = clearError;
+            return;
+        }
+
+        imageCacheVersion++;
+        await LoadAllDataAsync();
+        statusMessage = "Item image cleared.";
+    }
+
+    private void ShowLargeImageDialog(Guid itemId, string itemName)
+    {
+        largeImageTitle = itemName;
+        largeImageUrl = GetItemImageUrl(itemId);
+        showLargeImageDialog = true;
+    }
+
+    private void CloseLargeImageDialog()
+    {
+        showLargeImageDialog = false;
+        largeImageUrl = "";
+        largeImageTitle = "";
+    }
+
+    private static async Task<string> CreatePreviewUrlAsync(IBrowserFile file)
+    {
+        await using var stream = file.OpenReadStream(ItemImageService.MaxFileSizeBytes);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        var base64 = Convert.ToBase64String(memoryStream.ToArray());
+        var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "image/png" : file.ContentType;
+        return $"data:{contentType};base64,{base64}";
     }
 
     private static string DisplayValue(string value) =>
