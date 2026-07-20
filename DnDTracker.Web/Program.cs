@@ -19,6 +19,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuth
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
+        options.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<DnDTrackerDbContext>()
     .AddDefaultTokenProviders();
