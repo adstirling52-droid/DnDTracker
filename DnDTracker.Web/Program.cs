@@ -4,9 +4,11 @@ using DnDTracker.Web.Data;
 using DnDTracker.Web.Models;
 using DnDTracker.Web.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +36,12 @@ builder.Services.AddScoped<CampaignService>();
 builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SkillService>();
+builder.Services.AddScoped<ItemImageService>();
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = ItemImageService.MaxFileSizeBytes;
+});
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -64,5 +72,25 @@ app.MapPost("/Account/Logout", async (SignInManager<ApplicationUser> signInManag
     await signInManager.SignOutAsync();
     return Results.LocalRedirect("~/");
 });
+
+app.MapGet("/api/items/{itemId:guid}/image", async (
+    Guid itemId,
+    ClaimsPrincipal user,
+    ItemImageService itemImageService) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var (stream, contentType) = await itemImageService.OpenImageAsync(userId, itemId);
+    if (stream is null || contentType is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.File(stream, contentType);
+}).RequireAuthorization();
 
 app.Run();

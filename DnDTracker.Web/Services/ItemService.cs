@@ -12,7 +12,7 @@ public record ItemInput(
     string CurrentStatus,
     string Notes);
 
-public class ItemService(DnDTrackerDbContext db)
+public class ItemService(DnDTrackerDbContext db, ItemImageService itemImageService)
 {
     public async Task<List<Item>> GetUnassignedAsync(string userId, Guid campaignId)
     {
@@ -146,6 +146,7 @@ public class ItemService(DnDTrackerDbContext db)
             return false;
         }
 
+        await itemImageService.DeleteFilesForItemAsync(userId, itemId);
         db.Items.Remove(item);
         await db.SaveChangesAsync();
         return true;
