@@ -117,4 +117,4 @@ All queries must filter by the current user:
 
 ## Next phase
 
-Phase 4: implement these models in C# and create tables in LocalDB using Entity Framework Core.
+Phase 11: deploy to Azure VM with IIS and SQL Server — see [DEPLOYMENT.md](DEPLOYMENT.md).

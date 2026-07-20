@@ -17,4 +17,6 @@ Open `DnDTracker/DnDTracker.slnx` in Visual Studio to build and run it.
 
 ## Web app
 
-The web version is being built in `DnDTracker.Web/`. It will support multiple users, with each user's data kept separate, and will be hosted on Azure IIS at www.alanstirling.com.
+The web version is in `DnDTracker.Web/`. It supports multiple users, with each user's data kept separate.
+
+**Deployment:** see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for Azure VM + IIS + SQL Server setup (target: www.alanstirling.com).
