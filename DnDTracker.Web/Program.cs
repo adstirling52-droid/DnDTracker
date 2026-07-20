@@ -31,6 +31,9 @@ builder.Services.AddScoped<IUserValidator<ApplicationUser>, OptionalEmailUserVal
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<CampaignService>();
+builder.Services.AddScoped<CharacterService>();
+builder.Services.AddScoped<ItemService>();
+builder.Services.AddScoped<SkillService>();
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
