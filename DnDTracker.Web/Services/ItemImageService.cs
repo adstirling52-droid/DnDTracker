@@ -84,6 +84,34 @@ public class ItemImageService(IWebHostEnvironment environment, DnDTrackerDbConte
         return Task.CompletedTask;
     }
 
+    public async Task<string?> CopyImageForItemAsync(string userId, Guid sourceItemId, Guid targetItemId)
+    {
+        var sourceItem = await db.Items
+            .AsNoTracking()
+            .Include(i => i.Campaign)
+            .FirstOrDefaultAsync(i => i.Id == sourceItemId && i.Campaign.UserId == userId);
+
+        if (sourceItem is null || string.IsNullOrWhiteSpace(sourceItem.ImagePath))
+        {
+            return null;
+        }
+
+        var sourcePath = GetFullPath(sourceItem.ImagePath);
+        if (!File.Exists(sourcePath))
+        {
+            return null;
+        }
+
+        var extension = Path.GetExtension(sourcePath);
+        var relativePath = BuildRelativePath(userId, targetItemId, extension);
+        var targetPath = GetFullPath(relativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(targetPath)!);
+
+        DeleteFilesForItem(userId, targetItemId);
+        File.Copy(sourcePath, targetPath, overwrite: true);
+        return relativePath;
+    }
+
     public async Task<(Stream? Stream, string? ContentType)> OpenImageAsync(string userId, Guid itemId)
     {
         var item = await db.Items

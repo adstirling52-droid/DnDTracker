@@ -218,6 +218,50 @@ public class ItemService(DnDTrackerDbContext db, ItemImageService itemImageServi
         return null;
     }
 
+    public async Task<(Item? Item, string? Error)> CopyAsync(
+        string userId,
+        Guid campaignId,
+        Guid sourceItemId,
+        Guid? targetCharacterId)
+    {
+        var sourceItem = await GetOwnedItemAsync(userId, campaignId, sourceItemId);
+        if (sourceItem is null)
+        {
+            return (null, "Item not found.");
+        }
+
+        if (targetCharacterId.HasValue &&
+            !await OwnsCharacterAsync(userId, campaignId, targetCharacterId.Value))
+        {
+            return (null, "Character not found.");
+        }
+
+        var copyName = await GetAvailableCopyNameAsync(
+            campaignId,
+            targetCharacterId,
+            sourceItem.Name);
+
+        var copy = new Item
+        {
+            Id = Guid.NewGuid(),
+            CampaignId = campaignId,
+            CharacterId = targetCharacterId,
+            Name = copyName,
+            Description = sourceItem.Description,
+            WhereFound = sourceItem.WhereFound,
+            WhenFound = sourceItem.WhenFound,
+            CurrentStatus = sourceItem.CurrentStatus,
+            Notes = sourceItem.Notes
+        };
+
+        var copiedImagePath = await itemImageService.CopyImageForItemAsync(userId, sourceItemId, copy.Id);
+        copy.ImagePath = copiedImagePath ?? "";
+
+        db.Items.Add(copy);
+        await db.SaveChangesAsync();
+        return (copy, null);
+    }
+
     private static string? ValidateInput(ItemInput input)
     {
         if (string.IsNullOrWhiteSpace(input.Name))
@@ -302,4 +346,35 @@ public class ItemService(DnDTrackerDbContext db, ItemImageService itemImageServi
         return existingNames.Any(existingName =>
             string.Equals(existingName, name, StringComparison.OrdinalIgnoreCase));
     }
+
+    private async Task<string> GetAvailableCopyNameAsync(
+        Guid campaignId,
+        Guid? characterId,
+        string sourceName)
+    {
+        var baseName = $"{sourceName.Trim()} (copy)";
+        if (!await NameExistsInScopeAsync(campaignId, characterId, baseName))
+        {
+            return baseName;
+        }
+
+        for (var copyNumber = 2; copyNumber < 1000; copyNumber++)
+        {
+            var candidateName = $"{sourceName.Trim()} (copy {copyNumber})";
+            if (!await NameExistsInScopeAsync(campaignId, characterId, candidateName))
+            {
+                return candidateName;
+            }
+        }
+
+        return $"{sourceName.Trim()} (copy {Guid.NewGuid():N})";
+    }
+
+    private async Task<bool> NameExistsInScopeAsync(
+        Guid campaignId,
+        Guid? characterId,
+        string name) =>
+        characterId.HasValue
+            ? await CharacterItemNameExistsAsync(characterId.Value, name)
+            : await UnassignedNameExistsAsync(campaignId, name);
 }
