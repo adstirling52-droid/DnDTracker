@@ -1,0 +1,597 @@
+@page "/campaigns/{CampaignId:guid}/roll-tables"
+@rendermode InteractiveServer
+
+@using System.Security.Claims
+@using DnDTracker.Web.Models
+@using DnDTracker.Web.Services
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject CampaignService CampaignService
+@inject CharacterService CharacterService
+@inject ItemService ItemService
+@inject SkillService SkillService
+@inject RollTableService RollTableService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>Rollable Tables</PageTitle>
+
+@if (campaign is null)
+{
+    <h1>Campaign not found</h1>
+    <a class="btn btn-secondary" href="campaigns">Back to campaigns</a>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-0">Rollable Tables</h1>
+            <p class="text-muted mb-0">Campaign: @campaign.Name</p>
+        </div>
+        <a class="btn btn-secondary" href="campaigns/@CampaignId">Back to campaign</a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="alert alert-info" role="status">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@errorMessage</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <h2 class="h5">Tables</h2>
+            @if (rollTables.Count == 0)
+            {
+                <p class="text-muted small">No rollable tables imported.</p>
+            }
+            else
+            {
+                <div class="list-group mb-2">
+                    @foreach (var table in rollTables)
+                    {
+                        <button type="button"
+                                class="list-group-item list-group-item-action @(selectedTableId == table.Id ? "active" : "")"
+                                @onclick="() => SelectTable(table.Id)">
+                            @table.Name <span class="text-muted small">(@table.TableType)</span>
+                        </button>
+                    }
+                </div>
+            }
+            <div class="d-flex flex-wrap gap-1">
+                <label class="btn btn-sm btn-primary mb-0">
+                    Import CSV
+                    <InputFile class="d-none" OnChange="OnImportFileSelected" accept=".csv" />
+                </label>
+                <button class="btn btn-sm btn-danger" disabled="@(!HasTableSelection)" @onclick="ShowDeleteTableDialog">Remove Table</button>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <h2 class="h5">Table contents</h2>
+            @if (!HasTableSelection || selectedRows.Count == 0)
+            {
+                <p class="text-muted small">Select a table to view its rows.</p>
+            }
+            else
+            {
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Name</th>
+                                <th>Physical Description</th>
+                                <th>Special Characteristics</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in selectedRows)
+                            {
+                                <tr class="@(lastRolledRowId == row.Id ? "table-primary" : "")">
+                                    <td>@row.Number</td>
+                                    <td>@row.Name</td>
+                                    <td>@row.PhysicalDescription</td>
+                                    <td>@row.SpecialCharacteristics</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="border rounded p-3 mb-3">
+                <h3 class="h6">Roll result</h3>
+                @if (lastRolledRow is null || lastRolledTable is null)
+                {
+                    <p class="text-muted mb-0">No result rolled yet.</p>
+                }
+                else
+                {
+                    <p class="fw-semibold mb-1">@lastRolledRow.Name</p>
+                    <p class="mb-1">Physical Description: @lastRolledRow.PhysicalDescription</p>
+                    <p class="mb-1">Special Characteristics: @lastRolledRow.SpecialCharacteristics</p>
+                    <p class="text-muted small mb-0">Rolled @lastRolledRow.Number on @lastRolledTable.Name (@lastRolledTable.TableType)</p>
+                }
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-primary" disabled="@(!CanRoll)" @onclick="Roll">Roll</button>
+                <button class="btn btn-outline-primary" disabled="@(!CanAddRolledItem)" @onclick="ShowAddItemToCharacterDialog">Add to Character</button>
+                <button class="btn btn-outline-secondary" disabled="@(!CanAddRolledItem)" @onclick="AddRolledItemToUnassigned">Add to Unassigned</button>
+                <button class="btn btn-outline-primary" disabled="@(!CanAddRolledSkill)" @onclick="ShowAddSkillToCharacterDialog">Add Skill</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showImportTypeDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select table type</h5>
+                    <button type="button" class="btn-close" @onclick="CloseImportTypeDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+                    <p>Importing table: <strong>@pendingImportTableName</strong></p>
+                    <div class="mb-3">
+                        <label class="form-label" for="importTableType">Table type</label>
+                        <select id="importTableType" class="form-select" @bind="importTableType">
+                            <option value="Item">Item</option>
+                            <option value="Skill">Skill</option>
+                            <option value="Generic">Generic</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseImportTypeDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="ConfirmImport">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteTableDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Remove Table</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDeleteTableDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Remove rollable table '@SelectedTableName'?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDeleteTableDialog">No</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDeleteTable">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showAddCharacterDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@addCharacterDialogTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseAddCharacterDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+
+                    @if (characters.Count == 0)
+                    {
+                        <p class="text-muted">There are no characters in this campaign.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var character in characters)
+                            {
+                                <button type="button"
+                                        class="list-group-item list-group-item-action @(addTargetCharacterId == character.Id ? "active" : "")"
+                                        @onclick="() => addTargetCharacterId = character.Id">
+                                    @character.Name
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAddCharacterDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" disabled="@(!addTargetCharacterId.HasValue)" @onclick="ConfirmAddToCharacter">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid CampaignId { get; set; }
+
+    private enum AddToCharacterMode
+    {
+        Item,
+        Skill
+    }
+
+    private Campaign? campaign;
+    private List<RollTable> rollTables = [];
+    private List<RollTableRow> selectedRows = [];
+    private List<Character> characters = [];
+    private string? userId;
+
+    private Guid? selectedTableId;
+    private RollTable? lastRolledTable;
+    private RollTableRow? lastRolledRow;
+    private Guid? lastRolledRowId;
+
+    private string? statusMessage;
+    private string? errorMessage;
+    private string? dialogErrorMessage;
+
+    private bool showImportTypeDialog;
+    private string pendingImportTableName = "";
+    private string pendingImportCsv = "";
+    private string importTableType = "Item";
+
+    private bool showDeleteTableDialog;
+    private bool showAddCharacterDialog;
+    private string addCharacterDialogTitle = "";
+    private AddToCharacterMode addToCharacterMode;
+    private Guid? addTargetCharacterId;
+
+    private bool HasTableSelection => selectedTableId.HasValue;
+    private string? SelectedTableName => rollTables.FirstOrDefault(t => t.Id == selectedTableId)?.Name;
+    private bool CanRoll => HasTableSelection && selectedRows.Count > 0;
+    private bool CanAddRolledItem => lastRolledTable is not null &&
+                                     lastRolledRow is not null &&
+                                     string.Equals(lastRolledTable.TableType, "Item", StringComparison.OrdinalIgnoreCase);
+    private bool CanAddRolledSkill => lastRolledTable is not null &&
+                                        lastRolledRow is not null &&
+                                        string.Equals(lastRolledTable.TableType, "Skill", StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        userId = await GetUserIdAsync();
+        if (userId is null)
+        {
+            campaign = null;
+            return;
+        }
+
+        campaign = await CampaignService.GetCampaignAsync(userId, CampaignId);
+        if (campaign is null)
+        {
+            return;
+        }
+
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        rollTables = await RollTableService.GetAllAsync(userId);
+        characters = await CharacterService.GetByCampaignAsync(userId, CampaignId);
+
+        if (selectedTableId.HasValue &&
+            rollTables.All(t => t.Id != selectedTableId.Value))
+        {
+            selectedTableId = null;
+            selectedRows = [];
+            ClearRollResult();
+        }
+        else if (selectedTableId.HasValue)
+        {
+            await LoadSelectedTableRowsAsync();
+        }
+    }
+
+    private async Task SelectTable(Guid tableId)
+    {
+        selectedTableId = tableId;
+        ClearRollResult();
+        ClearMessages();
+        await LoadSelectedTableRowsAsync();
+    }
+
+    private async Task LoadSelectedTableRowsAsync()
+    {
+        if (userId is null || !selectedTableId.HasValue)
+        {
+            selectedRows = [];
+            return;
+        }
+
+        var table = await RollTableService.GetWithRowsAsync(userId, selectedTableId.Value);
+        selectedRows = table?.Rows ?? [];
+    }
+
+    private async Task OnImportFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        pendingImportTableName = Path.GetFileNameWithoutExtension(file.Name);
+        importTableType = "Item";
+        dialogErrorMessage = null;
+
+        try
+        {
+            await using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            pendingImportCsv = await reader.ReadToEndAsync();
+            showImportTypeDialog = true;
+            ClearMessages();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to read CSV file: {ex.Message}";
+        }
+    }
+
+    private void CloseImportTypeDialog()
+    {
+        showImportTypeDialog = false;
+        pendingImportTableName = "";
+        pendingImportCsv = "";
+        dialogErrorMessage = null;
+    }
+
+    private async Task ConfirmImport()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var (table, importError) = await RollTableService.ImportFromCsvAsync(
+            userId,
+            pendingImportTableName,
+            importTableType,
+            pendingImportCsv);
+
+        if (importError is not null)
+        {
+            dialogErrorMessage = importError;
+            return;
+        }
+
+        showImportTypeDialog = false;
+        pendingImportTableName = "";
+        pendingImportCsv = "";
+        await LoadDataAsync();
+        selectedTableId = table?.Id;
+        await LoadSelectedTableRowsAsync();
+        statusMessage = "Rollable table imported.";
+    }
+
+    private void ShowDeleteTableDialog()
+    {
+        if (!HasTableSelection)
+        {
+            errorMessage = "Please select a rollable table first.";
+            return;
+        }
+
+        showDeleteTableDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseDeleteTableDialog()
+    {
+        showDeleteTableDialog = false;
+    }
+
+    private async Task ConfirmDeleteTable()
+    {
+        if (userId is null || !selectedTableId.HasValue)
+        {
+            return;
+        }
+
+        var deleted = await RollTableService.DeleteAsync(userId, selectedTableId.Value);
+        showDeleteTableDialog = false;
+
+        if (!deleted)
+        {
+            errorMessage = "Rollable table not found.";
+            return;
+        }
+
+        selectedTableId = null;
+        selectedRows = [];
+        ClearRollResult();
+        await LoadDataAsync();
+        statusMessage = "Rollable table removed.";
+    }
+
+    private void Roll()
+    {
+        if (!CanRoll)
+        {
+            if (!HasTableSelection)
+            {
+                errorMessage = "Please select a rollable table first.";
+            }
+            else
+            {
+                errorMessage = "The selected table has no rows to roll on.";
+            }
+
+            return;
+        }
+
+        var table = rollTables.First(t => t.Id == selectedTableId);
+        var index = Random.Shared.Next(selectedRows.Count);
+        var row = selectedRows[index];
+
+        lastRolledTable = table;
+        lastRolledRow = row;
+        lastRolledRowId = row.Id;
+        ClearMessages();
+    }
+
+    private void ClearRollResult()
+    {
+        lastRolledTable = null;
+        lastRolledRow = null;
+        lastRolledRowId = null;
+    }
+
+    private async Task AddRolledItemToUnassigned()
+    {
+        if (userId is null || !CanAddRolledItem || lastRolledRow is null)
+        {
+            return;
+        }
+
+        var input = RollTableService.CreateItemInputFromRoll(lastRolledRow, "Unassigned");
+        var (_, error) = await ItemService.CreateUnassignedAsync(userId, CampaignId, input);
+        if (error is not null)
+        {
+            errorMessage = error;
+            return;
+        }
+
+        statusMessage = $"'{lastRolledRow.Name}' was added to the unassigned item pool.";
+    }
+
+    private void ShowAddItemToCharacterDialog()
+    {
+        if (!CanAddRolledItem)
+        {
+            errorMessage = "Please roll an item table first.";
+            return;
+        }
+
+        if (characters.Count == 0)
+        {
+            errorMessage = "There are no characters in this campaign.";
+            return;
+        }
+
+        addToCharacterMode = AddToCharacterMode.Item;
+        addCharacterDialogTitle = "Add rolled item to character";
+        addTargetCharacterId = characters.FirstOrDefault()?.Id;
+        dialogErrorMessage = null;
+        showAddCharacterDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowAddSkillToCharacterDialog()
+    {
+        if (!CanAddRolledSkill)
+        {
+            errorMessage = "Please roll a skill table first.";
+            return;
+        }
+
+        if (characters.Count == 0)
+        {
+            errorMessage = "There are no characters in this campaign.";
+            return;
+        }
+
+        addToCharacterMode = AddToCharacterMode.Skill;
+        addCharacterDialogTitle = "Add rolled skill to character";
+        addTargetCharacterId = characters.FirstOrDefault()?.Id;
+        dialogErrorMessage = null;
+        showAddCharacterDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseAddCharacterDialog()
+    {
+        showAddCharacterDialog = false;
+        addTargetCharacterId = null;
+        dialogErrorMessage = null;
+    }
+
+    private async Task ConfirmAddToCharacter()
+    {
+        if (userId is null || !addTargetCharacterId.HasValue || lastRolledRow is null)
+        {
+            return;
+        }
+
+        if (addToCharacterMode == AddToCharacterMode.Item)
+        {
+            var character = characters.First(c => c.Id == addTargetCharacterId.Value);
+            var input = RollTableService.CreateItemInputFromRoll(
+                lastRolledRow,
+                $"Carried by {character.Name}");
+
+            var (_, error) = await ItemService.CreateForCharacterAsync(
+                userId,
+                CampaignId,
+                addTargetCharacterId.Value,
+                input);
+
+            if (error is not null)
+            {
+                dialogErrorMessage = error;
+                return;
+            }
+
+            showAddCharacterDialog = false;
+            statusMessage = $"'{lastRolledRow.Name}' was added to {character.Name}.";
+            return;
+        }
+
+        var (name, description, notes) = RollTableService.CreateSkillInputFromRoll(lastRolledRow);
+        var (_, skillError) = await SkillService.CreateAsync(
+            userId,
+            CampaignId,
+            addTargetCharacterId.Value,
+            name,
+            description,
+            notes);
+
+        if (skillError is not null)
+        {
+            dialogErrorMessage = skillError;
+            return;
+        }
+
+        showAddCharacterDialog = false;
+        var targetCharacter = characters.First(c => c.Id == addTargetCharacterId.Value);
+        statusMessage = $"'{lastRolledRow.Name}' was added to {targetCharacter.Name} as a skill.";
+    }
+
+    private void ClearMessages()
+    {
+        statusMessage = null;
+        errorMessage = null;
+    }
+
+    private async Task<string?> GetUserIdAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        return authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+}
