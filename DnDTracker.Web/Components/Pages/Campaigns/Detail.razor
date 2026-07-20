@@ -168,7 +168,7 @@ else
                 <div class="d-flex flex-wrap gap-1">
                     <button class="btn btn-sm btn-primary" @onclick="ShowCreateUnassignedItemDialog">Add</button>
                     <button class="btn btn-sm btn-secondary" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowEditUnassignedItemDialog">Edit</button>
-                    <button class="btn btn-sm btn-outline-primary" disabled="@(!CanAssignItem)" @onclick="AssignSelectedItem">Assign</button>
+                    <button class="btn btn-sm btn-outline-primary" disabled="@(!CanAssignItem)" @onclick="ShowAssignDialog">Assign</button>
                     <button class="btn btn-sm btn-danger" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowDeleteUnassignedItemDialog">Remove</button>
                 </div>
             }
@@ -328,6 +328,50 @@ else
     </div>
 }
 
+@if (showAssignDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign to character</h5>
+                    <button type="button" class="btn-close" @onclick="CloseAssignDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+
+                    <p>Select a character to carry '@SelectedUnassignedItem?.Name':</p>
+
+                    @if (characters.Count == 0)
+                    {
+                        <p class="text-muted">No characters in this campaign. Add a character first.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var character in characters)
+                            {
+                                <button type="button"
+                                        class="list-group-item list-group-item-action @(assignTargetCharacterId == character.Id ? "active" : "")"
+                                        @onclick="() => assignTargetCharacterId = character.Id">
+                                    @character.Name
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseAssignDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" disabled="@(!assignTargetCharacterId.HasValue)" @onclick="ConfirmAssign">Assign</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @if (showDeleteDialog)
 {
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
@@ -410,6 +454,9 @@ else
     private string itemStatusInput = "";
     private string itemNotesInput = "";
 
+    private bool showAssignDialog;
+    private Guid? assignTargetCharacterId;
+
     private bool showDeleteDialog;
     private DeleteTarget deleteTarget;
     private string deleteDialogTitle = "";
@@ -419,7 +466,7 @@ else
     private bool HasSkillSelection => selectedSkillId.HasValue;
     private bool HasCharacterItemSelection => selectedItemId.HasValue;
     private bool HasUnassignedItemSelection => selectedUnassignedItemId.HasValue;
-    private bool CanAssignItem => HasCharacterSelection && HasUnassignedItemSelection;
+    private bool CanAssignItem => HasUnassignedItemSelection && characters.Count > 0;
 
     private Skill? SelectedSkill => skills.FirstOrDefault(s => s.Id == selectedSkillId);
     private Item? SelectedCharacterItem => characterItems.FirstOrDefault(i => i.Id == selectedItemId);
@@ -838,25 +885,59 @@ else
         ClearMessages();
     }
 
-    private async Task AssignSelectedItem()
+    private void ShowAssignDialog()
     {
-        if (userId is null || !CanAssignItem)
+        if (!HasUnassignedItemSelection || characters.Count == 0)
+        {
+            if (!HasUnassignedItemSelection)
+            {
+                errorMessage = "Please select an unassigned item first.";
+            }
+            else
+            {
+                errorMessage = "Add a character before assigning items.";
+            }
+
+            return;
+        }
+
+        assignTargetCharacterId = selectedCharacterId ?? characters.FirstOrDefault()?.Id;
+        dialogErrorMessage = null;
+        showAssignDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseAssignDialog()
+    {
+        showAssignDialog = false;
+        assignTargetCharacterId = null;
+        dialogErrorMessage = null;
+    }
+
+    private async Task ConfirmAssign()
+    {
+        if (userId is null || !HasUnassignedItemSelection || !assignTargetCharacterId.HasValue)
         {
             return;
         }
+
+        var assignedCharacterId = assignTargetCharacterId.Value;
 
         var error = await ItemService.AssignToCharacterAsync(
             userId,
             CampaignId,
             selectedUnassignedItemId!.Value,
-            selectedCharacterId!.Value);
+            assignedCharacterId);
 
         if (error is not null)
         {
-            errorMessage = error;
+            dialogErrorMessage = error;
             return;
         }
 
+        showAssignDialog = false;
+        assignTargetCharacterId = null;
+        selectedCharacterId = assignedCharacterId;
         selectedUnassignedItemId = null;
         await LoadAllDataAsync();
         activeTab = DetailTab.Items;
