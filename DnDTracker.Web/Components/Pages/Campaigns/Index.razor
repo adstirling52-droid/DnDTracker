@@ -9,6 +9,7 @@
 @attribute [Authorize]
 
 @inject CampaignService CampaignService
+@inject CampaignImportExportService CampaignImportExportService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
@@ -52,6 +53,15 @@
     <button class="btn btn-primary" @onclick="ShowCreateDialog">New Campaign</button>
     <button class="btn btn-secondary" disabled="@(!HasSelection)" @onclick="ShowEditDialog">Edit Campaign</button>
     <button class="btn btn-outline-primary" disabled="@(!HasSelection)" @onclick="OpenSelectedCampaign">Open Campaign</button>
+    <button class="btn btn-outline-secondary" @onclick="ShowImportDialog">Import Campaign</button>
+    @if (HasSelection)
+    {
+        <a class="btn btn-outline-secondary" href="@ExportUrl">Export Campaign</a>
+    }
+    else
+    {
+        <button class="btn btn-outline-secondary" disabled>Export Campaign</button>
+    }
     <button class="btn btn-danger" disabled="@(!HasSelection)" @onclick="ShowDeleteDialog">Remove Campaign</button>
 </div>
 
@@ -109,6 +119,44 @@
     </div>
 }
 
+@if (showImportDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import campaign</h5>
+                    <button type="button" class="btn-close" @onclick="CloseImportDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+
+                    <p class="small text-muted">
+                        Import a campaign JSON file exported from the desktop DnDTracker app or this web app.
+                        Provenance history is not imported. Item images are not included in JSON files.
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Campaign JSON file</label>
+                        <InputFile OnChange="OnImportFileSelected" accept=".json,application/json" class="form-control" />
+                        @if (!string.IsNullOrEmpty(pendingImportFileName))
+                        {
+                            <div class="form-text">Selected: @pendingImportFileName</div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseImportDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" disabled="@(!CanConfirmImport)" @onclick="ConfirmImport">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private List<Campaign> campaigns = [];
     private Guid? selectedCampaignId;
@@ -123,8 +171,15 @@
     private string? dialogErrorMessage;
 
     private bool showDeleteDialog;
+    private bool showImportDialog;
+    private string pendingImportFileName = "";
+    private string pendingImportJson = "";
 
     private bool HasSelection => selectedCampaignId.HasValue;
+    private bool CanConfirmImport => !string.IsNullOrWhiteSpace(pendingImportJson);
+    private string? ExportUrl => HasSelection
+        ? NavigationManager.ToAbsoluteUri($"api/campaigns/{selectedCampaignId}/export").ToString()
+        : null;
 
     private string? SelectedCampaignName =>
         campaigns.FirstOrDefault(c => c.Id == selectedCampaignId)?.Name;
@@ -288,6 +343,91 @@
         }
 
         NavigationManager.NavigateTo($"campaigns/{selectedCampaignId}");
+    }
+
+    private void ShowImportDialog()
+    {
+        pendingImportFileName = "";
+        pendingImportJson = "";
+        dialogErrorMessage = null;
+        showImportDialog = true;
+        ClearMessages();
+    }
+
+    private async Task OnImportFileSelected(InputFileChangeEventArgs e)
+    {
+        dialogErrorMessage = null;
+
+        try
+        {
+            await using var stream = e.File.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            using var reader = new StreamReader(stream);
+            pendingImportJson = await reader.ReadToEndAsync();
+            pendingImportFileName = e.File.Name;
+        }
+        catch (Exception ex)
+        {
+            pendingImportFileName = "";
+            pendingImportJson = "";
+            dialogErrorMessage = $"Failed to read JSON file: {ex.Message}";
+        }
+    }
+
+    private void CloseImportDialog()
+    {
+        showImportDialog = false;
+        pendingImportFileName = "";
+        pendingImportJson = "";
+        dialogErrorMessage = null;
+    }
+
+    private async Task ConfirmImport()
+    {
+        if (userId is null || !CanConfirmImport)
+        {
+            dialogErrorMessage = "Please choose a JSON file to import.";
+            return;
+        }
+
+        var (campaign, summary, importError) = await CampaignImportExportService.ImportAsync(userId, pendingImportJson);
+        if (importError is not null)
+        {
+            dialogErrorMessage = importError;
+            return;
+        }
+
+        CloseImportDialog();
+        await LoadCampaignsAsync();
+        selectedCampaignId = campaign?.Id;
+        statusMessage = BuildImportStatusMessage(campaign!.Name, summary);
+    }
+
+    private static string BuildImportStatusMessage(string campaignName, CampaignImportSummary? summary)
+    {
+        var message = $"Campaign '{campaignName}' imported.";
+
+        if (summary is null)
+        {
+            return message;
+        }
+
+        var notes = new List<string>();
+        if (summary.ItemsWithProvenanceSkipped > 0)
+        {
+            notes.Add("provenance history was not imported");
+        }
+
+        if (summary.ItemsWithImagesSkipped > 0)
+        {
+            notes.Add("item images were not imported");
+        }
+
+        if (notes.Count == 0)
+        {
+            return message;
+        }
+
+        return $"{message} Note: {string.Join(" and ", notes)}.";
     }
 
     private void ClearMessages()

@@ -33,6 +33,7 @@ builder.Services.AddScoped<IUserValidator<ApplicationUser>, OptionalEmailUserVal
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<CampaignService>();
+builder.Services.AddScoped<CampaignImportExportService>();
 builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SkillService>();
@@ -92,6 +93,29 @@ app.MapGet("/api/items/{itemId:guid}/image", async (
     }
 
     return Results.File(stream, contentType);
+}).RequireAuthorization();
+
+app.MapGet("/api/campaigns/{campaignId:guid}/export", async (
+    Guid campaignId,
+    ClaimsPrincipal user,
+    CampaignImportExportService campaignImportExportService) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var (json, fileName, error) = await campaignImportExportService.ExportAsync(userId, campaignId);
+    if (error is not null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.File(
+        System.Text.Encoding.UTF8.GetBytes(json!),
+        "application/json",
+        fileName);
 }).RequireAuthorization();
 
 app.Run();
