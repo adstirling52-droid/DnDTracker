@@ -9,8 +9,10 @@
 @attribute [Authorize]
 
 @inject CampaignService CampaignService
+@inject CharacterService CharacterService
+@inject ItemService ItemService
+@inject SkillService SkillService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
 
 <PageTitle>@pageTitle</PageTitle>
 
@@ -22,28 +24,934 @@
 }
 else
 {
-    <h1>@campaign.Name</h1>
-    <p class="text-muted">Campaign detail (characters, items, and skills) will be added in the next phase.</p>
-    <a class="btn btn-secondary" href="campaigns">Back to campaigns</a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0">@campaign.Name</h1>
+        <a class="btn btn-secondary" href="campaigns">Back to campaigns</a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="alert alert-info" role="status">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@errorMessage</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-3">
+            <h2 class="h5">Characters</h2>
+            @if (characters.Count == 0)
+            {
+                <p class="text-muted small">No characters yet.</p>
+            }
+            else
+            {
+                <div class="list-group mb-2">
+                    @foreach (var character in characters)
+                    {
+                        <button type="button"
+                                class="list-group-item list-group-item-action @(selectedCharacterId == character.Id ? "active" : "")"
+                                @onclick="() => SelectCharacter(character.Id)">
+                            @character.Name
+                        </button>
+                    }
+                </div>
+            }
+            <div class="d-flex flex-wrap gap-1">
+                <button class="btn btn-sm btn-primary" @onclick="ShowCreateCharacterDialog">Add</button>
+                <button class="btn btn-sm btn-secondary" disabled="@(!HasCharacterSelection)" @onclick="ShowEditCharacterDialog">Edit</button>
+                <button class="btn btn-sm btn-danger" disabled="@(!HasCharacterSelection)" @onclick="ShowDeleteCharacterDialog">Remove</button>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            @if (!HasCharacterSelection)
+            {
+                <p class="text-muted">Select a character to manage skills and items, or use the Unassigned tab.</p>
+            }
+
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <button type="button" class="nav-link @(activeTab == DetailTab.Skills ? "active" : "")" disabled="@(!HasCharacterSelection)" @onclick="() => SetTab(DetailTab.Skills)">Skills</button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link @(activeTab == DetailTab.Items ? "active" : "")" disabled="@(!HasCharacterSelection)" @onclick="() => SetTab(DetailTab.Items)">Items</button>
+                </li>
+                <li class="nav-item">
+                    <button type="button" class="nav-link @(activeTab == DetailTab.Unassigned ? "active" : "")" @onclick="() => SetTab(DetailTab.Unassigned)">Unassigned</button>
+                </li>
+            </ul>
+
+            @if (activeTab == DetailTab.Skills)
+            {
+                <h3 class="h6">Skills</h3>
+                @if (!HasCharacterSelection)
+                {
+                    <p class="text-muted small">Select a character first.</p>
+                }
+                else if (skills.Count == 0)
+                {
+                    <p class="text-muted small">No skills for this character.</p>
+                }
+                else
+                {
+                    <div class="list-group mb-2">
+                        @foreach (var skill in skills)
+                        {
+                            <button type="button"
+                                    class="list-group-item list-group-item-action @(selectedSkillId == skill.Id ? "active" : "")"
+                                    @onclick="() => SelectSkill(skill.Id)">
+                                @skill.Name
+                            </button>
+                        }
+                    </div>
+                }
+                <div class="d-flex flex-wrap gap-1">
+                    <button class="btn btn-sm btn-primary" disabled="@(!HasCharacterSelection)" @onclick="ShowCreateSkillDialog">Add</button>
+                    <button class="btn btn-sm btn-secondary" disabled="@(!HasSkillSelection)" @onclick="ShowEditSkillDialog">Edit</button>
+                    <button class="btn btn-sm btn-danger" disabled="@(!HasSkillSelection)" @onclick="ShowDeleteSkillDialog">Remove</button>
+                </div>
+            }
+            else if (activeTab == DetailTab.Items)
+            {
+                <h3 class="h6">Items</h3>
+                @if (!HasCharacterSelection)
+                {
+                    <p class="text-muted small">Select a character first.</p>
+                }
+                else if (characterItems.Count == 0)
+                {
+                    <p class="text-muted small">No items for this character.</p>
+                }
+                else
+                {
+                    <div class="list-group mb-2">
+                        @foreach (var item in characterItems)
+                        {
+                            <button type="button"
+                                    class="list-group-item list-group-item-action @(selectedItemId == item.Id ? "active" : "")"
+                                    @onclick="() => SelectCharacterItem(item.Id)">
+                                @item.Name
+                            </button>
+                        }
+                    </div>
+                }
+                <div class="d-flex flex-wrap gap-1">
+                    <button class="btn btn-sm btn-primary" disabled="@(!HasCharacterSelection)" @onclick="ShowCreateCharacterItemDialog">Add</button>
+                    <button class="btn btn-sm btn-secondary" disabled="@(!HasCharacterItemSelection)" @onclick="ShowEditCharacterItemDialog">Edit</button>
+                    <button class="btn btn-sm btn-warning" disabled="@(!HasCharacterItemSelection)" @onclick="UnassignSelectedItem">Unassign</button>
+                    <button class="btn btn-sm btn-danger" disabled="@(!HasCharacterItemSelection)" @onclick="ShowDeleteCharacterItemDialog">Remove</button>
+                </div>
+            }
+            else
+            {
+                <h3 class="h6">Unassigned items</h3>
+                @if (unassignedItems.Count == 0)
+                {
+                    <p class="text-muted small">No unassigned items.</p>
+                }
+                else
+                {
+                    <div class="list-group mb-2">
+                        @foreach (var item in unassignedItems)
+                        {
+                            <button type="button"
+                                    class="list-group-item list-group-item-action @(selectedUnassignedItemId == item.Id ? "active" : "")"
+                                    @onclick="() => SelectUnassignedItem(item.Id)">
+                                @item.Name
+                            </button>
+                        }
+                    </div>
+                }
+                <div class="d-flex flex-wrap gap-1">
+                    <button class="btn btn-sm btn-primary" @onclick="ShowCreateUnassignedItemDialog">Add</button>
+                    <button class="btn btn-sm btn-secondary" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowEditUnassignedItemDialog">Edit</button>
+                    <button class="btn btn-sm btn-outline-primary" disabled="@(!CanAssignItem)" @onclick="AssignSelectedItem">Assign</button>
+                    <button class="btn btn-sm btn-danger" disabled="@(!HasUnassignedItemSelection)" @onclick="ShowDeleteUnassignedItemDialog">Remove</button>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <h2 class="h5">Details</h2>
+            @if (activeTab == DetailTab.Skills && SelectedSkill is not null)
+            {
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@SelectedSkill.Name</dd>
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@DisplayValue(SelectedSkill.Description)</dd>
+                    <dt class="col-sm-4">Notes</dt>
+                    <dd class="col-sm-8">@DisplayValue(SelectedSkill.Notes)</dd>
+                </dl>
+            }
+            else if ((activeTab == DetailTab.Items && SelectedCharacterItem is not null) ||
+                     (activeTab == DetailTab.Unassigned && SelectedUnassignedItem is not null))
+            {
+                var item = activeTab == DetailTab.Items ? SelectedCharacterItem! : SelectedUnassignedItem!;
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@item.Name</dd>
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@DisplayValue(item.Description)</dd>
+                    <dt class="col-sm-4">Where found</dt>
+                    <dd class="col-sm-8">@DisplayValue(item.WhereFound)</dd>
+                    <dt class="col-sm-4">When found</dt>
+                    <dd class="col-sm-8">@DisplayValue(item.WhenFound)</dd>
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">@DisplayValue(item.CurrentStatus)</dd>
+                    <dt class="col-sm-4">Notes</dt>
+                    <dd class="col-sm-8">@DisplayValue(item.Notes)</dd>
+                </dl>
+            }
+            else
+            {
+                <p class="text-muted small">Select a skill or item to view details.</p>
+            }
+        </div>
+    </div>
+}
+
+@if (showCharacterDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@characterDialogTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseCharacterDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+                    <div class="form-floating">
+                        <input id="characterName" class="form-control" @bind="characterNameInput" @bind:event="oninput" placeholder="Character name" />
+                        <label for="characterName">Character name</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseCharacterDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveCharacter">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showSkillDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@skillDialogTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseSkillDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+                    <div class="form-floating mb-3">
+                        <input id="skillName" class="form-control" @bind="skillNameInput" @bind:event="oninput" placeholder="Skill name" />
+                        <label for="skillName">Skill name</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="skillDescription">Description</label>
+                        <textarea id="skillDescription" class="form-control" rows="2" @bind="skillDescriptionInput"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="skillNotes">Notes</label>
+                        <textarea id="skillNotes" class="form-control" rows="3" @bind="skillNotesInput"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseSkillDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveSkill">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showItemDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@itemDialogTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseItemDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                    {
+                        <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                    }
+                    <div class="form-floating mb-3">
+                        <input id="itemName" class="form-control" @bind="itemNameInput" @bind:event="oninput" placeholder="Item name" />
+                        <label for="itemName">Item name</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="itemDescription">Description</label>
+                        <input id="itemDescription" class="form-control" @bind="itemDescriptionInput" />
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="itemWhereFound">Where found</label>
+                            <input id="itemWhereFound" class="form-control" @bind="itemWhereFoundInput" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="itemWhenFound">When found</label>
+                            <input id="itemWhenFound" class="form-control" @bind="itemWhenFoundInput" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="itemStatus">Current status</label>
+                        <input id="itemStatus" class="form-control" @bind="itemStatusInput" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="itemNotes">Notes</label>
+                        <textarea id="itemNotes" class="form-control" rows="3" @bind="itemNotesInput"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseItemDialog">Cancel</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveItem">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showDeleteDialog)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@deleteDialogTitle</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDeleteDialog" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@deleteDialogMessage</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDeleteDialog">No</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmDelete">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @code {
     [Parameter]
     public Guid CampaignId { get; set; }
 
+    private enum DetailTab
+    {
+        Skills,
+        Items,
+        Unassigned
+    }
+
+    private enum DeleteTarget
+    {
+        Character,
+        CharacterItem,
+        UnassignedItem,
+        Skill
+    }
+
     private Campaign? campaign;
+    private List<Character> characters = [];
+    private List<Skill> skills = [];
+    private List<Item> characterItems = [];
+    private List<Item> unassignedItems = [];
+
+    private string? userId;
     private string pageTitle = "Campaign";
 
-    protected override async Task OnInitializedAsync()
+    private Guid? selectedCharacterId;
+    private Guid? selectedItemId;
+    private Guid? selectedSkillId;
+    private Guid? selectedUnassignedItemId;
+    private DetailTab activeTab = DetailTab.Skills;
+
+    private string? statusMessage;
+    private string? errorMessage;
+    private string? dialogErrorMessage;
+
+    private bool showCharacterDialog;
+    private bool editingCharacter;
+    private string characterDialogTitle = "";
+    private string characterNameInput = "";
+
+    private bool showSkillDialog;
+    private bool editingSkill;
+    private string skillDialogTitle = "";
+    private string skillNameInput = "";
+    private string skillDescriptionInput = "";
+    private string skillNotesInput = "";
+
+    private bool showItemDialog;
+    private bool editingItem;
+    private bool itemDialogForUnassigned;
+    private string itemDialogTitle = "";
+    private string itemNameInput = "";
+    private string itemDescriptionInput = "";
+    private string itemWhereFoundInput = "";
+    private string itemWhenFoundInput = "";
+    private string itemStatusInput = "";
+    private string itemNotesInput = "";
+
+    private bool showDeleteDialog;
+    private DeleteTarget deleteTarget;
+    private string deleteDialogTitle = "";
+    private string deleteDialogMessage = "";
+
+    private bool HasCharacterSelection => selectedCharacterId.HasValue;
+    private bool HasSkillSelection => selectedSkillId.HasValue;
+    private bool HasCharacterItemSelection => selectedItemId.HasValue;
+    private bool HasUnassignedItemSelection => selectedUnassignedItemId.HasValue;
+    private bool CanAssignItem => HasCharacterSelection && HasUnassignedItemSelection;
+
+    private Skill? SelectedSkill => skills.FirstOrDefault(s => s.Id == selectedSkillId);
+    private Item? SelectedCharacterItem => characterItems.FirstOrDefault(i => i.Id == selectedItemId);
+    private Item? SelectedUnassignedItem => unassignedItems.FirstOrDefault(i => i.Id == selectedUnassignedItemId);
+
+    protected override async Task OnParametersSetAsync()
     {
-        var userId = await GetUserIdAsync();
+        userId = await GetUserIdAsync();
         if (userId is null)
         {
+            campaign = null;
             return;
         }
 
         campaign = await CampaignService.GetCampaignAsync(userId, CampaignId);
         pageTitle = campaign?.Name ?? "Campaign not found";
+
+        if (campaign is not null)
+        {
+            await LoadAllDataAsync();
+        }
+    }
+
+    private async Task LoadAllDataAsync()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        characters = await CharacterService.GetByCampaignAsync(userId, CampaignId);
+        unassignedItems = await ItemService.GetUnassignedAsync(userId, CampaignId);
+
+        if (selectedCharacterId.HasValue &&
+            characters.All(c => c.Id != selectedCharacterId.Value))
+        {
+            selectedCharacterId = characters.FirstOrDefault()?.Id;
+        }
+
+        await LoadCharacterDataAsync();
+    }
+
+    private async Task LoadCharacterDataAsync()
+    {
+        selectedItemId = null;
+        selectedSkillId = null;
+        skills = [];
+        characterItems = [];
+
+        if (!HasCharacterSelection || userId is null)
+        {
+            return;
+        }
+
+        skills = await SkillService.GetByCharacterAsync(userId, CampaignId, selectedCharacterId!.Value);
+        characterItems = await ItemService.GetByCharacterAsync(userId, CampaignId, selectedCharacterId.Value);
+    }
+
+    private async Task SelectCharacter(Guid characterId)
+    {
+        selectedCharacterId = characterId;
+        if (activeTab == DetailTab.Unassigned)
+        {
+            activeTab = DetailTab.Skills;
+        }
+
+        ClearMessages();
+        await LoadCharacterDataAsync();
+    }
+
+    private void SetTab(DetailTab tab)
+    {
+        activeTab = tab;
+        selectedItemId = null;
+        selectedSkillId = null;
+        selectedUnassignedItemId = null;
+        ClearMessages();
+    }
+
+    private void SelectSkill(Guid skillId)
+    {
+        selectedSkillId = skillId;
+        selectedItemId = null;
+        selectedUnassignedItemId = null;
+        ClearMessages();
+    }
+
+    private void SelectCharacterItem(Guid itemId)
+    {
+        selectedItemId = itemId;
+        selectedSkillId = null;
+        selectedUnassignedItemId = null;
+        ClearMessages();
+    }
+
+    private void SelectUnassignedItem(Guid itemId)
+    {
+        selectedUnassignedItemId = itemId;
+        selectedItemId = null;
+        selectedSkillId = null;
+        ClearMessages();
+    }
+
+    private void ShowCreateCharacterDialog()
+    {
+        editingCharacter = false;
+        characterDialogTitle = "Create New Character";
+        characterNameInput = "";
+        dialogErrorMessage = null;
+        showCharacterDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowEditCharacterDialog()
+    {
+        if (!HasCharacterSelection)
+        {
+            return;
+        }
+
+        editingCharacter = true;
+        characterDialogTitle = "Edit Character";
+        characterNameInput = characters.First(c => c.Id == selectedCharacterId).Name;
+        dialogErrorMessage = null;
+        showCharacterDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseCharacterDialog()
+    {
+        showCharacterDialog = false;
+        dialogErrorMessage = null;
+    }
+
+    private async Task SaveCharacter()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        if (editingCharacter)
+        {
+            var error = await CharacterService.UpdateAsync(
+                userId, CampaignId, selectedCharacterId!.Value, characterNameInput);
+
+            if (error is not null)
+            {
+                dialogErrorMessage = error;
+                return;
+            }
+
+            showCharacterDialog = false;
+            await LoadAllDataAsync();
+            statusMessage = "Character updated.";
+            return;
+        }
+
+        var (character, createError) = await CharacterService.CreateAsync(userId, CampaignId, characterNameInput);
+        if (createError is not null)
+        {
+            dialogErrorMessage = createError;
+            return;
+        }
+
+        showCharacterDialog = false;
+        await LoadAllDataAsync();
+        selectedCharacterId = character?.Id;
+        await LoadCharacterDataAsync();
+        statusMessage = "Character created.";
+    }
+
+    private void ShowDeleteCharacterDialog()
+    {
+        if (!HasCharacterSelection)
+        {
+            return;
+        }
+
+        deleteTarget = DeleteTarget.Character;
+        deleteDialogTitle = "Confirm Remove Character";
+        deleteDialogMessage = $"Remove character '{characters.First(c => c.Id == selectedCharacterId).Name}'? Items on this character will also be removed.";
+        showDeleteDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowCreateSkillDialog()
+    {
+        editingSkill = false;
+        skillDialogTitle = "Create New Skill";
+        skillNameInput = "";
+        skillDescriptionInput = "";
+        skillNotesInput = "";
+        dialogErrorMessage = null;
+        showSkillDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowEditSkillDialog()
+    {
+        var skill = SelectedSkill;
+        if (skill is null)
+        {
+            return;
+        }
+
+        editingSkill = true;
+        skillDialogTitle = "Edit Skill";
+        skillNameInput = skill.Name;
+        skillDescriptionInput = skill.Description;
+        skillNotesInput = skill.Notes;
+        dialogErrorMessage = null;
+        showSkillDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseSkillDialog()
+    {
+        showSkillDialog = false;
+        dialogErrorMessage = null;
+    }
+
+    private async Task SaveSkill()
+    {
+        if (userId is null || !HasCharacterSelection)
+        {
+            return;
+        }
+
+        if (editingSkill)
+        {
+            var error = await SkillService.UpdateAsync(
+                userId,
+                CampaignId,
+                selectedCharacterId!.Value,
+                selectedSkillId!.Value,
+                skillNameInput,
+                skillDescriptionInput,
+                skillNotesInput);
+
+            if (error is not null)
+            {
+                dialogErrorMessage = error;
+                return;
+            }
+
+            showSkillDialog = false;
+            await LoadCharacterDataAsync();
+            statusMessage = "Skill updated.";
+            return;
+        }
+
+        var (skill, createError) = await SkillService.CreateAsync(
+            userId,
+            CampaignId,
+            selectedCharacterId!.Value,
+            skillNameInput,
+            skillDescriptionInput,
+            skillNotesInput);
+
+        if (createError is not null)
+        {
+            dialogErrorMessage = createError;
+            return;
+        }
+
+        showSkillDialog = false;
+        await LoadCharacterDataAsync();
+        selectedSkillId = skill?.Id;
+        statusMessage = "Skill created.";
+    }
+
+    private void ShowDeleteSkillDialog()
+    {
+        var skill = SelectedSkill;
+        if (skill is null)
+        {
+            return;
+        }
+
+        deleteTarget = DeleteTarget.Skill;
+        deleteDialogTitle = "Confirm Remove Skill";
+        deleteDialogMessage = $"Remove skill '{skill.Name}'?";
+        showDeleteDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowCreateCharacterItemDialog() => ShowCreateItemDialog(forUnassigned: false);
+
+    private void ShowCreateUnassignedItemDialog() => ShowCreateItemDialog(forUnassigned: true);
+
+    private void ShowCreateItemDialog(bool forUnassigned)
+    {
+        editingItem = false;
+        itemDialogForUnassigned = forUnassigned;
+        itemDialogTitle = "Create New Item";
+        ClearItemInputs();
+        dialogErrorMessage = null;
+        showItemDialog = true;
+        ClearMessages();
+    }
+
+    private void ShowEditCharacterItemDialog() => ShowEditItemDialog(forUnassigned: false);
+
+    private void ShowEditUnassignedItemDialog() => ShowEditItemDialog(forUnassigned: true);
+
+    private void ShowEditItemDialog(bool forUnassigned)
+    {
+        var item = forUnassigned ? SelectedUnassignedItem : SelectedCharacterItem;
+        if (item is null)
+        {
+            return;
+        }
+
+        editingItem = true;
+        itemDialogForUnassigned = forUnassigned;
+        itemDialogTitle = "Edit Item";
+        itemNameInput = item.Name;
+        itemDescriptionInput = item.Description;
+        itemWhereFoundInput = item.WhereFound;
+        itemWhenFoundInput = item.WhenFound;
+        itemStatusInput = item.CurrentStatus;
+        itemNotesInput = item.Notes;
+        dialogErrorMessage = null;
+        showItemDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseItemDialog()
+    {
+        showItemDialog = false;
+        dialogErrorMessage = null;
+    }
+
+    private async Task SaveItem()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var input = BuildItemInput();
+
+        if (editingItem)
+        {
+            var itemId = itemDialogForUnassigned ? selectedUnassignedItemId!.Value : selectedItemId!.Value;
+            var error = await ItemService.UpdateAsync(userId, CampaignId, itemId, input);
+            if (error is not null)
+            {
+                dialogErrorMessage = error;
+                return;
+            }
+
+            showItemDialog = false;
+            await LoadAllDataAsync();
+            statusMessage = "Item updated.";
+            return;
+        }
+
+        if (itemDialogForUnassigned)
+        {
+            var (item, createError) = await ItemService.CreateUnassignedAsync(userId, CampaignId, input);
+            if (createError is not null)
+            {
+                dialogErrorMessage = createError;
+                return;
+            }
+
+            showItemDialog = false;
+            await LoadAllDataAsync();
+            selectedUnassignedItemId = item?.Id;
+            statusMessage = "Item created.";
+            return;
+        }
+
+        if (!HasCharacterSelection)
+        {
+            dialogErrorMessage = "Please select a character first.";
+            return;
+        }
+
+        var (characterItem, characterCreateError) = await ItemService.CreateForCharacterAsync(
+            userId,
+            CampaignId,
+            selectedCharacterId!.Value,
+            input);
+
+        if (characterCreateError is not null)
+        {
+            dialogErrorMessage = characterCreateError;
+            return;
+        }
+
+        showItemDialog = false;
+        await LoadAllDataAsync();
+        selectedItemId = characterItem?.Id;
+        statusMessage = "Item created.";
+    }
+
+    private void ShowDeleteCharacterItemDialog() => ShowDeleteItemDialog(forUnassigned: false);
+
+    private void ShowDeleteUnassignedItemDialog() => ShowDeleteItemDialog(forUnassigned: true);
+
+    private void ShowDeleteItemDialog(bool forUnassigned)
+    {
+        var item = forUnassigned ? SelectedUnassignedItem : SelectedCharacterItem;
+        if (item is null)
+        {
+            return;
+        }
+
+        deleteTarget = forUnassigned ? DeleteTarget.UnassignedItem : DeleteTarget.CharacterItem;
+        deleteDialogTitle = "Confirm Remove Item";
+        deleteDialogMessage = $"Remove item '{item.Name}'?";
+        showDeleteDialog = true;
+        ClearMessages();
+    }
+
+    private async Task AssignSelectedItem()
+    {
+        if (userId is null || !CanAssignItem)
+        {
+            return;
+        }
+
+        var error = await ItemService.AssignToCharacterAsync(
+            userId,
+            CampaignId,
+            selectedUnassignedItemId!.Value,
+            selectedCharacterId!.Value);
+
+        if (error is not null)
+        {
+            errorMessage = error;
+            return;
+        }
+
+        selectedUnassignedItemId = null;
+        await LoadAllDataAsync();
+        activeTab = DetailTab.Items;
+        statusMessage = "Item assigned to character.";
+    }
+
+    private async Task UnassignSelectedItem()
+    {
+        if (userId is null || !HasCharacterItemSelection)
+        {
+            return;
+        }
+
+        var error = await ItemService.UnassignAsync(userId, CampaignId, selectedItemId!.Value);
+        if (error is not null)
+        {
+            errorMessage = error;
+            return;
+        }
+
+        selectedItemId = null;
+        await LoadAllDataAsync();
+        activeTab = DetailTab.Unassigned;
+        statusMessage = "Item moved to unassigned.";
+    }
+
+    private void CloseDeleteDialog()
+    {
+        showDeleteDialog = false;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (userId is null)
+        {
+            return;
+        }
+
+        var deleted = deleteTarget switch
+        {
+            DeleteTarget.Character => await CharacterService.DeleteAsync(
+                userId, CampaignId, selectedCharacterId!.Value),
+            DeleteTarget.CharacterItem => await ItemService.DeleteAsync(
+                userId, CampaignId, selectedItemId!.Value),
+            DeleteTarget.UnassignedItem => await ItemService.DeleteAsync(
+                userId, CampaignId, selectedUnassignedItemId!.Value),
+            DeleteTarget.Skill => await SkillService.DeleteAsync(
+                userId, CampaignId, selectedCharacterId!.Value, selectedSkillId!.Value),
+            _ => false
+        };
+
+        showDeleteDialog = false;
+
+        if (!deleted)
+        {
+            errorMessage = "Unable to remove the selected item.";
+            return;
+        }
+
+        if (deleteTarget == DeleteTarget.Character)
+        {
+            selectedCharacterId = null;
+        }
+
+        await LoadAllDataAsync();
+        selectedCharacterId ??= characters.FirstOrDefault()?.Id;
+        statusMessage = "Removed successfully.";
+    }
+
+    private ItemInput BuildItemInput() =>
+        new(
+            itemNameInput,
+            itemDescriptionInput,
+            itemWhereFoundInput,
+            itemWhenFoundInput,
+            itemStatusInput,
+            itemNotesInput);
+
+    private void ClearItemInputs()
+    {
+        itemNameInput = "";
+        itemDescriptionInput = "";
+        itemWhereFoundInput = "";
+        itemWhenFoundInput = "";
+        itemStatusInput = "";
+        itemNotesInput = "";
+    }
+
+    private static string DisplayValue(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private void ClearMessages()
+    {
+        statusMessage = null;
+        errorMessage = null;
     }
 
     private async Task<string?> GetUserIdAsync()
