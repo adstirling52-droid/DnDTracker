@@ -27,7 +27,13 @@
             <ValidationSummary class="text-danger" role="alert" />
 
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <InputText @bind-Value="Input.Username" id="Input.Username" class="form-control" autocomplete="username" aria-required="true" placeholder="username" />
+                <label for="Input.Username">Username</label>
+                <ValidationMessage For="() => Input.Username" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="name@example.com" />
                 <label for="Input.Email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
@@ -76,8 +82,8 @@
 
         var user = new ApplicationUser
         {
-            UserName = Input.Email,
-            Email = Input.Email
+            UserName = Input.Username.Trim(),
+            Email = Input.Email.Trim()
         };
 
         var result = await UserManager.CreateAsync(user, Input.Password);
@@ -96,6 +102,11 @@
 
     private sealed class InputModel
     {
+        [Required]
+        [StringLength(256, MinimumLength = 3, ErrorMessage = "Username must be at least 3 characters.")]
+        [RegularExpression(@"^[a-zA-Z0-9._@+-]+$", ErrorMessage = "Username can only contain letters, numbers, and . _ @ + -")]
+        public string Username { get; set; } = "";
+
         [Required]
         [EmailAddress]
         public string Email { get; set; } = "";
