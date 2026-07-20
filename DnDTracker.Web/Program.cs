@@ -6,6 +6,7 @@ using DnDTracker.Web.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,9 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     })
     .AddEntityFrameworkStores<DnDTrackerDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.RemoveAll<IUserValidator<ApplicationUser>>();
+builder.Services.AddScoped<IUserValidator<ApplicationUser>, OptionalEmailUserValidator>();
 
 builder.Services.AddAuthorization();
 
