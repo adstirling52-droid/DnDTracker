@@ -7,6 +7,8 @@
 
     <main>
         <div class="top-row px-4 auth-links">
+            <a href="/" class="site-home-link">Home</a>
+            <div class="auth-links-end">
             <AuthorizeView>
                 <Authorized>
                     <span class="me-3">Hello, @context.User.Identity?.Name</span>
@@ -20,6 +22,7 @@
                     <a href="Account/Login">Log in</a>
                 </NotAuthorized>
             </AuthorizeView>
+            </div>
         </div>
 
         <article class="content px-4">
