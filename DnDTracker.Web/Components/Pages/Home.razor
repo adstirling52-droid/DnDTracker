@@ -1,17 +1,23 @@
 ﻿@page "/"
+@layout LandingLayout
 @attribute [AllowAnonymous]
 
-<PageTitle>D&D Tracker</PageTitle>
+<PageTitle>Alan Stirling</PageTitle>
 
-<h1>D&D Tracker</h1>
+<section class="hero">
+    <h1>Alan Stirling</h1>
+    <p class="lead">Software developer. Personal projects and experiments.</p>
+</section>
 
-<AuthorizeView>
-    <Authorized>
-        <p>Welcome back, @context.User.Identity?.Name.</p>
-        <p>You are logged in and ready to track campaigns.</p>
-        <p><a href="campaigns">Go to your campaigns</a></p>
-    </Authorized>
-    <NotAuthorized>
-        <p>Please <a href="Account/Login">log in</a> or <a href="Account/Register">register</a> to use D&D Tracker.</p>
-    </NotAuthorized>
-</AuthorizeView>
+<section class="projects">
+    <h2>Projects</h2>
+
+    <article class="project-card">
+        <h3><a href="dnd">D&amp;D Tracker</a></h3>
+        <p>
+            A web app for managing tabletop RPG campaigns — track characters, items,
+            roll tables, and more. Built with ASP.NET Core Blazor Server.
+        </p>
+        <a class="btn btn-primary" href="dnd">Open D&amp;D Tracker</a>
+    </article>
+</section>

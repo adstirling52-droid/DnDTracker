@@ -89,7 +89,7 @@ app.MapRazorComponents<App>()
 app.MapPost("/Account/Logout", async (SignInManager<ApplicationUser> signInManager) =>
 {
     await signInManager.SignOutAsync();
-    return Results.LocalRedirect("~/");
+    return Results.LocalRedirect("~/dnd");
 });
 
 app.MapGet("/api/items/{itemId:guid}/image", async (

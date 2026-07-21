@@ -109,7 +109,7 @@
         Logger.LogInformation("User created a new account with password.");
 
         await SignInManager.SignInAsync(user, isPersistent: false);
-        NavigationManager.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+        NavigationManager.NavigateTo(ReturnUrl ?? "/dnd", forceLoad: true);
     }
 
     private sealed class InputModel : IValidatableObject

@@ -1,0 +1,17 @@
+@page "/dnd"
+@attribute [AllowAnonymous]
+
+<PageTitle>D&amp;D Tracker</PageTitle>
+
+<h1>D&amp;D Tracker</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <p>Welcome back, @context.User.Identity?.Name.</p>
+        <p>You are logged in and ready to track campaigns.</p>
+        <p><a href="campaigns">Go to your campaigns</a></p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Please <a href="Account/Login">log in</a> or <a href="Account/Register">register</a> to use D&amp;D Tracker.</p>
+    </NotAuthorized>
+</AuthorizeView>
