@@ -189,9 +189,9 @@ else
                     <dt class="col-sm-4">Name</dt>
                     <dd class="col-sm-8">@SelectedSkill.Name</dd>
                     <dt class="col-sm-4">Description</dt>
-                    <dd class="col-sm-8">@DisplayValue(SelectedSkill.Description)</dd>
+                    <dd class="col-sm-8 preserve-line-breaks">@DisplayValue(SelectedSkill.Description)</dd>
                     <dt class="col-sm-4">Notes</dt>
-                    <dd class="col-sm-8">@DisplayValue(SelectedSkill.Notes)</dd>
+                    <dd class="col-sm-8 preserve-line-breaks">@DisplayValue(SelectedSkill.Notes)</dd>
                 </dl>
             }
             else if ((activeTab == DetailTab.Items && SelectedCharacterItem is not null) ||
@@ -224,7 +224,7 @@ else
                     <dt class="col-sm-4">Name</dt>
                     <dd class="col-sm-8">@item.Name</dd>
                     <dt class="col-sm-4">Description</dt>
-                    <dd class="col-sm-8">@DisplayValue(item.Description)</dd>
+                    <dd class="col-sm-8 preserve-line-breaks">@DisplayValue(item.Description)</dd>
                     <dt class="col-sm-4">Where found</dt>
                     <dd class="col-sm-8">@DisplayValue(item.WhereFound)</dd>
                     <dt class="col-sm-4">When found</dt>
@@ -232,7 +232,7 @@ else
                     <dt class="col-sm-4">Status</dt>
                     <dd class="col-sm-8">@DisplayValue(item.CurrentStatus)</dd>
                     <dt class="col-sm-4">Notes</dt>
-                    <dd class="col-sm-8">@DisplayValue(item.Notes)</dd>
+                    <dd class="col-sm-8 preserve-line-breaks">@DisplayValue(item.Notes)</dd>
                 </dl>
             }
             else

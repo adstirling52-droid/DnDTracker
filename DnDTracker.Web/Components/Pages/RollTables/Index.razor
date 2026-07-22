@@ -94,8 +94,8 @@ else
                                 <tr id="roll-table-row-@row.Id" class="@(lastRolledRowId == row.Id ? "table-primary" : "")">
                                     <td>@row.Number</td>
                                     <td>@row.Name</td>
-                                    <td>@row.PhysicalDescription</td>
-                                    <td>@row.SpecialCharacteristics</td>
+                                    <td class="preserve-line-breaks">@row.PhysicalDescription</td>
+                                    <td class="preserve-line-breaks">@row.SpecialCharacteristics</td>
                                 </tr>
                             }
                         </tbody>
@@ -112,8 +112,8 @@ else
                 else
                 {
                     <p class="fw-semibold mb-1">@lastRolledRow.Name</p>
-                    <p class="mb-1">Physical Description: @lastRolledRow.PhysicalDescription</p>
-                    <p class="mb-1">Special Characteristics: @lastRolledRow.SpecialCharacteristics</p>
+                    <p class="mb-1">Physical Description: <span class="preserve-line-breaks">@lastRolledRow.PhysicalDescription</span></p>
+                    <p class="mb-1">Special Characteristics: <span class="preserve-line-breaks">@lastRolledRow.SpecialCharacteristics</span></p>
                     <p class="text-muted small mb-0">Rolled @lastRolledRow.Number on @lastRolledTable.Name (@lastRolledTable.TableType)</p>
                 }
             </div>
