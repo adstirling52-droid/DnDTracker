@@ -2,7 +2,7 @@
 # Run on the Azure VM in an elevated PowerShell session BEFORE any migration work.
 #
 # Usage:
-#   .\scripts\phase0-backup-vm.ps1 -BackupRoot "D:\Backups\phase0"
+#   .\scripts\phase0-backup-vm.ps1 -BackupRoot "C:\admin\backups\phase0"
 #
 # Creates:
 #   - DnDTracker site folder zip (excluding logs if large)
@@ -11,7 +11,7 @@
 #   - win-acme folder copy (if found)
 
 param(
-    [string]$BackupRoot = "D:\Backups\phase0",
+    [string]$BackupRoot = "C:\admin\backups\phase0",
     [string]$SitePath = "C:\inetpub\DnDTracker",
     [string]$SqlInstance = "localhost",
     [string]$DatabaseName = "DnDTracker"
