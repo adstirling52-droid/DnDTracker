@@ -1,4 +1,4 @@
-# Phase 0 — IIS / VM discovery script
+# Phase 0 - IIS / VM discovery script
 # Run on the Azure VM in an elevated PowerShell session.
 # Output is written to a timestamped folder under .\phase0-output\
 #
@@ -20,7 +20,7 @@ function Write-Section($title) {
     Write-Host "=== $title ===" -ForegroundColor Cyan
 }
 
-Write-Host "Phase 0 discovery — output: $outDir"
+Write-Host "Phase 0 discovery - output: $outDir"
 
 # --- System ---
 Write-Section "System"
@@ -133,7 +133,7 @@ Get-ChildItem IIS:\Sites | ForEach-Object {
 }
 $webSocket | Export-Csv (Join-Path $outDir "iis-websockets.csv") -NoTypeInformation
 
-# App pool environment variables (names only — no secret values)
+# App pool environment variables (names only - no secret values)
 $envVars = @()
 Get-ChildItem IIS:\AppPools | ForEach-Object {
     $poolName = $_.Name
