@@ -20,6 +20,10 @@ a, .btn-link {
     padding-top: 1.1rem;
 }
 
+.preserve-line-breaks {
+    white-space: pre-wrap;
+}
+
 h1:focus {
     outline: none;
 }
