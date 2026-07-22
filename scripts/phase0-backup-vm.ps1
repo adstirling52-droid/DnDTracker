@@ -1,8 +1,8 @@
-# Phase 0 — Pre-migration backup script
+# Phase 0 - Pre-migration backup script
 # Run on the Azure VM in an elevated PowerShell session BEFORE any migration work.
 #
 # Usage:
-#   .\scripts\phase0-backup-vm.ps1 -BackupRoot "D:\Backups\phase0"
+#   .\scripts\phase0-backup-vm.ps1 -BackupRoot "C:\admin\backups\phase0"
 #
 # Creates:
 #   - DnDTracker site folder zip (excluding logs if large)
@@ -11,7 +11,7 @@
 #   - win-acme folder copy (if found)
 
 param(
-    [string]$BackupRoot = "D:\Backups\phase0",
+    [string]$BackupRoot = "C:\admin\backups\phase0",
     [string]$SitePath = "C:\inetpub\DnDTracker",
     [string]$SqlInstance = "localhost",
     [string]$DatabaseName = "DnDTracker"
@@ -22,7 +22,7 @@ $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $outDir = Join-Path $BackupRoot $timestamp
 New-Item -ItemType Directory -Path $outDir -Force | Out-Null
 
-Write-Host "Phase 0 backup — output: $outDir" -ForegroundColor Cyan
+Write-Host "Phase 0 backup - output: $outDir" -ForegroundColor Cyan
 
 # --- Site folder ---
 if (Test-Path $SitePath) {
@@ -31,7 +31,7 @@ if (Test-Path $SitePath) {
     Compress-Archive -Path $SitePath -DestinationPath $zipPath -CompressionLevel Optimal
     Write-Host "  Created: $zipPath"
 } else {
-    Write-Warning "Site path not found: $SitePath — adjust -SitePath parameter"
+    Write-Warning "Site path not found: $SitePath - adjust -SitePath parameter"
 }
 
 # --- SQL database ---
@@ -50,14 +50,14 @@ WITH FORMAT, INIT, COMPRESSION, STATS = 10;
         Write-Host "  Created: $bakPath"
     } catch {
         Write-Warning "SQL backup failed. Run manually in SSMS if needed: $_"
-        "SQL backup failed — run manually in SSMS" | Set-Content (Join-Path $outDir "sql-backup-NOTE.txt")
+        "SQL backup failed - run manually in SSMS" | Set-Content (Join-Path $outDir "sql-backup-NOTE.txt")
     }
 } else {
-    Write-Warning "sqlcmd not found — back up the database manually in SSMS"
+    Write-Warning "sqlcmd not found - back up the database manually in SSMS"
     @"
 Manual SQL backup required:
 1. Open SSMS, connect to $SqlInstance
-2. Right-click database '$DatabaseName' → Tasks → Back Up...
+2. Right-click database '$DatabaseName' -> Tasks -> Back Up...
 3. Save .bak file to: $outDir
 "@ | Set-Content (Join-Path $outDir "sql-backup-NOTE.txt")
 }

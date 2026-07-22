@@ -46,7 +46,7 @@ On the VM, in **elevated PowerShell**:
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 cd C:\Admin\phase0
-.\phase0-discover-vm.ps1 -OutputRoot D:\phase0-output
+.\phase0-discover-vm.ps1 -OutputRoot C:\admin\phase0-output
 ```
 
 Review the output folder. Check:
@@ -60,7 +60,7 @@ Review the output folder. Check:
 Still in `C:\Admin\phase0`:
 
 ```powershell
-.\phase0-backup-vm.ps1 -BackupRoot D:\Backups\phase0
+.\phase0-backup-vm.ps1 -BackupRoot C:\admin\backups\phase0
 ```
 
 If `sqlcmd` is not installed, open **SSMS** and back up the `DnDTracker` database manually to the same backup folder (see `sql-backup-NOTE.txt` if created).
@@ -72,7 +72,7 @@ If `sqlcmd` is not installed, open **SSMS** and back up the `DnDTracker` databas
 
 ## 4. Copy backups off the VM
 
-Copy the entire timestamped folder from `D:\Backups\phase0\<timestamp>` to:
+Copy the entire timestamped folder from `C:\admin\backups\phase0\<timestamp>` to:
 
 - Your dev PC, or
 - Azure Storage / external drive
