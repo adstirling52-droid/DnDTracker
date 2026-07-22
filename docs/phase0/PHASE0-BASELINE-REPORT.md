@@ -166,9 +166,11 @@ The cloud agent **cannot RDP to your Azure VM**. Run these on the VM:
 
 ### Step A — Discovery
 
+On the VM (scripts copied from your dev PC — see `VM-RUNBOOK.md`):
+
 ```powershell
-cd C:\path\to\DnDTracker   # or copy script to VM
-.\scripts\phase0-discover-vm.ps1 -OutputRoot D:\phase0-output
+cd C:\Admin\phase0
+.\phase0-discover-vm.ps1 -OutputRoot D:\phase0-output
 ```
 
 This exports (no secret values for connection strings):
@@ -184,7 +186,8 @@ This exports (no secret values for connection strings):
 ### Step B — Backup
 
 ```powershell
-.\scripts\phase0-backup-vm.ps1 -BackupRoot D:\Backups\phase0
+cd C:\Admin\phase0
+.\phase0-backup-vm.ps1 -BackupRoot D:\Backups\phase0
 ```
 
 Creates:

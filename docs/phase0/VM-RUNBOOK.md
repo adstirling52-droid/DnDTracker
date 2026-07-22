@@ -2,34 +2,51 @@
 
 Run these steps on the **Azure VM** via Remote Desktop. Phase 0 does **not** change the live website.
 
+Your normal workflow is **git on your dev PC, copy files to the VM** (same as publishing DnDTracker). You do **not** need Git installed on the VM.
+
 ## Prerequisites
 
 - RDP access to the VM
-- Administrator PowerShell
-- Latest `main` branch from GitHub (or copy the two scripts below to the VM)
+- Administrator PowerShell on the VM
+- Dev PC with the repo pulled (`git pull origin main` after PR #34 is merged)
 
 ## 1. Get the scripts onto the VM
 
-**Option A — Git (if repo is on VM):**
+**Recommended — copy from your dev PC (matches how you deploy today):**
 
-```powershell
-cd C:\path\to\DnDTracker
-git pull origin main
+On your **dev PC**, after pulling the latest repo:
+
+1. Locate these two files in your local clone:
+   - `scripts\phase0-discover-vm.ps1`
+   - `scripts\phase0-backup-vm.ps1`
+2. Copy them to the VM via RDP (clipboard, shared drive, or zip).
+3. On the VM, put them in a simple folder, for example:
+
+```text
+C:\Admin\phase0\
 ```
 
-**Option B — Copy manually:**
+You do **not** need the full repo on the VM — only these two scripts.
 
-Copy these files from the repo to the VM:
+**Alternative — zip from dev PC:**
 
-- `scripts/phase0-discover-vm.ps1`
-- `scripts/phase0-backup-vm.ps1`
+```powershell
+# On dev PC, in repo root
+Compress-Archive -Path scripts\phase0-discover-vm.ps1, scripts\phase0-backup-vm.ps1 -DestinationPath phase0-scripts.zip
+```
+
+Copy `phase0-scripts.zip` to the VM, extract to `C:\Admin\phase0\`.
+
+**Optional — Git on VM:** Only if you later choose to clone the repo on the server. Not required for Phase 0.
 
 ## 2. Run discovery
 
+On the VM, in **elevated PowerShell**:
+
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-cd C:\path\to\DnDTracker
-.\scripts\phase0-discover-vm.ps1 -OutputRoot D:\phase0-output
+cd C:\Admin\phase0
+.\phase0-discover-vm.ps1 -OutputRoot D:\phase0-output
 ```
 
 Review the output folder. Check:
@@ -40,8 +57,10 @@ Review the output folder. Check:
 
 ## 3. Run backup
 
+Still in `C:\Admin\phase0`:
+
 ```powershell
-.\scripts\phase0-backup-vm.ps1 -BackupRoot D:\Backups\phase0
+.\phase0-backup-vm.ps1 -BackupRoot D:\Backups\phase0
 ```
 
 If `sqlcmd` is not installed, open **SSMS** and back up the `DnDTracker` database manually to the same backup folder (see `sql-backup-NOTE.txt` if created).
