@@ -1,6 +1,10 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.Extensions.Options
+@inject SiteHostService SiteHost
+@inject IOptions<SiteSettings> SiteSettings
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="dnd">DnDTracker</a>
+        <a class="navbar-brand" href="@(SiteHost.IsTrackerHost ? "/" : "dnd")">DnDTracker</a>
     </div>
 </div>
 
@@ -8,17 +12,34 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+        @if (SiteHost.IsTrackerHost)
+        {
+            <div class="nav-item px-3">
+                <a class="nav-link" href="@SiteSettings.Value.PublicSiteUrl">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                </a>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="dnd" Match="NavLinkMatch.Prefix">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> D&amp;D Tracker
-            </NavLink>
-        </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> D&amp;D Tracker
+                </NavLink>
+            </div>
+        }
+        else
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="dnd" Match="NavLinkMatch.Prefix">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> D&amp;D Tracker
+                </NavLink>
+            </div>
+        }
 
         <AuthorizeView>
             <Authorized>

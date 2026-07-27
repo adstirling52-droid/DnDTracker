@@ -9,5 +9,9 @@
       "Microsoft.EntityFrameworkCore": "Warning"
     }
   },
-  "AllowedHosts": "www.alanstirling.com;alanstirling.com"
+  "AllowedHosts": "www.alanstirling.com;alanstirling.com;tracker.alanstirling.com",
+  "SiteSettings": {
+    "PublicSiteUrl": "https://www.alanstirling.com",
+    "TrackerUrl": "https://tracker.alanstirling.com"
+  }
 }
