@@ -1,23 +1,18 @@
 ﻿@page "/"
-@layout LandingLayout
 @attribute [AllowAnonymous]
+@inject SiteHostService SiteHost
 
-<PageTitle>Alan Stirling</PageTitle>
+<PageTitle>@(SiteHost.IsTrackerHost ? "D&D Tracker" : "Alan Stirling")</PageTitle>
 
-<section class="hero">
-    <h1>Alan Stirling</h1>
-    <p class="lead">Software developer. Personal projects and experiments.</p>
-</section>
-
-<section class="projects">
-    <h2>Projects</h2>
-
-    <article class="project-card">
-        <h3><a href="dnd">D&amp;D Tracker</a></h3>
-        <p>
-            A web app for managing tabletop RPG campaigns — track characters, items,
-            roll tables, and more. Built with ASP.NET Core Blazor Server.
-        </p>
-        <a class="btn btn-primary" href="dnd">Open D&amp;D Tracker</a>
-    </article>
-</section>
+@if (SiteHost.IsTrackerHost)
+{
+    <LayoutView Layout="typeof(Layout.MainLayout)">
+        <TrackerHomeContent />
+    </LayoutView>
+}
+else
+{
+    <LayoutView Layout="typeof(Layout.LandingLayout)">
+        <PersonalHomeContent />
+    </LayoutView>
+}

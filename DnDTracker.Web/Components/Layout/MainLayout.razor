@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.Extensions.Options
+@inject SiteHostService SiteHost
+@inject IOptions<SiteSettings> SiteSettings
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +10,14 @@
 
     <main>
         <div class="top-row px-4 auth-links">
-            <a href="/" class="site-home-link">Home</a>
+            @if (SiteHost.IsTrackerHost)
+            {
+                <a href="@SiteSettings.Value.PublicSiteUrl" class="site-home-link">Home</a>
+            }
+            else
+            {
+                <a href="/" class="site-home-link">Home</a>
+            }
             <div class="auth-links-end">
             <AuthorizeView>
                 <Authorized>

@@ -18,6 +18,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
+builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection("SiteSettings"));
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<SiteHostService>();
+
 // Add services to the container.
 builder.Services.AddDbContext<DnDTrackerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -86,10 +90,11 @@ app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-app.MapPost("/Account/Logout", async (SignInManager<ApplicationUser> signInManager) =>
+app.MapPost("/Account/Logout", async (HttpContext context, SignInManager<ApplicationUser> signInManager) =>
 {
     await signInManager.SignOutAsync();
-    return Results.LocalRedirect("~/dnd");
+    var isTrackerHost = context.Request.Host.Host.StartsWith("tracker.", StringComparison.OrdinalIgnoreCase);
+    return Results.LocalRedirect(isTrackerHost ? "~/" : "~/dnd");
 });
 
 app.MapGet("/api/items/{itemId:guid}/image", async (
