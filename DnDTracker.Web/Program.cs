@@ -39,7 +39,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<IEmailSender, SendGridEmailSender>();
+builder.Services.AddSingleton<SendGridEmailSender>();
+builder.Services.AddSingleton<IEmailSender<ApplicationUser>>(sp => sp.GetRequiredService<SendGridEmailSender>());
 
 builder.Services.AddScoped<CampaignService>();
 builder.Services.AddScoped<CampaignImportExportService>();
@@ -141,7 +142,7 @@ app.MapGet("/api/campaigns/{campaignId:guid}/export", async (
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapGet("/dev/send-test-email", async (string to, IEmailSender emailSender) =>
+    app.MapGet("/dev/send-test-email", async (string to, SendGridEmailSender emailSender) =>
     {
         if (string.IsNullOrWhiteSpace(to))
         {
