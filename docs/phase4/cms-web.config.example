@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Grav CMS on IIS - example web.config with legacy DnDTracker redirects.
+  Merge the <rule> entries into your existing C:\inetpub\cms-test\web.config.
+  Place redirect rules BEFORE the Grav front-controller rule.
+-->
+<configuration>
+  <system.webServer>
+    <rewrite>
+      <rules>
+        <!-- Legacy DnDTracker paths on www -> tracker subdomain -->
+        <rule name="Redirect legacy dnd" stopProcessing="true">
+          <match url="^dnd/?$" ignoreCase="true" />
+          <action type="Redirect" url="https://tracker.alanstirling.com/" redirectType="Permanent" />
+        </rule>
+        <rule name="Redirect legacy campaigns" stopProcessing="true">
+          <match url="^campaigns(.*)" ignoreCase="true" />
+          <action type="Redirect" url="https://tracker.alanstirling.com/campaigns{R:1}" redirectType="Permanent" />
+        </rule>
+        <rule name="Redirect legacy account" stopProcessing="true">
+          <match url="^Account/(.*)" ignoreCase="true" />
+          <action type="Redirect" url="https://tracker.alanstirling.com/Account/{R:1}" redirectType="Permanent" />
+        </rule>
+
+        <!-- Standard Grav front controller (keep your existing rule if already present) -->
+        <rule name="Grav Front Controller" stopProcessing="true">
+          <match url=".*" />
+          <conditions logicalGrouping="MatchAll">
+            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+          </conditions>
+          <action type="Rewrite" url="index.php" />
+        </rule>
+      </rules>
+    </rewrite>
+    <defaultDocument>
+      <files>
+        <clear />
+        <add value="index.php" />
+      </files>
+    </defaultDocument>
+    <handlers>
+      <remove name="PHP_via_FastCGI" />
+      <add name="PHP_via_FastCGI" path="*.php" verb="*" modules="FastCgiModule" scriptProcessor="C:\PHP\php-cgi.exe" resourceType="Either" requireAccess="Script" />
+    </handlers>
+  </system.webServer>
+</configuration>
