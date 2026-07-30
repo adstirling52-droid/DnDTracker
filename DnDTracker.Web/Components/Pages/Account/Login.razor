@@ -22,7 +22,15 @@
             {
                 <div class="text-danger" role="alert">@errorMessage</div>
             }
+            else if (passwordReset)
+            {
+                <div class="alert alert-success" role="alert">
+                    Your password has been reset. Please log in with your new password.
+                </div>
+            }
 
+            @if (!passwordReset)
+            {
             <EditForm Model="Input" FormName="login" OnValidSubmit="LoginUser" method="post">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-danger" role="alert" />
@@ -39,8 +47,13 @@
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
 
+                <p class="mb-3">
+                    <a href="Account/ForgotPassword">Forgot your password?</a>
+                </p>
+
                 <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
             </EditForm>
+            }
         </section>
     </div>
 </div>
@@ -51,9 +64,13 @@
 
 @code {
     private string? errorMessage;
+    private bool passwordReset;
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery(Name = "reset")]
+    private string? Reset { get; set; }
 
     [SupplyParameterFromForm]
     private InputModel? Input { get; set; }
@@ -61,6 +78,7 @@
     protected override void OnInitialized()
     {
         Input ??= new();
+        passwordReset = Reset == "1";
     }
 
     private async Task LoginUser()
