@@ -18,6 +18,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection("SiteSettings"));
+builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SiteHostService>();
 
@@ -37,6 +38,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddSingleton<IEmailSender, SendGridEmailSender>();
 
 builder.Services.AddScoped<CampaignService>();
 builder.Services.AddScoped<CampaignImportExportService>();
@@ -135,5 +138,23 @@ app.MapGet("/api/campaigns/{campaignId:guid}/export", async (
         "application/json",
         fileName);
 }).RequireAuthorization();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/dev/send-test-email", async (string to, IEmailSender emailSender) =>
+    {
+        if (string.IsNullOrWhiteSpace(to))
+        {
+            return Results.BadRequest("Provide a 'to' query parameter with the recipient email address.");
+        }
+
+        await emailSender.SendEmailAsync(
+            to.Trim(),
+            "DnD Tracker SendGrid test",
+            "<p>If you received this message, SendGrid is configured correctly in the DnD Tracker app.</p>");
+
+        return Results.Text($"Test email sent to {to.Trim()}.");
+    });
+}
 
 app.Run();
