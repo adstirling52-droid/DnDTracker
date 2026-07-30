@@ -34,8 +34,8 @@
             </div>
 
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="email" placeholder="name@example.com" />
-                <label for="Input.Email">Email (optional)</label>
+                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="email" aria-required="true" placeholder="name@example.com" />
+                <label for="Input.Email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger" />
             </div>
 
@@ -81,16 +81,13 @@
             return;
         }
 
-        var email = string.IsNullOrWhiteSpace(Input.Email) ? null : Input.Email.Trim();
+        var email = Input.Email.Trim();
 
-        if (email is not null)
+        var existingUser = await UserManager.FindByEmailAsync(email);
+        if (existingUser is not null)
         {
-            var existingUser = await UserManager.FindByEmailAsync(email);
-            if (existingUser is not null)
-            {
-                message = "A user with that email address already exists.";
-                return;
-            }
+            message = "A user with that email address already exists.";
+            return;
         }
 
         var user = new ApplicationUser
@@ -113,14 +110,16 @@
         NavigationManager.NavigateTo(ReturnUrl ?? SiteHost.AppHomePath, forceLoad: true);
     }
 
-    private sealed class InputModel : IValidatableObject
+    private sealed class InputModel
     {
         [Required]
         [StringLength(256, MinimumLength = 3, ErrorMessage = "Username must be at least 3 characters.")]
         [RegularExpression(@"^[a-zA-Z0-9._@+-]+$", ErrorMessage = "Username can only contain letters, numbers, and . _ @ + -")]
         public string Username { get; set; } = "";
 
-        public string? Email { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
 
         [Required]
         [StringLength(100, MinimumLength = 6)]
@@ -131,20 +130,5 @@
         [DataType(DataType.Password)]
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; } = "";
-
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            if (string.IsNullOrWhiteSpace(Email))
-            {
-                yield break;
-            }
-
-            if (!new EmailAddressAttribute().IsValid(Email))
-            {
-                yield return new ValidationResult(
-                    "The Email field is not a valid e-mail address.",
-                    [nameof(Email)]);
-            }
-        }
     }
 }
