@@ -1,4 +1,5 @@
 using DnDTracker.Web.Components;
+using DnDTracker.Web.Components.Account;
 using DnDTracker.Web.Data;
 using DnDTracker.Web.Models;
 using DnDTracker.Web.Services;
