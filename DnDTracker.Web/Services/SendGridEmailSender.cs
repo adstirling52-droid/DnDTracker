@@ -9,9 +9,36 @@ namespace DnDTracker.Web.Services;
 
 public partial class SendGridEmailSender(
     IOptions<SendGridSettings> options,
-    ILogger<SendGridEmailSender> logger) : IEmailSender
+    ILogger<SendGridEmailSender> logger) : IEmailSender<ApplicationUser>
 {
     private readonly SendGridSettings _settings = options.Value;
+
+    public Task SendConfirmationLinkAsync(ApplicationUser user, string email, string confirmationLink) =>
+        SendEmailAsync(
+            email,
+            "Confirm your DnD Tracker email",
+            $"""
+            <p>Please confirm your account by <a href="{confirmationLink}">clicking here</a>.</p>
+            """);
+
+    public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, string resetLink) =>
+        SendEmailAsync(
+            email,
+            "Reset your DnD Tracker password",
+            $"""
+            <p>Please reset your password by <a href="{resetLink}">clicking here</a>.</p>
+            <p>If you did not request this, you can ignore this email.</p>
+            """);
+
+    public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, string resetCode) =>
+        SendEmailAsync(
+            email,
+            "Reset your DnD Tracker password",
+            $"""
+            <p>Your password reset code is:</p>
+            <p><strong>{resetCode}</strong></p>
+            <p>If you did not request this, you can ignore this email.</p>
+            """);
 
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
