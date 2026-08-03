@@ -1,0 +1,214 @@
+@page "/campaigns/{CampaignId:guid}/npc-generator"
+@rendermode InteractiveServer
+
+@using System.Security.Claims
+@using DnDTracker.Web.Models
+@using DnDTracker.Web.Models.NpcGenerator
+@using DnDTracker.Web.Services
+@using DnDTracker.Web.Services.NpcGenerator
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject CampaignService CampaignService
+@inject NpcGeneratorService NpcGeneratorService
+@inject NpcGenerationDataProvider NpcGenerationDataProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>NPC Generator</PageTitle>
+
+@if (campaign is null)
+{
+    <h1>Campaign not found</h1>
+    <p>The campaign may have been removed or you do not have access to it.</p>
+    <a class="btn btn-secondary" href="campaigns">Back to campaigns</a>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-0">NPC Generator</h1>
+            <p class="text-muted mb-0">Campaign: @campaign.Name</p>
+        </div>
+        <a class="btn btn-secondary" href="campaigns/@CampaignId">Back to campaign</a>
+    </div>
+
+    @if (!NpcGenerationDataProvider.IsLoaded)
+    {
+        <div class="alert alert-danger" role="alert">
+            The NPC generator is unavailable because its data could not be loaded.
+            @if (!string.IsNullOrEmpty(NpcGenerationDataProvider.LoadError))
+            {
+                <span> @NpcGenerationDataProvider.LoadError</span>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="alert alert-info" role="status">@statusMessage</div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@errorMessage</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <h2 class="h5">Generate</h2>
+            <p class="text-muted small">
+                Create a random NPC using curated tables and generation rules. Results are not saved to the campaign.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button"
+                        class="btn btn-primary"
+                        disabled="@(!CanGenerate)"
+                        @onclick="GenerateNpc">
+                    Generate NPC
+                </button>
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        disabled="@(!CanGenerate || currentNpc is null)"
+                        @onclick="GenerateNpc">
+                    Generate another NPC
+                </button>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <h2 class="h5">Generated NPC</h2>
+            @if (currentNpc is null)
+            {
+                <p class="text-muted mb-0">Click Generate NPC to create a character.</p>
+            }
+            else
+            {
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">Identity</h3>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">@currentNpc.Name</dd>
+                        <dt class="col-sm-4">Ancestry</dt>
+                        <dd class="col-sm-8">@currentNpc.Ancestry</dd>
+                        <dt class="col-sm-4">Gender or presentation</dt>
+                        <dd class="col-sm-8">@currentNpc.GenderPresentation</dd>
+                        <dt class="col-sm-4">Age category</dt>
+                        <dd class="col-sm-8">@currentNpc.AgeCategory</dd>
+                        <dt class="col-sm-4">Occupation</dt>
+                        <dd class="col-sm-8">@currentNpc.Occupation</dd>
+                    </dl>
+                </div>
+
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">Appearance</h3>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Appearance</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Appearance</dd>
+                        <dt class="col-sm-4">Distinctive feature</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.DistinctiveFeature</dd>
+                    </dl>
+                </div>
+
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">Behaviour</h3>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Personality</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Personality</dd>
+                        <dt class="col-sm-4">Mannerism</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Mannerism</dd>
+                        <dt class="col-sm-4">Voice</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Voice</dd>
+                    </dl>
+                </div>
+
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">Story</h3>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Background</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Background</dd>
+                        <dt class="col-sm-4">Motivation</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Motivation</dd>
+                        <dt class="col-sm-4">Secret</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.Secret</dd>
+                        <dt class="col-sm-4">Current problem</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.CurrentProblem</dd>
+                    </dl>
+                </div>
+
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">Game use</h3>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Quest hook</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.QuestHook</dd>
+                        <dt class="col-sm-4">Danger or complication</dt>
+                        <dd class="col-sm-8 preserve-line-breaks">@currentNpc.DangerOrComplication</dd>
+                    </dl>
+                </div>
+
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">DM summary</h3>
+                    <p class="preserve-line-breaks mb-0">@currentNpc.DmSummary</p>
+                </div>
+
+                <div class="border rounded p-3">
+                    <h3 class="h6">Image prompt</h3>
+                    <p class="preserve-line-breaks mb-0">@currentNpc.ImagePrompt</p>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid CampaignId { get; set; }
+
+    private Campaign? campaign;
+    private string? userId;
+    private GeneratedNpc? currentNpc;
+    private string? statusMessage;
+    private string? errorMessage;
+
+    private bool CanGenerate => NpcGenerationDataProvider.IsLoaded;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        userId = await GetUserIdAsync();
+        if (userId is null)
+        {
+            campaign = null;
+            return;
+        }
+
+        campaign = await CampaignService.GetCampaignAsync(userId, CampaignId);
+    }
+
+    private void GenerateNpc()
+    {
+        ClearMessages();
+
+        var (npc, generateError) = NpcGeneratorService.Generate();
+        if (generateError is not null)
+        {
+            errorMessage = generateError;
+            currentNpc = null;
+            return;
+        }
+
+        currentNpc = npc;
+        statusMessage = "NPC generated.";
+    }
+
+    private void ClearMessages()
+    {
+        statusMessage = null;
+        errorMessage = null;
+    }
+
+    private async Task<string?> GetUserIdAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        return authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+}
