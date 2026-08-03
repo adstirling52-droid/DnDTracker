@@ -7,6 +7,19 @@ namespace DnDTracker.Web.Tests.Services;
 
 public class NpcGeneratorServiceTests
 {
+    private static readonly string[] DmSummaryFieldLabels =
+    [
+        "Appearance:",
+        "Notable:",
+        "Personality:",
+        "Background:",
+        "Motivation:",
+        "Secret:",
+        "Current problem:",
+        "Quest hook:",
+        "Danger or complication:"
+    ];
+
     [Fact]
     public void Generate_ReturnsCompleteNpc_WhenDataIsLoaded()
     {
@@ -94,7 +107,22 @@ public class NpcGeneratorServiceTests
     }
 
     [Fact]
-    public void Generate_DmSummaryIncludesStructuredFields()
+    public void Generate_DmSummaryReadsAsProseWithoutFieldLabels()
+    {
+        var service = CreateService();
+
+        for (var i = 0; i < 50; i++)
+        {
+            var (npc, error) = service.Generate();
+
+            Assert.Null(error);
+            Assert.NotNull(npc);
+            AssertDmSummaryIsProse(npc);
+        }
+    }
+
+    [Fact]
+    public void Generate_DmSummaryIncludesImportantStructuredFields()
     {
         var service = CreateService();
 
@@ -103,8 +131,109 @@ public class NpcGeneratorServiceTests
         Assert.Null(error);
         Assert.NotNull(npc);
         Assert.Contains(npc.Name, npc.DmSummary, StringComparison.Ordinal);
-        Assert.Contains(npc.Secret, npc.DmSummary, StringComparison.Ordinal);
-        Assert.Contains(npc.QuestHook, npc.DmSummary, StringComparison.Ordinal);
+        Assert.Contains(KeyPhrase(npc.Secret), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(KeyPhrase(npc.QuestHook), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(KeyPhrase(npc.Background), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(KeyPhrase(npc.Appearance), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Generate_DmSummaryAndImagePromptAvoidDoubledPunctuation()
+    {
+        var npc = CreateExampleNpc();
+
+        var summary = NpcGeneratorService.ComposeDmSummary(npc);
+        var prompt = NpcGeneratorService.ComposeImagePrompt(npc, "a warm tavern interior with muted lantern light");
+
+        Assert.DoesNotContain("..", summary);
+        Assert.DoesNotContain("..", prompt);
+    }
+
+    [Fact]
+    public void ComposeImagePrompt_IncludesVisualElementsAndArtDirection()
+    {
+        var npc = CreateExampleNpc();
+        var prompt = NpcGeneratorService.ComposeImagePrompt(npc, "a misty river crossing at early morning");
+
+        Assert.StartsWith("Fantasy character portrait of", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("dwarf", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("ferry operator", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("river crossing", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Grounded fantasy", prompt, StringComparison.Ordinal);
+        Assert.DoesNotContain(npc.Secret, prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.InRange(CountWords(prompt), 60, 120);
+    }
+
+    [Fact]
+    public void ComposeDmSummary_ExampleNpcMatchesExpectedFlow()
+    {
+        var npc = CreateExampleNpc();
+        var summary = NpcGeneratorService.ComposeDmSummary(npc);
+
+        Assert.Contains("Helga Ironvein is a young adult dwarven ferry operator", summary, StringComparison.Ordinal);
+        Assert.Contains("quietly passes messages", summary, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("reliable local information", summary, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Appearance:", summary, StringComparison.Ordinal);
+        Assert.Equal(2, summary.Split(Environment.NewLine + Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).Length);
+        Assert.InRange(CountWords(summary), 125, 220);
+    }
+
+    [Fact]
+    public void ComposeImagePrompt_ExampleNpcProducesPolishedPrompt()
+    {
+        var npc = CreateExampleNpc();
+        var prompt = NpcGeneratorService.ComposeImagePrompt(npc, "a cosy riverside tavern with muted amber lantern light");
+
+        Assert.Contains("Fantasy character portrait of a young adult dwarf ferry operator", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("feminine presentation", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("watchful", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("warm but quietly watchful", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("cosy riverside tavern", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.InRange(CountWords(prompt), 60, 120);
+    }
+
+    private static GeneratedNpc CreateExampleNpc() => new()
+    {
+        Name = "Helga Ironvein",
+        Ancestry = "Dwarf",
+        GenderPresentation = "feminine presentation",
+        AgeCategory = "young adult",
+        Occupation = "Ferry operator",
+        Appearance = "Lean and alert, with quick eyes and hands that look accustomed to fine work.",
+        DistinctiveFeature = "A neatly notched ear, old enough to pass for a forgotten shaving mishap.",
+        Personality = "Warm with strangers but quietly watchful.",
+        Mannerism = "Hums under their breath while working.",
+        Voice = "Talks quickly, with a warm regional lilt.",
+        Background = "Inherited a modest family trade and has kept it alive through stubborn competence rather than ambition.",
+        Motivation = "Keep their home and neighbours safe from trouble they understand but cannot ignore.",
+        Secret = "Quietly passes messages for a smuggler in exchange for protection.",
+        CurrentProblem = "Owes money to someone impatient and well connected.",
+        QuestHook = "Offers reliable local information if the party helps with a personal errand first.",
+        DangerOrComplication = "Their creditor has ties to violent people."
+    };
+
+    private static void AssertDmSummaryIsProse(GeneratedNpc npc)
+    {
+        foreach (var label in DmSummaryFieldLabels)
+        {
+            Assert.DoesNotContain(label, npc.DmSummary, StringComparison.Ordinal);
+        }
+
+        Assert.Contains(Environment.NewLine + Environment.NewLine, npc.DmSummary);
+        Assert.DoesNotContain("..", npc.DmSummary);
+        Assert.InRange(CountWords(npc.DmSummary), 110, 230);
+        Assert.StartsWith(npc.Name, npc.DmSummary, StringComparison.Ordinal);
+    }
+
+    private static int CountWords(string text) =>
+        text.Split([' ', '\r', '\n', '\t'], StringSplitOptions.RemoveEmptyEntries).Length;
+
+    private static string KeyPhrase(string text)
+    {
+        var cleaned = text.Trim().TrimEnd('.', '!', '?');
+        var words = cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var phraseLength = Math.Min(4, words.Length);
+        return string.Join(' ', words[..phraseLength]);
     }
 
     private static NpcGeneratorService CreateService() =>
