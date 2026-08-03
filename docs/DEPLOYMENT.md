@@ -283,24 +283,19 @@ When you change the app:
 4. Recycle the IIS application pool (or restart the site).
 5. Start the site again. Migrations run automatically on startup.
 
-If the site fails with **HTTP 500.30** after an update that adds database tables:
+If the site fails with **HTTP 500.30** after an update:
 
-1. Open `C:\inetpub\DnDTracker\Data\startup.log` (written on every Production startup attempt).
-2. Open the newest file in `C:\inetpub\DnDTracker\logs\` (IIS stdout logs; the app pool identity needs **Modify** on the `logs` folder).
-3. Confirm the publish output contains migration `20260803143258_AddCampaignNpcs` (the `#57` fix). A build from PR `#56` alone will fail because that migration was not registered with EF Core.
-4. In SSMS, check whether the table already exists without a history row:
+1. Open `C:\inetpub\DnDTracker\Data\startup.log` — this records the exact startup exception.
+2. Confirm the deployed DLL contains migration `20260803143258_AddCampaignNpcs`:
 
-```sql
-SELECT MigrationId FROM __EFMigrationsHistory ORDER BY MigrationId;
-SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'CampaignNpcs';
+```powershell
+findstr 20260803143258 C:\inetpub\DnDTracker\DnDTracker.Web.dll
 ```
 
-If `CampaignNpcs` exists but `20260803143258_AddCampaignNpcs` is missing from history, either drop the empty table and restart the site, or record the migration manually:
+3. Ensure the app pool identity has **Modify** on `C:\inetpub\DnDTracker\Data` (needed to create `Data\npc-images` on first startup after PR `#56`).
+4. Recycle the IIS application pool after copying files.
 
-```sql
-INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20260803143258_AddCampaignNpcs', N'10.0.10');
-```
+To capture IIS stdout logs temporarily: create `C:\inetpub\DnDTracker\logs`, grant the app pool **Modify** on it, set `stdoutLogEnabled="true"` in `web.config`, recycle the app pool, then read the newest `logs\stdout*.log`.
 
 ---
 
