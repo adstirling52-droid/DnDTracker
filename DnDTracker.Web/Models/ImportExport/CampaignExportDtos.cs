@@ -1,24 +1,24 @@
 namespace DnDTracker.Web.Models.ImportExport;
 
-public class DesktopCampaignDto
+public class CampaignExportDto
 {
     public string Name { get; set; } = "";
 
-    public List<DesktopCharacterDto> Characters { get; set; } = [];
+    public List<CampaignExportCharacterDto> Characters { get; set; } = [];
 
-    public List<DesktopItemDto> UnassignedItems { get; set; } = [];
+    public List<CampaignExportItemDto> UnassignedItems { get; set; } = [];
 }
 
-public class DesktopCharacterDto
+public class CampaignExportCharacterDto
 {
     public string Name { get; set; } = "";
 
-    public List<DesktopItemDto> Items { get; set; } = [];
+    public List<CampaignExportItemDto> Items { get; set; } = [];
 
-    public List<DesktopSkillDto> Skills { get; set; } = [];
+    public List<CampaignExportSkillDto> Skills { get; set; } = [];
 }
 
-public class DesktopItemDto
+public class CampaignExportItemDto
 {
     public string Name { get; set; } = "";
 
@@ -34,10 +34,10 @@ public class DesktopItemDto
 
     public string ImagePath { get; set; } = "";
 
-    public List<DesktopProvenanceEntryDto>? ProvenanceEntries { get; set; }
+    public List<CampaignExportProvenanceEntryDto>? ProvenanceEntries { get; set; }
 }
 
-public class DesktopProvenanceEntryDto
+public class CampaignExportProvenanceEntryDto
 {
     public string What { get; set; } = "";
 
@@ -48,7 +48,7 @@ public class DesktopProvenanceEntryDto
     public string Notes { get; set; } = "";
 }
 
-public class DesktopSkillDto
+public class CampaignExportSkillDto
 {
     public string Name { get; set; } = "";
 

@@ -106,14 +106,9 @@ All queries must filter by the current user:
 - `Campaign` and `RollTable`: `WHERE UserId = current user`
 - `Character`, `Item`: only through campaigns owned by the current user
 
-## Desktop app comparison
+## Campaign JSON import/export
 
-| Desktop (JSON) | Web (database) |
-|----------------|----------------|
-| `campaigns.json` | Campaign, Character, Item, Skill tables |
-| `rolltables.json` (global on PC) | RollTable per user |
-| `ProvenanceEntries` on items | Not implemented on web |
-| `%LocalAppData%\DnDTracker\Images` | Server uploads folder per user |
+Campaigns can be exported to and imported from JSON files using the interchange format defined in `Models/ImportExport/CampaignExportDtos.cs`. Provenance history and item images are not included in JSON exports.
 
 ## Next phase
 

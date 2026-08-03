@@ -36,12 +36,12 @@ public class CampaignImportExportService(DnDTrackerDbContext db, CampaignService
             return (null, null, "Campaign not found.");
         }
 
-        var dto = new DesktopCampaignDto
+        var dto = new CampaignExportDto
         {
             Name = campaign.Name,
             Characters = campaign.Characters
                 .OrderBy(character => character.Name)
-                .Select(character => new DesktopCharacterDto
+                .Select(character => new CampaignExportCharacterDto
                 {
                     Name = character.Name,
                     Items = character.Items
@@ -50,7 +50,7 @@ public class CampaignImportExportService(DnDTrackerDbContext db, CampaignService
                         .ToList(),
                     Skills = character.Skills
                         .OrderBy(skill => skill.Name)
-                        .Select(skill => new DesktopSkillDto
+                        .Select(skill => new CampaignExportSkillDto
                         {
                             Name = skill.Name,
                             Description = skill.Description,
@@ -75,10 +75,10 @@ public class CampaignImportExportService(DnDTrackerDbContext db, CampaignService
         string userId,
         string json)
     {
-        DesktopCampaignDto? dto;
+        CampaignExportDto? dto;
         try
         {
-            dto = JsonSerializer.Deserialize<DesktopCampaignDto>(json, JsonOptions);
+            dto = JsonSerializer.Deserialize<CampaignExportDto>(json, JsonOptions);
         }
         catch (JsonException)
         {
@@ -205,7 +205,7 @@ public class CampaignImportExportService(DnDTrackerDbContext db, CampaignService
     private (string? Error, CampaignImportSummary Summary) AddItems(
         Guid campaignId,
         Guid? characterId,
-        IEnumerable<DesktopItemDto> itemDtos,
+        IEnumerable<CampaignExportItemDto> itemDtos,
         CampaignImportSummary summary)
     {
         var itemNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -261,7 +261,7 @@ public class CampaignImportExportService(DnDTrackerDbContext db, CampaignService
         return (null, summary);
     }
 
-    private static DesktopItemDto MapItemToDto(Item item) => new()
+    private static CampaignExportItemDto MapItemToDto(Item item) => new()
     {
         Name = item.Name,
         Description = item.Description,
