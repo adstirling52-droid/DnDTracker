@@ -14,6 +14,7 @@
 @inject NpcGeneratorService NpcGeneratorService
 @inject NpcGenerationDataProvider NpcGenerationDataProvider
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
 
 <PageTitle>NPC Generator</PageTitle>
 
@@ -147,13 +148,32 @@ else
                 </div>
 
                 <div class="border rounded p-3 mb-3">
-                    <h3 class="h6">DM summary</h3>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3 class="h6 mb-0">DM summary</h3>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                @onclick="CopyDmSummaryAsync">
+                            Copy summary
+                        </button>
+                    </div>
                     <p class="preserve-line-breaks mb-0">@currentNpc.DmSummary</p>
                 </div>
 
                 <div class="border rounded p-3">
-                    <h3 class="h6">Image prompt</h3>
-                    <p class="preserve-line-breaks mb-0">@currentNpc.ImagePrompt</p>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3 class="h6 mb-0">Image prompt</h3>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary"
+                                @onclick="CopyImagePromptAsync">
+                            Copy image prompt
+                        </button>
+                    </div>
+                    <label class="form-label visually-hidden" for="imagePromptEditor">Image prompt</label>
+                    <textarea id="imagePromptEditor"
+                              class="form-control preserve-line-breaks"
+                              rows="5"
+                              @bind="editableImagePrompt"></textarea>
+                    <div class="form-text">Edit this prompt before copying it into an external image generator.</div>
                 </div>
             }
         </div>
@@ -167,6 +187,7 @@ else
     private Campaign? campaign;
     private string? userId;
     private GeneratedNpc? currentNpc;
+    private string editableImagePrompt = "";
     private string? statusMessage;
     private string? errorMessage;
 
@@ -193,11 +214,57 @@ else
         {
             errorMessage = generateError;
             currentNpc = null;
+            editableImagePrompt = "";
+            return;
+        }
+
+        if (npc is null)
+        {
+            errorMessage = "Could not generate an NPC. Please try again.";
+            currentNpc = null;
+            editableImagePrompt = "";
             return;
         }
 
         currentNpc = npc;
+        editableImagePrompt = npc.ImagePrompt;
         statusMessage = "NPC generated.";
+    }
+
+    private async Task CopyDmSummaryAsync()
+    {
+        if (currentNpc is null)
+        {
+            return;
+        }
+
+        ClearMessages();
+        var copied = await JS.InvokeAsync<bool>("dndCopyToClipboard", currentNpc.DmSummary);
+        statusMessage = copied
+            ? "DM summary copied to the clipboard."
+            : null;
+        if (!copied)
+        {
+            errorMessage = "Copy failed. Select the summary text and copy it manually.";
+        }
+    }
+
+    private async Task CopyImagePromptAsync()
+    {
+        if (currentNpc is null)
+        {
+            return;
+        }
+
+        ClearMessages();
+        var copied = await JS.InvokeAsync<bool>("dndCopyToClipboard", editableImagePrompt);
+        statusMessage = copied
+            ? "Image prompt copied to the clipboard."
+            : null;
+        if (!copied)
+        {
+            errorMessage = "Copy failed. Select the image prompt text and copy it manually.";
+        }
     }
 
     private void ClearMessages()
