@@ -23,6 +23,8 @@ public class DnDTrackerDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<RollTableRow> RollTableRows => Set<RollTableRow>();
 
+    public DbSet<CampaignNpc> CampaignNpcs => Set<CampaignNpc>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -37,6 +39,10 @@ public class DnDTrackerDbContext : IdentityDbContext<ApplicationUser>
             entity.HasMany(c => c.Items)
                 .WithOne(i => i.Campaign)
                 .HasForeignKey(i => i.CampaignId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(c => c.Npcs)
+                .WithOne(n => n.Campaign)
+                .HasForeignKey(n => n.CampaignId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
