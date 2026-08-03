@@ -1,22 +1,13 @@
 # DnDTracker
 
-A learning project in C# for tracking D&D campaigns, characters, items, skills, roll tables, and item provenance.
+A web application for Dungeon Masters to track D&D campaigns, characters, items, skills, and roll tables during play.
 
-## Projects in this repository
-
-| Folder | Purpose | Status |
-|--------|---------|--------|
-| `DnDTracker/` | Windows desktop app (WPF) | Working |
-| `DnDTracker.Web/` | Online web app (ASP.NET Core) | In progress |
-
-## Desktop app
-
-The desktop version is a WPF application that stores data locally on your PC as JSON files under `%LocalAppData%\DnDTracker\`.
-
-Open `DnDTracker/DnDTracker.slnx` in Visual Studio to build and run it.
+The live app is hosted at [tracker.alanstirling.com](https://tracker.alanstirling.com).
 
 ## Web app
 
-The web version is in `DnDTracker.Web/`. It supports multiple users, with each user's data kept separate.
+The application lives in `DnDTracker.Web/`. It is an ASP.NET Core Blazor Server app with SQL Server persistence and ASP.NET Core Identity for multi-user access. Each user's data is kept separate.
 
-**Deployment:** see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for Azure VM + IIS + SQL Server setup (target: www.alanstirling.com).
+Open `DnDTracker.Web/DnDTracker.Web.slnx` in Visual Studio to build and run locally.
+
+**Deployment:** see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for Azure VM + IIS + SQL Server setup.
