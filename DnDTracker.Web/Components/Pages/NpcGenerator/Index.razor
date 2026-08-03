@@ -11,9 +11,11 @@
 @attribute [Authorize]
 
 @inject CampaignService CampaignService
+@inject CampaignNpcService CampaignNpcService
 @inject NpcGeneratorService NpcGeneratorService
 @inject NpcGenerationDataProvider NpcGenerationDataProvider
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
 <PageTitle>NPC Generator</PageTitle>
@@ -31,7 +33,10 @@ else
             <h1 class="mb-0">NPC Generator</h1>
             <p class="text-muted mb-0">Campaign: @campaign.Name</p>
         </div>
-        <a class="btn btn-secondary" href="campaigns/@CampaignId">Back to campaign</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-primary" href="campaigns/@CampaignId/npcs">Saved NPCs</a>
+            <a class="btn btn-secondary" href="campaigns/@CampaignId">Back to campaign</a>
+        </div>
     </div>
 
     @if (!NpcGenerationDataProvider.IsLoaded)
@@ -59,7 +64,7 @@ else
         <div class="col-lg-4">
             <h2 class="h5">Generate</h2>
             <p class="text-muted small">
-                Create a random NPC using curated tables and generation rules. Results are not saved to the campaign.
+                Create a random NPC using curated tables and generation rules. Save results to this campaign when you are ready.
             </p>
             <div class="d-flex flex-wrap gap-2">
                 <button type="button"
@@ -73,6 +78,12 @@ else
                         disabled="@(!CanGenerate || currentNpc is null)"
                         @onclick="GenerateNpc">
                     Generate another NPC
+                </button>
+                <button type="button"
+                        class="btn btn-success"
+                        disabled="@(!CanSave)"
+                        @onclick="SaveNpcAsync">
+                    Save to campaign
                 </button>
             </div>
         </div>
@@ -193,6 +204,8 @@ else
 
     private bool CanGenerate => NpcGenerationDataProvider.IsLoaded;
 
+    private bool CanSave => CanGenerate && currentNpc is not null && userId is not null && campaign is not null;
+
     protected override async Task OnParametersSetAsync()
     {
         userId = await GetUserIdAsync();
@@ -229,6 +242,31 @@ else
         currentNpc = npc;
         editableImagePrompt = npc.ImagePrompt;
         statusMessage = "NPC generated.";
+    }
+
+    private async Task SaveNpcAsync()
+    {
+        if (currentNpc is null || userId is null)
+        {
+            return;
+        }
+
+        ClearMessages();
+
+        var (savedNpc, saveError) = await CampaignNpcService.SaveFromGeneratedAsync(
+            userId,
+            CampaignId,
+            currentNpc,
+            editableImagePrompt);
+
+        if (saveError is not null)
+        {
+            errorMessage = saveError;
+            return;
+        }
+
+        statusMessage = $"Saved {savedNpc!.Name} to this campaign.";
+        NavigationManager.NavigateTo($"campaigns/{CampaignId}/npcs?selected={savedNpc.Id}");
     }
 
     private async Task CopyDmSummaryAsync()

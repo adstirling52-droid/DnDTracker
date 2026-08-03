@@ -49,6 +49,8 @@ builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SkillService>();
 builder.Services.AddScoped<ItemImageService>();
+builder.Services.AddScoped<CampaignNpcService>();
+builder.Services.AddScoped<CampaignNpcImageService>();
 builder.Services.AddScoped<RollTableService>();
 
 builder.Services.AddSingleton<NpcGenerationDataProvider>();
@@ -72,6 +74,7 @@ if (app.Environment.IsProduction())
 
     var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
     Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "item-images"));
+    Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "npc-images"));
 }
 
 // Configure the HTTP request pipeline.
@@ -113,6 +116,26 @@ app.MapGet("/api/items/{itemId:guid}/image", async (
     }
 
     var (stream, contentType) = await itemImageService.OpenImageAsync(userId, itemId);
+    if (stream is null || contentType is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.File(stream, contentType);
+}).RequireAuthorization();
+
+app.MapGet("/api/campaign-npcs/{npcId:guid}/image", async (
+    Guid npcId,
+    ClaimsPrincipal user,
+    CampaignNpcImageService npcImageService) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var (stream, contentType) = await npcImageService.OpenImageAsync(userId, npcId);
     if (stream is null || contentType is null)
     {
         return Results.NotFound();
