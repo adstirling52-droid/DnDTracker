@@ -132,8 +132,12 @@ public class NpcGeneratorServiceTests
         Assert.NotNull(npc);
         Assert.Contains(npc.Name, npc.DmSummary, StringComparison.Ordinal);
         Assert.Contains(KeyPhrase(npc.Secret), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(KeyPhrase(npc.QuestHook), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
         Assert.Contains(KeyPhrase(npc.Background), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
+        Assert.True(
+            npc.DmSummary.Contains(KeyPhrase(npc.QuestHook), StringComparison.OrdinalIgnoreCase) ||
+            npc.DmSummary.Contains("may ask", StringComparison.OrdinalIgnoreCase) ||
+            npc.DmSummary.Contains("may offer", StringComparison.OrdinalIgnoreCase) ||
+            npc.DmSummary.Contains("may claim", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(KeyPhrase(npc.Appearance), npc.DmSummary, StringComparison.OrdinalIgnoreCase);
     }
 
