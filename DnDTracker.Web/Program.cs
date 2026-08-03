@@ -52,6 +52,7 @@ builder.Services.AddScoped<ItemImageService>();
 builder.Services.AddScoped<RollTableService>();
 
 builder.Services.AddSingleton<NpcGenerationDataProvider>();
+builder.Services.AddScoped<NpcGeneratorService>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
