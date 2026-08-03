@@ -122,17 +122,14 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
         var ancestryAdjective = ToAncestryAdjective(npc.Ancestry);
 
         var paragraphOne = JoinSentences(
-            BuildIntroductionSentence(npc, ancestryAdjective),
-            BuildDistinctiveSentence(npc.DistinctiveFeature),
-            BuildBehaviourSentence(pronouns, npc.Personality, npc.Mannerism, npc.Voice));
+            BuildIntroWithAppearance(npc, ancestryAdjective),
+            EnsureSentence(FormatDistinctiveFeature(npc.DistinctiveFeature, pronouns)),
+            EnsureSentence(FormatBehaviour(npc.Personality, npc.Mannerism, npc.Voice, pronouns)));
 
         var paragraphTwo = JoinSentences(
-            BuildBackgroundSentence(npc.Name, npc.Background),
-            BuildMotivationSentence(pronouns, npc.Motivation),
-            BuildSecretSentence(pronouns, npc.Secret),
-            BuildProblemSentence(pronouns, npc.CurrentProblem),
-            BuildQuestHookSentence(pronouns, npc.QuestHook),
-            BuildDangerSentence(pronouns, npc.DangerOrComplication));
+            BuildBackgroundClause(npc, pronouns),
+            BuildMotivationWithSecret(npc, pronouns),
+            BuildSituationWithHookAndDanger(npc, pronouns));
 
         return FinalizeProse(paragraphOne, paragraphTwo);
     }
@@ -147,14 +144,14 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
 
         var firstWord = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0].ToLowerInvariant();
 
-        if (firstWord is "hour" or "hourglass" or "honest" or "heir")
+        if (firstWord is "hour" or "hourglass" or "honest" or "heir" or "elderly" or "expected" or "innkeeper" or "itinerant" or "old" or "unusual" or "unknown" or "impossible")
         {
             return "an";
         }
 
-        if (firstWord is "adult" or "university" or "user" or "one" or "once" or "unique" or "european" or "union")
+        if (firstWord is "adult" or "university" or "user" or "one" or "once" or "unique" or "european" or "union" or "young" or "middle-aged" or "middle" or "dwarven" or "human" or "elven" or "lean" or "compact" or "broad-shouldered" or "weathered")
         {
-            return "a";
+            return firstWord is "adult" ? "an" : "a";
         }
 
         return firstWord.Length > 0 && "aeiou".Contains(firstWord[0]) ? "an" : "a";
@@ -184,17 +181,24 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
         return CollapseRepeatedPunctuation(prompt);
     }
 
-    private static string BuildIntroductionSentence(GeneratedNpc npc, string ancestryAdjective)
+    private static string BuildIntroWithAppearance(GeneratedNpc npc, string ancestryAdjective)
     {
-        var occupation = npc.Occupation.ToLowerInvariant();
-        var rolePhrase = $"{npc.AgeCategory} {ancestryAdjective} {occupation}";
-        var article = SelectIndefiniteArticle(npc.AgeCategory);
+        var rolePhrase = FormatRolePhrase(npc.AgeCategory, ancestryAdjective, npc.Occupation);
         var appearance = NormalizeField(npc.Appearance);
+
+        if (appearance.StartsWith("Otherwise unremarkable", StringComparison.OrdinalIgnoreCase))
+        {
+            var detail = appearance.StartsWith("Otherwise unremarkable at a glance, except for ", StringComparison.OrdinalIgnoreCase)
+                ? appearance["Otherwise unremarkable at a glance, except for ".Length..]
+                : appearance["Otherwise unremarkable, except for ".Length..];
+            detail = LowercaseFirst(TrimTerminalPunctuation(detail));
+            return EnsureSentence(
+                $"{npc.Name} is {rolePhrase}, otherwise unremarkable at a glance save for {detail}");
+        }
 
         if (IsAdjectiveLedFragment(appearance))
         {
-            return EnsureSentence(
-                $"{npc.Name} is {article} {rolePhrase}, {LowercaseFirst(appearance)}");
+            return EnsureSentence($"{npc.Name} is {rolePhrase}, {LowercaseFirst(appearance)}");
         }
 
         if (IsNounFragment(appearance))
@@ -202,63 +206,112 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
             var appearanceBody = StripLeadingArticle(appearance);
             var appearanceArticle = SelectIndefiniteArticle(appearanceBody);
             return EnsureSentence(
-                $"{npc.Name} is {article} {rolePhrase} with {appearanceArticle} {LowercaseFirst(appearanceBody)}");
+                $"{npc.Name} is {rolePhrase} with {appearanceArticle} {LowercaseFirst(appearanceBody)}");
         }
 
-        return EnsureSentence($"{npc.Name} is {article} {rolePhrase}. {BuildAppearanceSentence(npc.Name, appearance)}");
+        if (string.IsNullOrWhiteSpace(appearance))
+        {
+            return EnsureSentence($"{npc.Name} is {rolePhrase}");
+        }
+
+        return EnsureSentence($"{npc.Name} is {rolePhrase}, {LowercaseFirst(appearance)}");
     }
 
-    private static string BuildAppearanceSentence(string name, string appearance)
+    private static string FormatRolePhrase(string ageCategory, string ancestryAdjective, string occupation)
     {
-        var cleaned = NormalizeField(appearance);
+        var occupationLower = occupation.ToLowerInvariant();
+        var normalizedAge = ageCategory.ToLowerInvariant().Trim();
+
+        return normalizedAge switch
+        {
+            "adult in their prime" => $"an adult {ancestryAdjective} {occupationLower} in the prime of life",
+            "elderly" => $"an elderly {ancestryAdjective} {occupationLower}",
+            "young adult" => $"a young adult {ancestryAdjective} {occupationLower}",
+            "middle-aged" => $"a middle-aged {ancestryAdjective} {occupationLower}",
+            _ => $"{SelectIndefiniteArticle(normalizedAge)} {normalizedAge} {ancestryAdjective} {occupationLower}"
+        };
+    }
+
+    private static string FormatDistinctiveFeature(string distinctiveFeature, PronounSet pronouns)
+    {
+        var cleaned = ApplyNpcPronouns(NormalizeField(distinctiveFeature), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
         }
 
-        if (StartsWithVerb(cleaned))
+        if (cleaned.StartsWith("Ink-stained fingers", StringComparison.OrdinalIgnoreCase))
         {
-            return EnsureSentence($"{name} {LowercaseFirst(cleaned)}");
+            return $"{pronouns.PossessiveAdjective} fingers are permanently stained with ink that never quite washes clean";
         }
 
-        return EnsureSentence($"{name} looks {LowercaseFirst(cleaned)}");
-    }
-
-    private static string BuildDistinctiveSentence(string distinctiveFeature)
-    {
-        var cleaned = NormalizeField(distinctiveFeature);
-        if (string.IsNullOrWhiteSpace(cleaned))
+        if (cleaned.StartsWith("A faint scent of dried herbs", StringComparison.OrdinalIgnoreCase))
         {
-            return string.Empty;
+            return $"A faint scent of dried herbs clings to {pronouns.PossessiveAdjective} clothes";
+        }
+
+        if (cleaned.StartsWith("A braided beard", StringComparison.OrdinalIgnoreCase))
+        {
+            return cleaned;
         }
 
         if (StartsWithArticle(cleaned))
         {
-            return EnsureSentence(cleaned);
+            return cleaned;
         }
 
-        return EnsureSentence($"One notable feature is {LowercaseFirst(cleaned)}");
+        return $"{pronouns.Subject} has {LowercaseFirst(cleaned)}";
     }
 
-    private static string BuildBehaviourSentence(
-        PronounSet pronouns,
-        string personality,
-        string mannerism,
-        string voice)
+    private static string FormatBehaviour(string personality, string mannerism, string voice, PronounSet pronouns)
     {
-        var personalityClause = BuildPersonalityClause(pronouns, personality);
-        var mannerismClause = BuildMannerismClause(pronouns, mannerism);
-        var voiceClause = BuildVoiceClause(pronouns, voice);
+        var personalityPhrase = FormatPersonality(personality, pronouns);
+        var mannerismPhrase = FormatMannerism(mannerism, pronouns, includeSubject: false);
+        var voicePhrase = FormatVoice(voice, pronouns, includeSubject: false);
 
-        return EnsureSentence($"{personalityClause}, {mannerismClause}, and {voiceClause}");
+        var trailing = new[] { mannerismPhrase, voicePhrase }
+            .Where(part => !string.IsNullOrWhiteSpace(part))
+            .ToList();
+
+        if (trailing.Count == 0)
+        {
+            return personalityPhrase;
+        }
+
+        if (trailing.Count == 1)
+        {
+            return $"{personalityPhrase}, {trailing[0]}";
+        }
+
+        return $"{personalityPhrase}, {trailing[0]}, and {trailing[1]}";
     }
 
-    private static string BuildPersonalityClause(PronounSet pronouns, string personality)
+    private static string FormatPersonality(string personality, PronounSet pronouns)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(personality), pronouns);
+        var cleaned = ApplyNpcPronouns(NormalizeField(personality), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return $"{pronouns.Subject} {pronouns.Is} guarded";
+        }
+
+        if (cleaned.StartsWith("Dry, precise, and difficult to fluster", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} has a dry, precise manner and is difficult to unsettle";
+        }
+
+        if (cleaned.StartsWith("Warm with strangers but quietly watchful", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} {pronouns.Is} warm with strangers but quietly watchful";
+        }
+
+        if (cleaned.StartsWith("Guarded at first, but unexpectedly kind once trust is earned", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} {pronouns.Is} guarded at first, but unexpectedly kind once trust is earned";
+        }
+
+        if (cleaned.StartsWith("Restlessly curious", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} {pronouns.Is} restlessly curious, with a habit of turning conversations back to other people";
         }
 
         if (StartsWithPronoun(cleaned))
@@ -266,175 +319,445 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
             return AlignPronoun(cleaned, pronouns);
         }
 
-        return $"{pronouns.Subject} {pronouns.Is} {LowercaseFirst(cleaned)}";
+        if (IsLikelyAdjective(cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0]))
+        {
+            return $"{pronouns.Subject} {pronouns.Is} {LowercaseFirst(cleaned)}";
+        }
+
+        return $"{pronouns.Subject} {pronouns.Has} a {LowercaseFirst(cleaned)} manner";
     }
 
-    private static string BuildMannerismClause(PronounSet pronouns, string mannerism)
+    private static string FormatMannerism(string mannerism, PronounSet pronouns, bool includeSubject = true)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(mannerism), pronouns);
-        if (string.IsNullOrWhiteSpace(cleaned))
-        {
-            return "often pausing to choose their words carefully".Replace("their", pronouns.PossessiveAdjective, StringComparison.Ordinal);
-        }
-
-        return ToGerundClause(cleaned);
-    }
-
-    private static string BuildVoiceClause(PronounSet pronouns, string voice)
-    {
-        var cleaned = ApplyGenericPossessives(NormalizeField(voice), pronouns);
-        if (string.IsNullOrWhiteSpace(cleaned))
-        {
-            return $"{pronouns.SubjectLower} {pronouns.Speaks} in a steady voice";
-        }
-
-        if (cleaned.StartsWith("Speaks ", StringComparison.OrdinalIgnoreCase))
-        {
-            return "speaking" + cleaned[6..].ToLowerInvariant();
-        }
-
-        if (cleaned.StartsWith("Talks ", StringComparison.OrdinalIgnoreCase))
-        {
-            return "talking" + cleaned[5..].ToLowerInvariant();
-        }
-
-        if (cleaned.StartsWith("Uses ", StringComparison.OrdinalIgnoreCase))
-        {
-            return "using" + cleaned[4..].ToLowerInvariant();
-        }
-
-        return ToGerundClause(cleaned);
-    }
-
-    private static string BuildBackgroundSentence(string name, string background)
-    {
-        var cleaned = NormalizeField(background);
+        var cleaned = ApplyNpcPronouns(NormalizeField(mannerism), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
         }
 
-        if (StartsWithPronoun(cleaned) || cleaned.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+        if (cleaned.StartsWith("Squints slightly when trying to recall a detail", StringComparison.OrdinalIgnoreCase))
         {
-            return EnsureSentence(cleaned);
+            return includeSubject
+                ? $"{pronouns.Subject} squints slightly when trying to recall a detail"
+                : "squints slightly when trying to recall a detail";
         }
 
-        return EnsureSentence($"{name} {LowercaseFirst(cleaned)}");
+        if (cleaned.StartsWith("Hums under", StringComparison.OrdinalIgnoreCase))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} hums under {pronouns.PossessiveAdjective} breath while working"
+                : $"hums under {pronouns.PossessiveAdjective} breath while working";
+        }
+
+        if (cleaned.StartsWith("Glances toward exits and windows when entering a new room", StringComparison.OrdinalIgnoreCase))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} glances toward exits and windows when entering a new room"
+                : "glances toward exits and windows when entering a new room";
+        }
+
+        if (StartsWithVerb(cleaned))
+        {
+            var phrase = AdaptClauseForSubject(LowercaseFirst(cleaned), pronouns);
+            return includeSubject ? $"{pronouns.Subject} {phrase}" : phrase;
+        }
+
+        var fallback = AdaptClauseForSubject(LowercaseFirst(cleaned), pronouns);
+        return includeSubject ? $"{pronouns.Subject} {fallback}" : fallback;
     }
 
-    private static string BuildMotivationSentence(PronounSet pronouns, string motivation)
+    private static string FormatVoice(string voice, PronounSet pronouns, bool includeSubject = true)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(motivation), pronouns);
+        var cleaned = ApplyNpcPronouns(NormalizeField(voice), pronouns);
+        if (string.IsNullOrWhiteSpace(cleaned))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} {pronouns.Speaks} in a steady voice"
+                : $"{pronouns.Speaks} in a steady voice";
+        }
+
+        if (cleaned.StartsWith("Uses soft, carefully chosen words", StringComparison.OrdinalIgnoreCase))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} {pronouns.Speaks} in soft, carefully chosen words, as if afraid of being overheard"
+                : $"{pronouns.Speaks} in soft, carefully chosen words, as if afraid of being overheard";
+        }
+
+        if (cleaned.StartsWith("Speaks in a low, measured voice", StringComparison.OrdinalIgnoreCase))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} {pronouns.Speaks} in a low, measured voice"
+                : $"{pronouns.Speaks} in a low, measured voice";
+        }
+
+        if (cleaned.StartsWith("Talks quickly, with a warm regional lilt", StringComparison.OrdinalIgnoreCase))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} talks quickly, with a warm regional lilt"
+                : "talks quickly, with a warm regional lilt";
+        }
+
+        if (cleaned.StartsWith("Gravelly and direct", StringComparison.OrdinalIgnoreCase))
+        {
+            return includeSubject
+                ? $"{pronouns.Subject} {pronouns.Is} gravelly and direct, with little patience for evasion"
+                : $"{pronouns.Is} gravelly and direct, with little patience for evasion";
+        }
+
+        if (cleaned.StartsWith("Speaks ", StringComparison.OrdinalIgnoreCase) ||
+            cleaned.StartsWith("Talks ", StringComparison.OrdinalIgnoreCase) ||
+            cleaned.StartsWith("Uses ", StringComparison.OrdinalIgnoreCase))
+        {
+            var phrase = AdaptClauseForSubject(LowercaseFirst(cleaned), pronouns);
+            return includeSubject ? $"{pronouns.Subject} {phrase}" : phrase;
+        }
+
+        return includeSubject
+            ? $"{pronouns.Subject} {pronouns.Speaks} with a {LowercaseFirst(cleaned)} voice"
+            : $"{pronouns.Speaks} with a {LowercaseFirst(cleaned)} voice";
+    }
+
+    private static string BuildBackgroundClause(GeneratedNpc npc, PronounSet pronouns)
+    {
+        var cleaned = ApplyNpcPronouns(NormalizeField(npc.Background), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
+        }
+
+        if (cleaned.StartsWith("Completed most of a respectable apprenticeship", StringComparison.OrdinalIgnoreCase))
+        {
+            return EnsureSentence(
+                $"{pronouns.Subject} completed most of a respectable apprenticeship, then fled after discovering something unsettling in {pronouns.PossessiveAdjective} master's records");
+        }
+
+        if (cleaned.StartsWith("Inherited a modest family trade", StringComparison.OrdinalIgnoreCase))
+        {
+            return EnsureSentence($"{npc.Name} inherited a modest family trade and has kept it alive through stubborn competence rather than ambition");
+        }
+
+        if (cleaned.StartsWith("Once served in a border company", StringComparison.OrdinalIgnoreCase))
+        {
+            return EnsureSentence($"{pronouns.Subject} once served in a border company and left after a mission went badly wrong");
         }
 
         if (StartsWithPronoun(cleaned))
         {
             return EnsureSentence(AlignPronoun(cleaned, pronouns));
+        }
+
+        if (StartsWithVerb(cleaned))
+        {
+            return EnsureSentence($"{pronouns.Subject} {AdaptClauseForSubject(LowercaseFirst(cleaned), pronouns)}");
+        }
+
+        return EnsureSentence($"{npc.Name} {LowercaseFirst(cleaned)}");
+    }
+
+    private static string BuildMotivationWithSecret(GeneratedNpc npc, PronounSet pronouns)
+    {
+        var motivation = FormatMotivation(npc.Motivation, pronouns);
+        var secret = FormatSecret(npc.Secret, pronouns);
+
+        if (string.IsNullOrWhiteSpace(motivation))
+        {
+            return EnsureSentence(secret);
+        }
+
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            return EnsureSentence(motivation);
+        }
+
+        return EnsureSentence($"{motivation}, though {LowercaseFirst(secret)}");
+    }
+
+    private static string FormatMotivation(string motivation, PronounSet pronouns)
+    {
+        var cleaned = ApplyNpcPronouns(NormalizeField(motivation), pronouns);
+        if (string.IsNullOrWhiteSpace(cleaned))
+        {
+            return string.Empty;
+        }
+
+        if (cleaned.StartsWith("Settle an old debt before it ruins someone", StringComparison.OrdinalIgnoreCase))
+        {
+            var carePhrase = pronouns.Subject == "They"
+                ? "someone they care about"
+                : $"someone {pronouns.SubjectLower} cares about";
+            return $"{pronouns.Subject} {pronouns.Wants} to settle an old debt before it ruins {carePhrase}";
         }
 
         if (cleaned.StartsWith("Keep ", StringComparison.OrdinalIgnoreCase))
         {
-            return EnsureSentence($"{pronouns.Subject} {pronouns.Wants} to keep {cleaned[5..].TrimStart().ToLowerInvariant()}");
+            var remainder = ApplyNpcPronouns(cleaned[5..].TrimStart(), pronouns);
+            return $"{pronouns.Subject} {pronouns.Wants} to keep {LowercaseFirst(remainder)}";
+        }
+
+        if (cleaned.StartsWith("Find out what happened to someone who vanished", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} {pronouns.Wants} to find out what happened to someone who vanished without explanation";
         }
 
         if (StartsWithVerb(cleaned))
         {
-            return EnsureSentence($"{pronouns.Subject} {pronouns.Wants} to {ToBaseVerbPhrase(cleaned)}");
+            return $"{pronouns.Subject} {pronouns.Wants} to {ToBaseVerbPhrase(cleaned)}";
         }
 
-        return EnsureSentence($"{pronouns.Subject} {pronouns.Is} driven to {LowercaseFirst(cleaned)}");
+        return $"{pronouns.Subject} {pronouns.Is} driven to {LowercaseFirst(cleaned)}";
     }
 
-    private static string BuildSecretSentence(PronounSet pronouns, string secret)
+    private static string FormatSecret(string secret, PronounSet pronouns)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(secret), pronouns);
+        var cleaned = ApplyNpcPronouns(NormalizeField(secret), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
+        }
+
+        if (cleaned.StartsWith("Uses a false name because", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.SubjectLower} uses a false name because {pronouns.PossessiveAdjective} real one would attract the wrong attention";
+        }
+
+        if (cleaned.StartsWith("Quietly passes messages for a smuggler", StringComparison.OrdinalIgnoreCase))
+        {
+            var verb = pronouns.Subject == "They" ? "pass" : "passes";
+            return $"{pronouns.SubjectLower} quietly {verb} messages for a smuggler in exchange for protection";
+        }
+
+        if (cleaned.StartsWith("Hides a valuable heirloom", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.SubjectLower} hides a valuable heirloom that would be seized if discovered";
         }
 
         if (StartsWithPronoun(cleaned))
         {
-            return EnsureSentence($"At the same time, {LowercaseFirst(AlignPronoun(cleaned, pronouns))}");
+            return LowercaseFirst(AlignPronoun(cleaned, pronouns));
         }
 
         if (StartsWithVerb(cleaned))
         {
-            return EnsureSentence($"At the same time, {pronouns.SubjectLower} {ToThirdPersonVerbPhrase(cleaned, pronouns)}");
+            return $"{pronouns.SubjectLower} {ToThirdPersonVerbPhrase(cleaned, pronouns)}";
         }
 
-        return EnsureSentence($"At the same time, {pronouns.SubjectLower} {AdaptClauseForSubject(LowercaseFirst(cleaned), pronouns)}");
+        return $"{pronouns.SubjectLower} {AdaptClauseForSubject(LowercaseFirst(cleaned), pronouns)}";
     }
 
-    private static string BuildProblemSentence(PronounSet pronouns, string problem)
+    private static string BuildSituationWithHookAndDanger(GeneratedNpc npc, PronounSet pronouns)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(problem), pronouns);
+        var problem = FormatProblem(npc.CurrentProblem, pronouns);
+        var questHook = FormatQuestHook(npc.QuestHook, pronouns);
+        var danger = FormatDanger(npc.DangerOrComplication, pronouns);
+
+        if (string.IsNullOrWhiteSpace(problem) && string.IsNullOrWhiteSpace(questHook) && string.IsNullOrWhiteSpace(danger))
+        {
+            return string.Empty;
+        }
+
+        if (!string.IsNullOrWhiteSpace(problem) && !string.IsNullOrWhiteSpace(questHook) && !string.IsNullOrWhiteSpace(danger))
+        {
+            return EnsureSentence($"{problem}, and {LowercaseFirst(questHook)}—though {LowercaseFirst(danger)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(problem) && !string.IsNullOrWhiteSpace(questHook))
+        {
+            return EnsureSentence($"{problem}, and {LowercaseFirst(questHook)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(problem) && !string.IsNullOrWhiteSpace(danger))
+        {
+            return EnsureSentence($"{problem}, though {LowercaseFirst(danger)}");
+        }
+
+        return EnsureSentence(problem ?? questHook ?? danger ?? string.Empty);
+    }
+
+    private static string FormatProblem(string problem, PronounSet pronouns)
+    {
+        var cleaned = ApplyNpcPronouns(NormalizeField(problem), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
+        }
+
+        if (cleaned.StartsWith("A expected shipment", StringComparison.OrdinalIgnoreCase) ||
+            cleaned.StartsWith("An expected shipment", StringComparison.OrdinalIgnoreCase))
+        {
+            return "An expected shipment or payment has failed to arrive";
+        }
+
+        if (cleaned.StartsWith("Owes money to someone impatient and well connected", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} {pronouns.Owes} money to someone impatient and well connected";
+        }
+
+        if (cleaned.StartsWith("Someone is quietly sabotaging", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"someone is quietly sabotaging {pronouns.PossessiveAdjective} livelihood";
         }
 
         if (StartsWithPronoun(cleaned))
         {
-            return EnsureSentence($"Now {LowercaseFirst(AlignPronoun(cleaned, pronouns))}");
-        }
-
-        if (cleaned.StartsWith("Owes ", StringComparison.OrdinalIgnoreCase))
-        {
-            return EnsureSentence($"Now {pronouns.SubjectLower} {pronouns.Owes} {cleaned[5..].TrimStart().ToLowerInvariant()}");
+            return AlignPronoun(cleaned, pronouns);
         }
 
         if (StartsWithVerb(cleaned))
         {
-            return EnsureSentence($"Now {pronouns.SubjectLower} {ToThirdPersonVerbPhrase(cleaned, pronouns)}");
+            return $"{pronouns.Subject} {ToThirdPersonVerbPhrase(cleaned, pronouns)}";
         }
 
-        return EnsureSentence($"Now, {LowercaseFirst(cleaned)}");
+        var article = SelectIndefiniteArticle(cleaned);
+        return $"{char.ToUpperInvariant(article[0])}{article[1..]} {LowercaseFirst(cleaned)}";
     }
 
-    private static string BuildQuestHookSentence(PronounSet pronouns, string questHook)
+    private static string FormatQuestHook(string questHook, PronounSet pronouns)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(questHook), pronouns);
+        var cleaned = ApplyNpcPronouns(NormalizeField(questHook), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
         }
 
-        if (StartsWithPronoun(cleaned))
+        if (cleaned.StartsWith("Offers reliable local information if the party helps with a personal errand first", StringComparison.OrdinalIgnoreCase))
         {
-            return EnsureSentence(AlignPronoun(cleaned, pronouns));
+            return $"{pronouns.Subject} may offer reliable local information if the party helps with a personal errand first";
+        }
+
+        if (cleaned.StartsWith("Asks the party to watch", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} may ask the party to watch {pronouns.PossessiveAdjective} workplace for whoever is causing the trouble";
+        }
+
+        if (cleaned.StartsWith("Claims to have witnessed something impossible near town", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{pronouns.Subject} may claim to have witnessed something impossible near town and needs someone credible to investigate";
         }
 
         if (StartsWithVerb(cleaned))
         {
-            return EnsureSentence($"{pronouns.Subject} may {ToBaseVerbPhrase(cleaned)}");
+            return $"{pronouns.Subject} may {ToBaseVerbPhrase(cleaned)}";
         }
 
-        return EnsureSentence($"{pronouns.Subject} may {LowercaseFirst(cleaned)}");
+        return $"{pronouns.Subject} may {LowercaseFirst(cleaned)}";
     }
 
-    private static string BuildDangerSentence(PronounSet pronouns, string danger)
+    private static string FormatDanger(string danger, PronounSet pronouns)
     {
-        var cleaned = ApplyGenericPossessives(NormalizeField(danger), pronouns);
+        var cleaned = ApplyNpcPronouns(NormalizeField(danger), pronouns);
         if (string.IsNullOrWhiteSpace(cleaned))
         {
             return string.Empty;
         }
 
-        if (cleaned.StartsWith("Helping ", StringComparison.OrdinalIgnoreCase))
+        if (cleaned.StartsWith("Their creditor has ties to violent people", StringComparison.OrdinalIgnoreCase) ||
+            cleaned.StartsWith($"{pronouns.PossessiveAdjective} creditor has ties to violent people", StringComparison.OrdinalIgnoreCase))
         {
-            return EnsureSentence($"However, {LowercaseFirst(cleaned)}");
+            return $"{pronouns.PossessiveAdjective} creditor has ties to violent people";
         }
 
-        if (cleaned.StartsWith("Their ", StringComparison.OrdinalIgnoreCase))
+        if (cleaned.StartsWith("Helping them may draw attention from local authorities", StringComparison.OrdinalIgnoreCase) ||
+            cleaned.StartsWith($"Helping {pronouns.Object} may draw attention from local authorities", StringComparison.OrdinalIgnoreCase))
         {
-            cleaned = $"{pronouns.PossessiveAdjective} {cleaned[6..]}";
+            return $"helping {pronouns.Object} may draw attention from local authorities";
         }
 
-        return EnsureSentence($"However, {LowercaseFirst(cleaned)}");
+        if (cleaned.StartsWith("An unknown enemy already knows the party spoke with them", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"an unknown enemy already knows the party spoke with {pronouns.Object}";
+        }
+
+        return LowercaseFirst(cleaned);
+    }
+
+    private static string ApplyNpcPronouns(string text, PronounSet pronouns)
+    {
+        text = Regex.Replace(text, @"\btheir\b", pronouns.PossessiveAdjective, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bthemselves\b", pronouns.Reflexive, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bthem\b", pronouns.Object, RegexOptions.IgnoreCase);
+        text = AdaptNpcSubjectPronouns(text, pronouns);
+        return text;
+    }
+
+    private static string AdaptNpcSubjectPronouns(string text, PronounSet pronouns)
+    {
+        text = Regex.Replace(
+            text,
+            @"\bthey (?<verb>[a-z]+)\b",
+            match => $"{pronouns.SubjectLower} {ConjugateVerbForSubject(match.Groups["verb"].Value, pronouns)}",
+            RegexOptions.IgnoreCase);
+
+        text = Regex.Replace(text, @"\bthey\b", pronouns.SubjectLower, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bshe\b", pronouns.SubjectLower, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bhe\b", pronouns.SubjectLower, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bher\b", pronouns.PossessiveAdjective, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bhis\b", pronouns.PossessiveAdjective, RegexOptions.IgnoreCase);
+        text = Regex.Replace(text, @"\bhim\b", pronouns.Object, RegexOptions.IgnoreCase);
+
+        return text;
+    }
+
+    private static string ConjugateVerbForSubject(string verb, PronounSet pronouns)
+    {
+        var lowerVerb = verb.ToLowerInvariant();
+        if (pronouns.Subject == "They")
+        {
+            if (lowerVerb.EndsWith("ies", StringComparison.Ordinal))
+            {
+                return lowerVerb[..^3] + "y";
+            }
+
+            if (lowerVerb.EndsWith("s", StringComparison.Ordinal) &&
+                !lowerVerb.EndsWith("ss", StringComparison.Ordinal) &&
+                lowerVerb is not "is" and not "has")
+            {
+                return lowerVerb[..^1];
+            }
+
+            if (lowerVerb == "is")
+            {
+                return "are";
+            }
+
+            if (lowerVerb == "has")
+            {
+                return "have";
+            }
+
+            return lowerVerb;
+        }
+
+        if (lowerVerb == "are")
+        {
+            return "is";
+        }
+
+        if (lowerVerb == "have")
+        {
+            return "has";
+        }
+
+        if (lowerVerb == "understand")
+        {
+            return "understands";
+        }
+
+        if (lowerVerb == "care")
+        {
+            return "cares";
+        }
+
+        if (lowerVerb == "pass")
+        {
+            return "passes";
+        }
+
+        if (!lowerVerb.EndsWith('s') || lowerVerb.EndsWith("ss", StringComparison.Ordinal))
+        {
+            return lowerVerb + "s";
+        }
+
+        return lowerVerb;
     }
 
     private static string AlignPronoun(string text, PronounSet pronouns)
