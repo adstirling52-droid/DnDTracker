@@ -69,8 +69,29 @@ var app = builder.Build();
 if (app.Environment.IsProduction())
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<DnDTrackerDbContext>();
-    db.Database.Migrate();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        logger.LogCritical(
+            "Connection string 'DefaultConnection' is not configured. " +
+            "Set ConnectionStrings__DefaultConnection in IIS application pool environment variables.");
+        throw new InvalidOperationException("Database connection string is not configured.");
+    }
+
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<DnDTrackerDbContext>();
+        db.Database.Migrate();
+        logger.LogInformation("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogCritical(ex, "Database migration failed during startup.");
+        throw;
+    }
 
     var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
     Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "item-images"));
