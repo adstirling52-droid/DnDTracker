@@ -141,15 +141,42 @@ internal static class ProductionDatabaseStartup
         values.Count == 0 ? "(none)" : string.Join(", ", values);
 }
 
-internal sealed class StartupLogWriter(string logPath)
+internal sealed class StartupLogWriter
 {
+    private readonly string[] _logPaths;
+
+    private StartupLogWriter(params string[] logPaths) => _logPaths = logPaths;
+
     public static StartupLogWriter ForContentRoot(string contentRootPath) =>
-        new(Path.Combine(contentRootPath, "Data", "startup.log"));
+        CreateWriters(contentRootPath);
 
     public static StartupLogWriter ForAppDirectory() =>
-        new(Path.Combine(AppContext.BaseDirectory, "Data", "startup.log"));
+        CreateWriters(AppContext.BaseDirectory);
 
     public void Write(string message)
+    {
+        foreach (var logPath in _logPaths)
+        {
+            if (TryWrite(logPath, message))
+            {
+                return;
+            }
+        }
+    }
+
+    private static StartupLogWriter CreateWriters(string rootPath)
+    {
+        var paths = new[]
+        {
+            Path.Combine(rootPath, "startup.log"),
+            Path.Combine(rootPath, "Data", "startup.log"),
+            Path.Combine(Path.GetTempPath(), "DnDTracker-startup.log")
+        };
+
+        return new StartupLogWriter(paths);
+    }
+
+    private static bool TryWrite(string logPath, string message)
     {
         try
         {
@@ -161,10 +188,11 @@ internal sealed class StartupLogWriter(string logPath)
 
             var line = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] {message}{Environment.NewLine}";
             File.AppendAllText(logPath, line);
+            return true;
         }
         catch
         {
-            // Best-effort logging only; IIS stdout/Event Viewer remain the fallback.
+            return false;
         }
     }
 }

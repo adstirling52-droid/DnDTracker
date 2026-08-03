@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+StartupLogWriter.ForAppDirectory().Write("DnDTracker process started.");
+
 try
 {
     await RunAsync(args);

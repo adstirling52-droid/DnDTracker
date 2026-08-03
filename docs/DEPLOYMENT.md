@@ -285,17 +285,28 @@ When you change the app:
 
 If the site fails with **HTTP 500.30** after an update:
 
-1. Open `C:\inetpub\DnDTracker\Data\startup.log` — this records the exact startup exception.
-2. Confirm the deployed DLL contains migration `20260803143258_AddCampaignNpcs`:
+1. Check these startup log locations (first one the app pool can write wins):
+   - `C:\inetpub\DnDTracker\startup.log`
+   - `C:\inetpub\DnDTracker\Data\startup.log`
+   - `%TEMP%\DnDTracker-startup.log`
+2. If no log file exists, IIS failed before the app started. Run this in an elevated PowerShell session on the VM to see the error directly:
+
+```powershell
+cd C:\inetpub\DnDTracker
+$env:ASPNETCORE_ENVIRONMENT = "Production"
+$env:ConnectionStrings__DefaultConnection = "<paste your IIS app pool connection string here>"
+dotnet .\DnDTracker.Web.dll
+```
+
+3. Also check **Event Viewer → Windows Logs → Application** for `.NET Runtime` or `IIS AspNetCore Module V2` errors.
+4. Confirm the deployed DLL contains migration `20260803143258_AddCampaignNpcs`:
 
 ```powershell
 findstr 20260803143258 C:\inetpub\DnDTracker\DnDTracker.Web.dll
 ```
 
-3. Ensure the app pool identity has **Modify** on `C:\inetpub\DnDTracker\Data` (needed to create `Data\npc-images` on first startup after PR `#56`).
-4. Recycle the IIS application pool after copying files.
-
-To capture IIS stdout logs temporarily: create `C:\inetpub\DnDTracker\logs`, grant the app pool **Modify** on it, set `stdoutLogEnabled="true"` in `web.config`, recycle the app pool, then read the newest `logs\stdout*.log`.
+5. Ensure the app pool identity has **Modify** on `C:\inetpub\DnDTracker\Data` (needed to create `Data\npc-images` on first startup after PR `#56`).
+6. Recycle the IIS application pool after copying files.
 
 ---
 
@@ -308,7 +319,8 @@ To capture IIS stdout logs temporarily: create `C:\inetpub\DnDTracker\logs`, gra
 | 500.30 after PR `#56`/`#57` deploy | Ensure build includes migration `20260803143258_AddCampaignNpcs` (PR `#57`), not the earlier unregistered hand-written migration from PR `#56`. |
 | Blazor disconnects immediately | WebSockets enabled on the IIS site? |
 | HTTPS redirect loop | Forwarded headers / URL Rewrite rule correct? |
-| Image upload fails | `Data\item-images` folder exists and app pool has Modify permission |
+| Image upload fails | `Data\item-images` folder exists and app pool has Modify permission on `Data` |
+| NPC portrait upload fails | `Data\npc-images` folder exists and app pool has Modify permission on `Data` |
 | 403 / forbidden | App pool identity can read `C:\inetpub\DnDTracker` |
 
 ---
