@@ -84,18 +84,14 @@ if (app.Environment.IsProduction())
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<DnDTrackerDbContext>();
-        db.Database.Migrate();
-        logger.LogInformation("Database migrations applied successfully.");
+        var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
+        ProductionDatabaseStartup.ApplyMigrationsAndPrepareDataFolders(db, contentRoot, logger);
     }
     catch (Exception ex)
     {
         logger.LogCritical(ex, "Database migration failed during startup.");
         throw;
     }
-
-    var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
-    Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "item-images"));
-    Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "npc-images"));
 }
 
 // Configure the HTTP request pipeline.
