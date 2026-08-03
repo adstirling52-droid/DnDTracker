@@ -11,4 +11,6 @@ public class Campaign
     public List<Character> Characters { get; set; } = new();
 
     public List<Item> Items { get; set; } = new();
+
+    public List<CampaignNpc> Npcs { get; set; } = new();
 }
