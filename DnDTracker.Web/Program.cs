@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DnDTracker.Web.Components;
 using DnDTracker.Web.Components.Account;
 using DnDTracker.Web.Data;
@@ -9,8 +10,19 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
+try
+{
+    await RunAsync(args);
+}
+catch (Exception ex)
+{
+    StartupLogWriter.ForAppDirectory().Write("Application startup failed: " + ex);
+    throw;
+}
+
+static async Task RunAsync(string[] args)
+{
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -203,3 +215,4 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
+}

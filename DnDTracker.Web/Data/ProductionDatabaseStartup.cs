@@ -13,12 +13,11 @@ internal static class ProductionDatabaseStartup
         string contentRootPath,
         ILogger logger)
     {
-        var startupLogPath = Path.Combine(contentRootPath, "Data", "startup.log");
-        var startupLog = new StartupLogWriter(startupLogPath);
+        var startupLog = StartupLogWriter.ForContentRoot(contentRootPath);
 
         try
         {
-            startupLog.Write("Production startup began.");
+            startupLog.Write("Production database startup began.");
 
             var appliedMigrations = db.Database.GetAppliedMigrations().ToList();
             var pendingMigrations = db.Database.GetPendingMigrations().ToList();
@@ -40,8 +39,10 @@ internal static class ProductionDatabaseStartup
             {
                 var message =
                     "The compiled EF model does not match the latest migration snapshot. " +
-                    "Redeploy a build that includes the AddCampaignNpcs migration Designer file " +
-                    $"(expected migration id: {AddCampaignNpcsMigrationId}).";
+                    "This usually means an older build (PR #56) was deployed without the EF Designer file. " +
+                    "Redeploy a build that includes migration " +
+                    AddCampaignNpcsMigrationId +
+                    ", even if the database is already up to date.";
                 startupLog.Write("ERROR: " + message);
                 logger.LogCritical(message);
                 throw new InvalidOperationException(message);
@@ -54,14 +55,34 @@ internal static class ProductionDatabaseStartup
             startupLog.Write("Database migrations applied successfully.");
             logger.LogInformation("Database migrations applied successfully.");
 
-            Directory.CreateDirectory(Path.Combine(contentRootPath, "Data", "item-images"));
-            Directory.CreateDirectory(Path.Combine(contentRootPath, "Data", "npc-images"));
+            EnsureDataFolder(contentRootPath, "item-images", startupLog, logger);
+            EnsureDataFolder(contentRootPath, "npc-images", startupLog, logger);
             startupLog.Write("Data folders verified.");
         }
         catch (Exception ex)
         {
-            startupLog.Write("Startup failed: " + ex);
+            startupLog.Write("Production database startup failed: " + ex);
             logger.LogCritical(ex, "Database migration failed during startup. See Data/startup.log for details.");
+            throw;
+        }
+    }
+
+    private static void EnsureDataFolder(
+        string contentRootPath,
+        string folderName,
+        StartupLogWriter startupLog,
+        ILogger logger)
+    {
+        var folderPath = Path.Combine(contentRootPath, "Data", folderName);
+        try
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+        catch (Exception ex)
+        {
+            var message = $"Unable to create data folder '{folderPath}'. Grant Modify permission to the IIS app pool identity.";
+            startupLog.Write("ERROR: " + message + " " + ex.Message);
+            logger.LogCritical(ex, message);
             throw;
         }
     }
@@ -118,26 +139,32 @@ internal static class ProductionDatabaseStartup
 
     private static string FormatList(IReadOnlyCollection<string> values) =>
         values.Count == 0 ? "(none)" : string.Join(", ", values);
+}
 
-    private sealed class StartupLogWriter(string logPath)
+internal sealed class StartupLogWriter(string logPath)
+{
+    public static StartupLogWriter ForContentRoot(string contentRootPath) =>
+        new(Path.Combine(contentRootPath, "Data", "startup.log"));
+
+    public static StartupLogWriter ForAppDirectory() =>
+        new(Path.Combine(AppContext.BaseDirectory, "Data", "startup.log"));
+
+    public void Write(string message)
     {
-        public void Write(string message)
+        try
         {
-            try
+            var directory = Path.GetDirectoryName(logPath);
+            if (!string.IsNullOrEmpty(directory))
             {
-                var directory = Path.GetDirectoryName(logPath);
-                if (!string.IsNullOrEmpty(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
+                Directory.CreateDirectory(directory);
+            }
 
-                var line = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] {message}{Environment.NewLine}";
-                File.AppendAllText(logPath, line);
-            }
-            catch
-            {
-                // Best-effort logging only; IIS stdout/Event Viewer remain the fallback.
-            }
+            var line = $"[{DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC] {message}{Environment.NewLine}";
+            File.AppendAllText(logPath, line);
+        }
+        catch
+        {
+            // Best-effort logging only; IIS stdout/Event Viewer remain the fallback.
         }
     }
 }
