@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "tone": "Grounded, system-neutral fantasy with occasional unusual or memorable details.",
+  "ancestries": [
+    { "id": "human", "label": "Human", "tags": ["common"] },
+    { "id": "dwarf", "label": "Dwarf", "tags": ["common", "underground"] },
+    { "id": "elf", "label": "Elf", "tags": ["common", "fey-touched"] }
+  ],
+  "namesByAncestry": {
+    "human": ["Mira Thornfield", "Garret Holt", "Sera Vance"],
+    "dwarf": ["Thorin Brickforge", "Helga Ironvein", "Durin Slatebeard"],
+    "elf": ["Lirien Dawnsong", "Caeris Moonbrook", "Thalanil Riverwind"]
+  },
+  "ageCategories": [
+    { "id": "young", "text": "young adult", "tags": ["adult"] },
+    { "id": "adult", "text": "adult in their prime", "tags": ["adult"] },
+    { "id": "middle-aged", "text": "middle-aged", "tags": ["mature"] },
+    { "id": "elderly", "text": "elderly", "tags": ["mature"] }
+  ],
+  "genderPresentations": [
+    { "id": "masculine", "text": "masculine presentation", "tags": [] },
+    { "id": "feminine", "text": "feminine presentation", "tags": [] },
+    { "id": "androgynous", "text": "androgynous presentation", "tags": [] }
+  ],
+  "occupations": [
+    {
+      "id": "innkeeper",
+      "label": "Innkeeper",
+      "tags": ["civilised", "service", "urban"],
+      "appearanceTags": ["practical", "work-worn"]
+    },
+    {
+      "id": "herbalist",
+      "label": "Herbalist",
+      "tags": ["civilised", "scholarly", "rural"],
+      "appearanceTags": ["practical", "natural"]
+    },
+    {
+      "id": "guard",
+      "label": "Town guard",
+      "tags": ["civilised", "authority", "urban"],
+      "appearanceTags": ["uniformed", "sturdy"]
+    },
+    {
+      "id": "ferryman",
+      "label": "Ferry operator",
+      "tags": ["travel", "rural", "service"],
+      "appearanceTags": ["weathered", "practical"]
+    },
+    {
+      "id": "itinerant-scribe",
+      "label": "Itinerant scribe",
+      "tags": ["scholarly", "travel", "urban"],
+      "appearanceTags": ["travel-worn", "neat"]
+    }
+  ],
+  "appearances": [
+    {
+      "id": "broad-steady",
+      "text": "Broad-shouldered and steady-looking, with sun-browned skin and short, practical hair.",
+      "tags": ["adult", "practical", "sturdy"]
+    },
+    {
+      "id": "lean-alert",
+      "text": "Lean and alert, with quick eyes and hands that look accustomed to fine work.",
+      "tags": ["adult", "urban", "scholarly"]
+    },
+    {
+      "id": "weathered-compact",
+      "text": "Compact and weathered, with cracked knuckles and a posture shaped by long outdoor labour.",
+      "tags": ["mature", "rural", "weathered"]
+    },
+    {
+      "id": "striking-unusual-eyes",
+      "text": "Otherwise unremarkable at a glance, except for unusually clear grey eyes that seem to notice everything.",
+      "tags": ["adult", "memorable"]
+    }
+  ],
+  "distinctiveFeatures": [
+    { "id": "notched-ear", "text": "A neatly notched ear, old enough to pass for a forgotten shaving mishap.", "tags": [] },
+    { "id": "ink-stained-fingers", "text": "Ink-stained fingers that never quite wash clean.", "tags": ["scholarly"] },
+    { "id": "braided-beard-charms", "text": "A braided beard threaded with tiny brass charms.", "tags": ["dwarf", "memorable"] },
+    { "id": "faint-scent-herbs", "text": "A faint scent of dried herbs that clings to their clothes.", "tags": ["natural"] }
+  ],
+  "personalities": [
+    { "id": "warm-watchful", "text": "Warm with strangers but quietly watchful.", "tags": ["service"] },
+    { "id": "dry-precise", "text": "Dry, precise, and difficult to fluster.", "tags": ["scholarly", "authority"] },
+    { "id": "restless-curious", "text": "Restlessly curious, with a habit of turning conversations back to other people.", "tags": ["travel"] },
+    { "id": "guarded-kind", "text": "Guarded at first, but unexpectedly kind once trust is earned.", "tags": [] }
+  ],
+  "mannerisms": [
+    { "id": "taps-counter", "text": "Taps the nearest flat surface once before answering a question.", "tags": [] },
+    { "id": "squints-recall", "text": "Squints slightly when trying to recall a detail.", "tags": ["scholarly"] },
+    { "id": "checks-exits", "text": "Glances toward exits and windows when entering a new room.", "tags": ["authority"] },
+    { "id": "hum-under-breath", "text": "Hums under their breath while working.", "tags": ["service", "rural"] }
+  ],
+  "voices": [
+    { "id": "low-measured", "text": "Speaks in a low, measured voice.", "tags": ["mature", "authority"] },
+    { "id": "quick-warm", "text": "Talks quickly, with a warm regional lilt.", "tags": ["service", "rural"] },
+    { "id": "soft-careful", "text": "Uses soft, carefully chosen words, as if afraid of being overheard.", "tags": ["scholarly"] },
+    { "id": "gravelly-direct", "text": "Gravelly and direct, with little patience for evasion.", "tags": ["sturdy"] }
+  ],
+  "backgrounds": [
+    {
+      "id": "retired-soldier",
+      "text": "Once served in a border company and left after a mission went badly wrong.",
+      "tags": ["military", "mature", "guard"]
+    },
+    {
+      "id": "apprentice-fled",
+      "text": "Completed most of a respectable apprenticeship, then fled after discovering something unsettling in their master's records.",
+      "tags": ["scholarly", "secret"]
+    },
+    {
+      "id": "family-trade",
+      "text": "Inherited a modest family trade and has kept it alive through stubborn competence rather than ambition.",
+      "tags": ["service", "civilised"]
+    }
+  ],
+  "motivations": [
+    { "id": "keep-home-safe", "text": "Keep their home and neighbours safe from trouble they understand but cannot ignore.", "tags": ["service", "civilised"] },
+    { "id": "pay-old-debt", "text": "Settle an old debt before it ruins someone they care about.", "tags": ["secret"] },
+    { "id": "find-missing-person", "text": "Find out what happened to someone who vanished without explanation.", "tags": ["travel", "secret"] }
+  ],
+  "secrets": [
+    { "id": "smuggler-contact", "text": "Quietly passes messages for a smuggler in exchange for protection.", "tags": ["urban", "service"] },
+    { "id": "false-identity", "text": "Uses a false name because their real one would attract the wrong attention.", "tags": ["authority", "secret"] },
+    { "id": "hidden-heirloom", "text": "Hides a valuable heirloom that would be seized if discovered.", "tags": ["civilised"] }
+  ],
+  "problems": [
+    { "id": "debts-due", "text": "Owes money to someone impatient and well connected.", "tags": ["urban", "secret"] },
+    { "id": "sabotage-business", "text": "Someone is quietly sabotaging their livelihood.", "tags": ["service", "civilised"] },
+    { "id": "missing-shipment", "text": "A expected shipment or payment has failed to arrive.", "tags": ["travel", "rural"] }
+  ],
+  "questHooks": [
+    { "id": "ask-investigate-sabotage", "text": "Asks the party to watch their workplace for whoever is causing the trouble.", "tags": ["service"] },
+    { "id": "offer-information", "text": "Offers reliable local information if the party helps with a personal errand first.", "tags": ["urban"] },
+    { "id": "witnessed-strange-event", "text": "Claims to have witnessed something impossible near town and needs someone credible to investigate.", "tags": ["memorable", "secret"] }
+  ],
+  "dangers": [
+    { "id": "connected-creditor", "text": "Their creditor has ties to violent people.", "tags": ["urban", "secret"] },
+    { "id": "draws-attention", "text": "Helping them may draw attention from local authorities.", "tags": ["authority"] },
+    { "id": "unknown-enemy", "text": "An unknown enemy already knows the party spoke with them.", "tags": ["memorable"] }
+  ],
+  "imageEnvironments": [
+    { "id": "tavern-interior", "text": "a warm tavern interior with muted lantern light", "tags": ["service", "urban"] },
+    { "id": "market-stall", "text": "a busy market stall at dusk", "tags": ["civilised", "urban"] },
+    { "id": "river-crossing", "text": "a misty river crossing at early morning", "tags": ["rural", "travel"] },
+    { "id": "workshop-shelves", "text": "a cluttered workshop lined with shelves and jars", "tags": ["scholarly", "natural"] }
+  ]
+}

@@ -3,6 +3,7 @@ using DnDTracker.Web.Components.Account;
 using DnDTracker.Web.Data;
 using DnDTracker.Web.Models;
 using DnDTracker.Web.Services;
+using DnDTracker.Web.Services.NpcGenerator;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -49,6 +50,8 @@ builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SkillService>();
 builder.Services.AddScoped<ItemImageService>();
 builder.Services.AddScoped<RollTableService>();
+
+builder.Services.AddSingleton<NpcGenerationDataProvider>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
