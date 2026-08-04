@@ -45,7 +45,7 @@ public class NpcGeneratorSummaryGrammarTests
     public void ComposeDmSummary_ElderlyNpcUsesNaturalAgePhrase()
     {
         var npc = CreateNpc(
-            genderPresentation: "masculine presentation",
+            genderPresentation: "masculine",
             ageCategory: "elderly",
             appearance: "Compact and weathered, with cracked knuckles and a posture shaped by long outdoor labour.");
 
@@ -75,7 +75,7 @@ public class NpcGeneratorSummaryGrammarTests
     {
         var npc = CreateHelgaNpc();
         npc.Name = "Garret Holt";
-        npc.GenderPresentation = "masculine presentation";
+        npc.GenderPresentation = "masculine";
 
         var summary = NpcGeneratorService.ComposeDmSummary(npc);
 
@@ -92,7 +92,7 @@ public class NpcGeneratorSummaryGrammarTests
     {
         var npc = CreateHelgaNpc();
         npc.Name = "Sera Vance";
-        npc.GenderPresentation = "androgynous presentation";
+        npc.GenderPresentation = "androgynous";
 
         var summary = NpcGeneratorService.ComposeDmSummary(npc);
 
@@ -171,9 +171,11 @@ public class NpcGeneratorSummaryGrammarTests
     }
 
     [Theory]
+    [InlineData("feminine", "She", "her")]
+    [InlineData("masculine", "He", "his")]
+    [InlineData("androgynous", "They", "their")]
     [InlineData("feminine presentation", "She", "her")]
     [InlineData("masculine presentation", "He", "his")]
-    [InlineData("androgynous presentation", "They", "their")]
     public void GetPronounSet_ReturnsExpectedForms(string genderPresentation, string subject, string possessiveAdjective)
     {
         var pronouns = NpcGeneratorService.GetPronounSet(genderPresentation);
@@ -187,7 +189,7 @@ public class NpcGeneratorSummaryGrammarTests
         Name = "Thorin Brickforge",
         Ancestry = "Dwarf",
         AgeCategory = "adult in their prime",
-        GenderPresentation = "feminine presentation",
+        GenderPresentation = "feminine",
         Occupation = "Itinerant scribe",
         Appearance = "Otherwise unremarkable at a glance, except for unusually clear grey eyes that seem to notice everything.",
         DistinctiveFeature = "Ink-stained fingers that never quite wash clean.",
@@ -204,7 +206,7 @@ public class NpcGeneratorSummaryGrammarTests
 
     private static GeneratedNpc CreateHelgaNpc() => CreateNpc(
         name: "Helga Ironvein",
-        genderPresentation: "feminine presentation",
+        genderPresentation: "feminine",
         ageCategory: "young adult",
         ancestry: "Dwarf",
         occupation: "Ferry operator",
@@ -222,7 +224,7 @@ public class NpcGeneratorSummaryGrammarTests
 
     private static GeneratedNpc CreateNpc(
         string name = "Test NPC",
-        string genderPresentation = "feminine presentation",
+        string genderPresentation = "feminine",
         string ageCategory = "adult in their prime",
         string ancestry = "Human",
         string occupation = "Innkeeper",

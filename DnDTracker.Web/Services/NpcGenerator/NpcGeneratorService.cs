@@ -162,7 +162,7 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
 
     internal static string ComposeImagePrompt(GeneratedNpc npc, string environment)
     {
-        var presentation = TrimTerminalPunctuation(npc.GenderPresentation).ToLowerInvariant();
+        var gender = TrimTerminalPunctuation(npc.GenderPresentation).ToLowerInvariant();
         var appearance = EnsureSentence(TrimTerminalPunctuation(npc.Appearance));
         var distinctive = EnsureDistinctiveFeaturePhrase(npc.DistinctiveFeature);
         var expression = BuildVisibleExpression(npc.Personality);
@@ -170,7 +170,7 @@ public sealed class NpcGeneratorService(NpcGenerationDataProvider dataProvider)
         var setting = FormatEnvironmentPhrase(environment);
 
         var prompt = JoinSentences(
-            $"Fantasy character portrait of a {npc.AgeCategory} {npc.Ancestry.ToLowerInvariant()} {npc.Occupation.ToLowerInvariant()} with {presentation}.",
+            $"Fantasy character portrait of a {gender} {npc.AgeCategory} {npc.Ancestry.ToLowerInvariant()} {npc.Occupation.ToLowerInvariant()}.",
             appearance,
             distinctive,
             attire,

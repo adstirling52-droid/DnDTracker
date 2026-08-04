@@ -18,9 +18,9 @@
     { "id": "elderly", "text": "elderly", "tags": ["mature"] }
   ],
   "genderPresentations": [
-    { "id": "masculine", "text": "masculine presentation", "tags": [] },
-    { "id": "feminine", "text": "feminine presentation", "tags": [] },
-    { "id": "androgynous", "text": "androgynous presentation", "tags": [] }
+    { "id": "masculine", "text": "masculine", "tags": [] },
+    { "id": "feminine", "text": "feminine", "tags": [] },
+    { "id": "androgynous", "text": "androgynous", "tags": [] }
   ],
   "occupations": [
     {

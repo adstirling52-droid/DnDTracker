@@ -299,7 +299,7 @@ public class CampaignNpcServiceTests
     {
         Name = name,
         Ancestry = "Dwarf",
-        GenderPresentation = "feminine presentation",
+        GenderPresentation = "feminine",
         AgeCategory = "young adult",
         Occupation = "Ferry operator",
         Appearance = "Lean and alert.",
