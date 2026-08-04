@@ -14,6 +14,7 @@
 @inject ItemService ItemService
 @inject ItemImageService ItemImageService
 @inject SkillService SkillService
+@inject CampaignNpcService CampaignNpcService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>@pageTitle</PageTitle>
@@ -66,6 +67,25 @@ else
                 <button class="btn btn-sm btn-secondary" disabled="@(!HasCharacterSelection)" @onclick="ShowEditCharacterDialog">Edit</button>
                 <button class="btn btn-sm btn-danger" disabled="@(!HasCharacterSelection)" @onclick="ShowDeleteCharacterDialog">Remove</button>
             </div>
+
+            <h2 class="h6 mt-4">Current NPCs</h2>
+            @if (currentNpcs.Count == 0)
+            {
+                <p class="text-muted small mb-0">No NPCs marked as current. Edit a saved NPC and enable "Show as current NPC".</p>
+            }
+            else
+            {
+                <div class="list-group mb-2">
+                    @foreach (var npc in currentNpcs)
+                    {
+                        <div class="list-group-item py-2">
+                            <div class="fw-semibold">@npc.Name</div>
+                            <div class="small text-muted">@DisplayValue(npc.Occupation)</div>
+                            <div class="small text-muted">@DisplayValue(npc.Location)</div>
+                        </div>
+                    }
+                </div>
+            }
 
             <h2 class="h6 mt-4">Modules</h2>
             <div class="d-flex flex-wrap gap-1">
@@ -542,6 +562,7 @@ else
     private List<Skill> skills = [];
     private List<Item> characterItems = [];
     private List<Item> unassignedItems = [];
+    private List<CampaignNpc> currentNpcs = [];
 
     private string? userId;
     private string pageTitle = "Campaign";
@@ -640,6 +661,7 @@ else
 
         characters = await CharacterService.GetByCampaignAsync(userId, CampaignId);
         unassignedItems = await ItemService.GetUnassignedAsync(userId, CampaignId);
+        currentNpcs = await CampaignNpcService.GetCurrentAsync(userId, CampaignId);
 
         if (selectedCharacterId.HasValue &&
             characters.All(c => c.Id != selectedCharacterId.Value))
