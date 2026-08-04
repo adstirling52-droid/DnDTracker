@@ -5,6 +5,7 @@
 @using DnDTracker.Web.Models
 @using DnDTracker.Web.Services
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Forms
 
 @attribute [Authorize]
 
@@ -72,20 +73,47 @@ else
             <h2 class="h5">Details</h2>
             @if (!HasNpcSelection || selectedNpc is null)
             {
-                <p class="text-muted mb-0">Select a saved NPC to view details or copy text for play.</p>
+                <p class="text-muted mb-0">Select a saved NPC to view details, upload a portrait, or copy text for play.</p>
             }
             else
             {
-                @if (HasNpcImage(selectedNpc))
-                {
-                    <div class="border rounded p-3 mb-3">
-                        <h3 class="h6">Portrait</h3>
-                        <img src="@GetNpcImageUrl(selectedNpc.Id)"
-                             alt="Portrait of @selectedNpc.Name"
-                             class="rounded border"
-                             style="max-width: 220px; max-height: 220px; object-fit: cover;" />
+                <div class="border rounded p-3 mb-3">
+                    <h3 class="h6">Portrait</h3>
+                    <div class="d-flex flex-wrap align-items-start gap-3">
+                        @if (HasNpcImage(selectedNpc))
+                        {
+                            <img src="@GetNpcImageUrl(selectedNpc.Id)"
+                                 alt="Portrait of @selectedNpc.Name"
+                                 class="rounded border"
+                                 style="max-width: 220px; max-height: 220px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="border rounded bg-light text-muted d-flex align-items-center justify-content-center"
+                                 style="width: 220px; height: 220px;">
+                                No portrait uploaded
+                            </div>
+                        }
+
+                        <div>
+                            <label class="btn btn-sm btn-outline-primary mb-2">
+                                Upload image
+                                <InputFile class="d-none"
+                                           OnChange="OnPortraitSelected"
+                                           accept=".png,.jpg,.jpeg,.bmp" />
+                            </label>
+                            @if (HasNpcImage(selectedNpc))
+                            {
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary d-block"
+                                        @onclick="RemovePortraitAsync">
+                                    Remove image
+                                </button>
+                            }
+                            <div class="form-text mt-2">PNG, JPG, JPEG, or BMP up to 5 MB.</div>
+                        </div>
                     </div>
-                }
+                </div>
 
                 <div class="border rounded p-3 mb-3">
                     <h3 class="h6">Identity</h3>
@@ -189,6 +217,7 @@ else
     private List<CampaignNpc> savedNpcs = [];
     private Guid? selectedNpcId;
     private CampaignNpc? selectedNpc;
+    private long imageCacheVersion;
     private string? statusMessage;
     private string? errorMessage;
 
@@ -247,6 +276,68 @@ else
         ClearMessages();
     }
 
+    private async Task OnPortraitSelected(InputFileChangeEventArgs e)
+    {
+        if (userId is null || !selectedNpcId.HasValue)
+        {
+            return;
+        }
+
+        ClearMessages();
+
+        var file = e.File;
+        if (file.Size > CampaignNpcImageService.MaxFileSizeBytes)
+        {
+            errorMessage = "Image must be 5 MB or smaller.";
+            return;
+        }
+
+        if (!CampaignNpcImageService.IsAllowedExtension(Path.GetExtension(file.Name)))
+        {
+            errorMessage = "Only PNG, JPG, JPEG, and BMP images are supported.";
+            return;
+        }
+
+        await using var stream = file.OpenReadStream(CampaignNpcImageService.MaxFileSizeBytes);
+        var (_, saveError) = await CampaignNpcImageService.SaveForNpcAsync(
+            userId,
+            CampaignId,
+            selectedNpcId.Value,
+            stream,
+            file.Name);
+
+        if (saveError is not null)
+        {
+            errorMessage = saveError;
+            return;
+        }
+
+        imageCacheVersion++;
+        await LoadSavedNpcsAsync();
+        statusMessage = "Portrait uploaded.";
+    }
+
+    private async Task RemovePortraitAsync()
+    {
+        if (userId is null || !selectedNpcId.HasValue)
+        {
+            return;
+        }
+
+        ClearMessages();
+
+        var clearError = await CampaignNpcImageService.ClearForNpcAsync(userId, CampaignId, selectedNpcId.Value);
+        if (clearError is not null)
+        {
+            errorMessage = clearError;
+            return;
+        }
+
+        imageCacheVersion++;
+        await LoadSavedNpcsAsync();
+        statusMessage = "Portrait removed.";
+    }
+
     private async Task CopyDmSummaryAsync()
     {
         if (selectedNpc is null)
@@ -280,7 +371,7 @@ else
     }
 
     private string GetNpcImageUrl(Guid npcId) =>
-        CampaignNpcImageService.GetImageUrl(npcId);
+        CampaignNpcImageService.GetImageUrl(npcId, imageCacheVersion);
 
     private static bool HasNpcImage(CampaignNpc npc) =>
         !string.IsNullOrWhiteSpace(npc.ImagePath);
