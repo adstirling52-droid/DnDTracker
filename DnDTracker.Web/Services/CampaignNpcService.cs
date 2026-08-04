@@ -5,8 +5,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DnDTracker.Web.Services;
 
+public record CampaignNpcUpdateInput(
+    string Name,
+    string Occupation,
+    string Location,
+    string DmSummary,
+    bool IsCurrent);
+
 public class CampaignNpcService(DnDTrackerDbContext db, CampaignNpcImageService npcImageService)
 {
+    public const int MaxLocationLength = 200;
+    public const int MaxDmSummaryLength = 4000;
+
     public async Task<List<CampaignNpc>> GetAllAsync(string userId, Guid campaignId)
     {
         if (!await OwnsCampaignAsync(userId, campaignId))
@@ -19,6 +29,20 @@ public class CampaignNpcService(DnDTrackerDbContext db, CampaignNpcImageService 
             .Where(npc => npc.CampaignId == campaignId)
             .OrderByDescending(npc => npc.SavedAtUtc)
             .ThenBy(npc => npc.Name)
+            .ToListAsync();
+    }
+
+    public async Task<List<CampaignNpc>> GetCurrentAsync(string userId, Guid campaignId)
+    {
+        if (!await OwnsCampaignAsync(userId, campaignId))
+        {
+            return [];
+        }
+
+        return await db.CampaignNpcs
+            .AsNoTracking()
+            .Where(npc => npc.CampaignId == campaignId && npc.IsCurrent)
+            .OrderBy(npc => npc.Name)
             .ToListAsync();
     }
 
@@ -59,6 +83,47 @@ public class CampaignNpcService(DnDTrackerDbContext db, CampaignNpcImageService 
 
         await npcImageService.DeleteFilesForNpcAsync(userId, npcId);
         db.CampaignNpcs.Remove(npc);
+        await db.SaveChangesAsync();
+        return null;
+    }
+
+    public async Task<string?> UpdateAsync(
+        string userId,
+        Guid campaignId,
+        Guid npcId,
+        CampaignNpcUpdateInput input)
+    {
+        var npc = await GetOwnedNpcAsync(userId, campaignId, npcId);
+        if (npc is null)
+        {
+            return "Saved NPC not found.";
+        }
+
+        var trimmedName = input.Name.Trim();
+        if (string.IsNullOrWhiteSpace(trimmedName))
+        {
+            return "Please enter an NPC name.";
+        }
+
+        var trimmedLocation = input.Location.Trim();
+        if (trimmedLocation.Length > MaxLocationLength)
+        {
+            return $"Location must be {MaxLocationLength} characters or fewer.";
+        }
+
+        var trimmedDmSummary = input.DmSummary.Trim();
+        if (trimmedDmSummary.Length > MaxDmSummaryLength)
+        {
+            return $"DM summary must be {MaxDmSummaryLength} characters or fewer.";
+        }
+
+        npc.Name = trimmedName;
+        npc.Occupation = input.Occupation.Trim();
+        npc.Location = trimmedLocation;
+        npc.DmSummary = trimmedDmSummary;
+        npc.IsCurrent = input.IsCurrent;
+        npc.UpdatedAtUtc = DateTime.UtcNow;
+
         await db.SaveChangesAsync();
         return null;
     }
