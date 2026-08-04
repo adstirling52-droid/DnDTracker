@@ -123,6 +123,26 @@ app.MapGet("/api/items/{itemId:guid}/image", async (
     return Results.File(stream, contentType);
 }).RequireAuthorization();
 
+app.MapGet("/api/campaign-npcs/{npcId:guid}/image", async (
+    Guid npcId,
+    ClaimsPrincipal user,
+    CampaignNpcImageService npcImageService) =>
+{
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId is null)
+    {
+        return Results.Unauthorized();
+    }
+
+    var (stream, contentType) = await npcImageService.OpenImageAsync(userId, npcId);
+    if (stream is null || contentType is null)
+    {
+        return Results.NotFound();
+    }
+
+    return Results.File(stream, contentType);
+}).RequireAuthorization();
+
 app.MapGet("/api/campaigns/{campaignId:guid}/export", async (
     Guid campaignId,
     ClaimsPrincipal user,
