@@ -49,6 +49,8 @@ builder.Services.AddScoped<CharacterService>();
 builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<SkillService>();
 builder.Services.AddScoped<ItemImageService>();
+builder.Services.AddScoped<CampaignNpcService>();
+builder.Services.AddScoped<CampaignNpcImageService>();
 builder.Services.AddScoped<RollTableService>();
 
 builder.Services.AddSingleton<NpcGenerationDataProvider>();
