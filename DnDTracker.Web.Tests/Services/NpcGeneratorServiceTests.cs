@@ -188,8 +188,7 @@ public class NpcGeneratorServiceTests
         var npc = CreateExampleNpc();
         var prompt = NpcGeneratorService.ComposeImagePrompt(npc, "a cosy riverside tavern with muted amber lantern light");
 
-        Assert.Contains("Fantasy character portrait of a young adult dwarf ferry operator", prompt, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("feminine presentation", prompt, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Fantasy character portrait of a feminine young adult dwarf ferry operator", prompt, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("watchful", prompt, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("warm but quietly watchful", prompt, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("cosy riverside tavern", prompt, StringComparison.OrdinalIgnoreCase);
@@ -200,7 +199,7 @@ public class NpcGeneratorServiceTests
     {
         Name = "Helga Ironvein",
         Ancestry = "Dwarf",
-        GenderPresentation = "feminine presentation",
+        GenderPresentation = "feminine",
         AgeCategory = "young adult",
         Occupation = "Ferry operator",
         Appearance = "Lean and alert, with quick eyes and hands that look accustomed to fine work.",
