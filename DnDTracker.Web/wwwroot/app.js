@@ -17,3 +17,28 @@ window.dndCopyToClipboard = async (text) => {
         return false;
     }
 };
+
+const dndVisibilityHandlers = new WeakMap();
+
+window.dndRegisterVisibilityRefresh = (dotNetRef) => {
+    const handler = () => {
+        if (document.visibilityState === 'visible') {
+            dotNetRef.invokeMethodAsync('RefreshCurrentNpcsFromJsAsync');
+        }
+    };
+
+    document.addEventListener('visibilitychange', handler);
+    window.addEventListener('pageshow', handler);
+    dndVisibilityHandlers.set(dotNetRef, handler);
+};
+
+window.dndUnregisterVisibilityRefresh = (dotNetRef) => {
+    const handler = dndVisibilityHandlers.get(dotNetRef);
+    if (!handler) {
+        return;
+    }
+
+    document.removeEventListener('visibilitychange', handler);
+    window.removeEventListener('pageshow', handler);
+    dndVisibilityHandlers.delete(dotNetRef);
+};
