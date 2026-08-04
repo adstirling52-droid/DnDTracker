@@ -19,6 +19,16 @@ public class CampaignNpcMigrationTests
     }
 
     [Fact]
+    public void AddCampaignNpcLocationAndCurrent_migration_is_registered_with_ef()
+    {
+        using var context = CreateContext();
+
+        var migrations = context.Database.GetMigrations().ToList();
+
+        Assert.Contains("20260804184920_AddCampaignNpcLocationAndCurrent", migrations);
+    }
+
+    [Fact]
     public void Model_has_no_pending_changes_after_AddCampaignNpcs_migration()
     {
         using var context = CreateContext();

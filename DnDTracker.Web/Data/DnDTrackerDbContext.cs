@@ -66,5 +66,11 @@ public class DnDTrackerDbContext : IdentityDbContext<ApplicationUser>
                 .HasForeignKey(r => r.RollTableId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        modelBuilder.Entity<CampaignNpc>(entity =>
+        {
+            entity.Property(n => n.Location)
+                .HasMaxLength(200);
+        });
     }
 }

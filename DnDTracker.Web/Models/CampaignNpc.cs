@@ -8,6 +8,8 @@ public class CampaignNpc
 
     public DateTime SavedAtUtc { get; set; }
 
+    public DateTime? UpdatedAtUtc { get; set; }
+
     public string Name { get; set; } = "";
 
     public string Ancestry { get; set; } = "";
@@ -17,6 +19,10 @@ public class CampaignNpc
     public string AgeCategory { get; set; } = "";
 
     public string Occupation { get; set; } = "";
+
+    public string Location { get; set; } = "";
+
+    public bool IsCurrent { get; set; }
 
     public string Appearance { get; set; } = "";
 
