@@ -5,6 +5,7 @@
 @using DnDTracker.Web.Models
 @using DnDTracker.Web.Services
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Forms
 
 @attribute [Authorize]
@@ -16,6 +17,10 @@
 @inject SkillService SkillService
 @inject CampaignNpcService CampaignNpcService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+
+@implements IAsyncDisposable
 
 <PageTitle>@pageTitle</PageTitle>
 
@@ -563,6 +568,7 @@ else
     private List<Item> characterItems = [];
     private List<Item> unassignedItems = [];
     private List<CampaignNpc> currentNpcs = [];
+    private DotNetObjectReference<Detail>? _visibilityRefreshRef;
 
     private string? userId;
     private string pageTitle = "Campaign";
@@ -634,6 +640,20 @@ else
     private Item? SelectedCharacterItem => characterItems.FirstOrDefault(i => i.Id == selectedItemId);
     private Item? SelectedUnassignedItem => unassignedItems.FirstOrDefault(i => i.Id == selectedUnassignedItemId);
 
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && campaign is not null)
+        {
+            _visibilityRefreshRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("dndRegisterVisibilityRefresh", _visibilityRefreshRef);
+        }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         userId = await GetUserIdAsync();
@@ -661,7 +681,7 @@ else
 
         characters = await CharacterService.GetByCampaignAsync(userId, CampaignId);
         unassignedItems = await ItemService.GetUnassignedAsync(userId, CampaignId);
-        currentNpcs = await CampaignNpcService.GetCurrentAsync(userId, CampaignId);
+        await RefreshCurrentNpcsAsync();
 
         if (selectedCharacterId.HasValue &&
             characters.All(c => c.Id != selectedCharacterId.Value))
@@ -670,6 +690,43 @@ else
         }
 
         await LoadCharacterDataAsync();
+    }
+
+    private async Task RefreshCurrentNpcsAsync()
+    {
+        if (userId is null || campaign is null)
+        {
+            currentNpcs = [];
+            return;
+        }
+
+        currentNpcs = await CampaignNpcService.GetCurrentAsync(userId, CampaignId);
+    }
+
+    [JSInvokable]
+    public async Task RefreshCurrentNpcsFromJsAsync()
+    {
+        await RefreshCurrentNpcsAsync();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (!IsThisCampaignPage(e.Location))
+        {
+            return;
+        }
+
+        _ = InvokeAsync(async () =>
+        {
+            await RefreshCurrentNpcsAsync();
+            StateHasChanged();
+        });
+    }
+
+    private bool IsThisCampaignPage(string uri)
+    {
+        var relative = NavigationManager.ToBaseRelativePath(uri).TrimEnd('/');
+        return string.Equals(relative, $"campaigns/{CampaignId}", StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task LoadCharacterDataAsync()
@@ -1501,5 +1558,17 @@ else
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         return authState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+
+        if (_visibilityRefreshRef is not null)
+        {
+            await JS.InvokeVoidAsync("dndUnregisterVisibilityRefresh", _visibilityRefreshRef);
+            _visibilityRefreshRef.Dispose();
+            _visibilityRefreshRef = null;
+        }
     }
 }
