@@ -707,6 +707,7 @@ else
     public async Task RefreshCurrentNpcsFromJsAsync()
     {
         await RefreshCurrentNpcsAsync();
+        StateHasChanged();
     }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
