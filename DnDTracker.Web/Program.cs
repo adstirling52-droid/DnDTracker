@@ -58,7 +58,9 @@ builder.Services.AddScoped<NpcGeneratorService>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = ItemImageService.MaxFileSizeBytes;
+    options.MultipartBodyLengthLimit = Math.Max(
+        ItemImageService.MaxFileSizeBytes,
+        CampaignNpcImageService.MaxFileSizeBytes);
 });
 
 builder.Services.AddRazorComponents()
@@ -74,6 +76,7 @@ if (app.Environment.IsProduction())
 
     var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
     Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "item-images"));
+    Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "npc-images"));
 }
 
 // Configure the HTTP request pipeline.
