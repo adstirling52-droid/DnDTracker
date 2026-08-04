@@ -61,26 +61,44 @@ else
                         <button type="button"
                                 class="list-group-item list-group-item-action @(selectedNpcId == npc.Id ? "active" : "")"
                                 @onclick="() => SelectNpc(npc.Id)">
-                            <div class="fw-semibold">@npc.Name</div>
-                            <div class="small @(selectedNpcId == npc.Id ? "" : "text-muted")">@npc.Occupation</div>
+                            <div class="fw-semibold">
+                                @npc.Name
+                                @if (npc.IsCurrent)
+                                {
+                                    <span class="badge @(selectedNpcId == npc.Id ? "bg-light text-dark" : "bg-primary") ms-1">Current</span>
+                                }
+                            </div>
+                            <div class="small @(selectedNpcId == npc.Id ? "" : "text-muted")">@DisplayValue(npc.Occupation)</div>
+                            @if (!string.IsNullOrWhiteSpace(npc.Location))
+                            {
+                                <div class="small @(selectedNpcId == npc.Id ? "" : "text-muted")">@npc.Location</div>
+                            }
                         </button>
                     }
                 </div>
             }
 
-            <button type="button"
-                    class="btn btn-sm btn-danger"
-                    disabled="@(!HasNpcSelection)"
-                    @onclick="ShowDeleteDialog">
-                Remove saved NPC
-            </button>
+            <div class="d-flex flex-wrap gap-1">
+                <button type="button"
+                        class="btn btn-sm btn-secondary"
+                        disabled="@(!HasNpcSelection)"
+                        @onclick="ShowEditDialog">
+                    Edit NPC
+                </button>
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        disabled="@(!HasNpcSelection)"
+                        @onclick="ShowDeleteDialog">
+                    Remove saved NPC
+                </button>
+            </div>
         </div>
 
         <div class="col-lg-8">
             <h2 class="h5">Details</h2>
             @if (!HasNpcSelection || selectedNpc is null)
             {
-                <p class="text-muted mb-0">Select a saved NPC to view details, upload a portrait, or copy text for play.</p>
+                <p class="text-muted mb-0">Select a saved NPC to view details, edit fields, upload a portrait, or copy text for play.</p>
             }
             else
             {
@@ -134,7 +152,11 @@ else
                         <dt class="col-sm-4">Age category</dt>
                         <dd class="col-sm-8">@selectedNpc.AgeCategory</dd>
                         <dt class="col-sm-4">Occupation</dt>
-                        <dd class="col-sm-8">@selectedNpc.Occupation</dd>
+                        <dd class="col-sm-8">@DisplayValue(selectedNpc.Occupation)</dd>
+                        <dt class="col-sm-4">Location</dt>
+                        <dd class="col-sm-8">@DisplayValue(selectedNpc.Location)</dd>
+                        <dt class="col-sm-4">Current NPC</dt>
+                        <dd class="col-sm-8">@(selectedNpc.IsCurrent ? "Yes — shown on campaign page" : "No")</dd>
                     </dl>
                 </div>
 
@@ -211,6 +233,61 @@ else
         </div>
     </div>
 
+    @if (showEditDialog)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,.5);">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit NPC</h5>
+                        <button type="button" class="btn-close" @onclick="CloseEditDialog" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @if (!string.IsNullOrEmpty(dialogErrorMessage))
+                        {
+                            <div class="alert alert-danger" role="alert">@dialogErrorMessage</div>
+                        }
+                        <div class="form-floating mb-3">
+                            <input id="editNpcName" class="form-control" @bind="editNameInput" @bind:event="oninput" placeholder="NPC name" />
+                            <label for="editNpcName">Name</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input id="editNpcOccupation" class="form-control" @bind="editOccupationInput" placeholder="Occupation" />
+                            <label for="editNpcOccupation">Occupation</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input id="editNpcLocation"
+                                   class="form-control"
+                                   @bind="editLocationInput"
+                                   maxlength="@CampaignNpcService.MaxLocationLength"
+                                   placeholder="Location" />
+                            <label for="editNpcLocation">Location</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="editNpcDmSummary">DM summary</label>
+                            <textarea id="editNpcDmSummary"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="@CampaignNpcService.MaxDmSummaryLength"
+                                      @bind="editDmSummaryInput"></textarea>
+                        </div>
+                        <div class="form-check">
+                            <input id="editNpcIsCurrent"
+                                   class="form-check-input"
+                                   type="checkbox"
+                                   @bind="editIsCurrentInput" />
+                            <label class="form-check-label" for="editNpcIsCurrent">Show as current NPC</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseEditDialog">Cancel</button>
+                        <button type="button" class="btn btn-primary" @onclick="SaveEditAsync">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     @if (showDeleteDialog)
     {
         <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
@@ -246,9 +323,16 @@ else
     private Guid? selectedNpcId;
     private CampaignNpc? selectedNpc;
     private long imageCacheVersion;
+    private bool showEditDialog;
     private bool showDeleteDialog;
     private string? statusMessage;
     private string? errorMessage;
+    private string? dialogErrorMessage;
+    private string editNameInput = "";
+    private string editOccupationInput = "";
+    private string editLocationInput = "";
+    private string editDmSummaryInput = "";
+    private bool editIsCurrentInput;
 
     private bool HasNpcSelection => selectedNpcId.HasValue;
 
@@ -303,6 +387,59 @@ else
         selectedNpcId = npcId;
         selectedNpc = savedNpcs.FirstOrDefault(npc => npc.Id == npcId);
         ClearMessages();
+    }
+
+    private void ShowEditDialog()
+    {
+        if (selectedNpc is null)
+        {
+            return;
+        }
+
+        editNameInput = selectedNpc.Name;
+        editOccupationInput = selectedNpc.Occupation;
+        editLocationInput = selectedNpc.Location;
+        editDmSummaryInput = selectedNpc.DmSummary;
+        editIsCurrentInput = selectedNpc.IsCurrent;
+        dialogErrorMessage = null;
+        showEditDialog = true;
+        ClearMessages();
+    }
+
+    private void CloseEditDialog()
+    {
+        showEditDialog = false;
+        dialogErrorMessage = null;
+    }
+
+    private async Task SaveEditAsync()
+    {
+        if (userId is null || !selectedNpcId.HasValue)
+        {
+            return;
+        }
+
+        dialogErrorMessage = null;
+        var updateError = await CampaignNpcService.UpdateAsync(
+            userId,
+            CampaignId,
+            selectedNpcId.Value,
+            new CampaignNpcUpdateInput(
+                editNameInput,
+                editOccupationInput,
+                editLocationInput,
+                editDmSummaryInput,
+                editIsCurrentInput));
+
+        if (updateError is not null)
+        {
+            dialogErrorMessage = updateError;
+            return;
+        }
+
+        showEditDialog = false;
+        await LoadSavedNpcsAsync();
+        statusMessage = "NPC updated.";
     }
 
     private async Task OnPortraitSelected(InputFileChangeEventArgs e)
@@ -435,6 +572,9 @@ else
 
     private static bool HasNpcImage(CampaignNpc npc) =>
         !string.IsNullOrWhiteSpace(npc.ImagePath);
+
+    private static string DisplayValue(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "—" : value;
 
     private void ClearMessages()
     {
