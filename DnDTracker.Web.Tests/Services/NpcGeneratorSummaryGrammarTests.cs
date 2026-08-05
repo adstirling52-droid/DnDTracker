@@ -92,7 +92,7 @@ public class NpcGeneratorSummaryGrammarTests
     {
         var npc = CreateHelgaNpc();
         npc.Name = "Sera Vance";
-        npc.GenderPresentation = "androgynous";
+        npc.GenderPresentation = "Unknown";
 
         var summary = NpcGeneratorService.ComposeDmSummary(npc);
 
@@ -173,9 +173,7 @@ public class NpcGeneratorSummaryGrammarTests
     [Theory]
     [InlineData("feminine", "She", "her")]
     [InlineData("masculine", "He", "his")]
-    [InlineData("androgynous", "They", "their")]
-    [InlineData("feminine presentation", "She", "her")]
-    [InlineData("masculine presentation", "He", "his")]
+    [InlineData("Unknown", "They", "their")]
     public void GetPronounSet_ReturnsExpectedForms(string genderPresentation, string subject, string possessiveAdjective)
     {
         var pronouns = NpcGeneratorService.GetPronounSet(genderPresentation);
