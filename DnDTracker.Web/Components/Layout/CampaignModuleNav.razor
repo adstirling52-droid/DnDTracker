@@ -1,0 +1,62 @@
+@rendermode InteractiveServer
+
+@using System.Text.RegularExpressions
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@if (campaignId.HasValue)
+{
+    <div class="nav-item px-3 pt-2">
+        <div class="nav-link text-muted small py-0">Campaign modules</div>
+    </div>
+    <div class="nav-item px-3">
+        <a class="nav-link" href="campaigns/@campaignId.Value/roll-tables" target="_blank" rel="noopener noreferrer">
+            <span class="bi bi-dice-5" aria-hidden="true"></span> Roll Tables
+        </a>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="@($"campaigns/{campaignId.Value}/npc-generator")" Match="NavLinkMatch.Prefix">
+            <span class="bi bi-person-plus" aria-hidden="true"></span> Create NPC
+        </NavLink>
+    </div>
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="@($"campaigns/{campaignId.Value}/npcs")" Match="NavLinkMatch.Prefix">
+            <span class="bi bi-people" aria-hidden="true"></span> View NPCs
+        </NavLink>
+    </div>
+}
+
+@code {
+    private static readonly Regex CampaignIdRegex = new(
+        @"^campaigns/([0-9a-fA-F-]{36})",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private Guid? campaignId;
+
+    protected override void OnInitialized()
+    {
+        UpdateCampaignId(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) =>
+        UpdateCampaignId(e.Location);
+
+    private void UpdateCampaignId(string uri)
+    {
+        var relative = NavigationManager.ToBaseRelativePath(uri);
+        var match = CampaignIdRegex.Match(relative);
+        Guid? newId = match.Success && Guid.TryParse(match.Groups[1].Value, out var id) ? id : null;
+
+        if (campaignId == newId)
+        {
+            return;
+        }
+
+        campaignId = newId;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() =>
+        NavigationManager.LocationChanged -= OnLocationChanged;
+}
