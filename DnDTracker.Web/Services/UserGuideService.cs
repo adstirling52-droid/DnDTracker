@@ -4,7 +4,7 @@ namespace DnDTracker.Web.Services;
 
 public class UserGuideService
 {
-    private const string RelativePath = Path.Combine("Data", "UserGuide", "USER_GUIDE.md");
+    private static readonly string RelativePath = Path.Combine("Data", "UserGuide", "USER_GUIDE.md");
     private readonly IWebHostEnvironment environment;
     private string? cachedHtml;
 
