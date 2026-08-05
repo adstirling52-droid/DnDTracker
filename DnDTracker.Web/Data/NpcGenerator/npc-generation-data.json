@@ -2,11 +2,85 @@
   "schemaVersion": 1,
   "tone": "Grounded, system-neutral fantasy with occasional unusual or memorable details.",
   "ancestries": [
-    { "id": "human", "label": "Human", "tags": ["common"] },
-    { "id": "dwarf", "label": "Dwarf", "tags": ["common", "underground"] },
-    { "id": "elf", "label": "Elf", "tags": ["common", "fey-touched"] },
-    { "id": "halfling", "label": "Halfling", "tags": ["common", "rural"] },
-    { "id": "half-elf", "label": "Half-elf", "tags": ["common", "travel"] }
+    {
+      "id": "dragonborn",
+      "label": "Dragonborn",
+      "tags": [
+        "uncommon",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "dwarf",
+      "label": "Dwarf",
+      "tags": [
+        "common",
+        "underground"
+      ]
+    },
+    {
+      "id": "elf",
+      "label": "Elf",
+      "tags": [
+        "common",
+        "fey-touched"
+      ]
+    },
+    {
+      "id": "gnome",
+      "label": "Gnome",
+      "tags": [
+        "common",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "goblin",
+      "label": "Goblin",
+      "tags": [
+        "uncommon",
+        "urban"
+      ]
+    },
+    {
+      "id": "half-elf",
+      "label": "Half-elf",
+      "tags": [
+        "common",
+        "travel"
+      ]
+    },
+    {
+      "id": "half-orc",
+      "label": "Half-orc",
+      "tags": [
+        "uncommon",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "halfling",
+      "label": "Halfling",
+      "tags": [
+        "common",
+        "rural"
+      ]
+    },
+    {
+      "id": "human",
+      "label": "Human",
+      "tags": [
+        "common"
+      ]
+    },
+    {
+      "id": "tiefling",
+      "label": "Tiefling",
+      "tags": [
+        "uncommon",
+        "memorable"
+      ]
+    }
   ],
   "namesByAncestry": {
     "human": [
@@ -17,7 +91,19 @@
       "Hester Bramwell",
       "Tomas Reed",
       "Clara Dunwich",
-      "Jonas Merritt"
+      "Jonas Merritt",
+      "Edric Vale",
+      "Nella Marsh",
+      "Tomas Rook",
+      "Bran Hallow",
+      "Ysabel Crane",
+      "Jonas Pike",
+      "Mara Fen",
+      "Orren Bell",
+      "Celia Ward",
+      "Davin Cross",
+      "Hessa Moor",
+      "Perrin Shaw"
     ],
     "dwarf": [
       "Thorin Brickforge",
@@ -27,7 +113,19 @@
       "Karg Stonefoot",
       "Runa Emberbraid",
       "Grim Hollowanvil",
-      "Sigrid Flintmark"
+      "Sigrid Flintmark",
+      "Bromm Coalkey",
+      "Dagna Deepdelve",
+      "Kelda Stonehand",
+      "Orik Emberfall",
+      "Hilda Copperbraid",
+      "Borin Flintlock",
+      "Sigrun Anvilborn",
+      "Garrik Blackpick",
+      "Marda Goldvein",
+      "Tovik Barrelbrace",
+      "Runa Ashmantle",
+      "Korrin Stoutshield"
     ],
     "elf": [
       "Lirien Dawnsong",
@@ -37,7 +135,19 @@
       "Faelar Nightbloom",
       "Sylwen Ashmere",
       "Aerion Silverfern",
-      "Naeris Windholde"
+      "Naeris Windholde",
+      "Aelar Mossglade",
+      "Sylra Evenstar",
+      "Nym Elmsong",
+      "Vaelis Silverreed",
+      "Ilyra Greenbough",
+      "Coren Nightbrook",
+      "Faelar Windmere",
+      "Sarith Willowshade",
+      "Elenwe Starling",
+      "Tirian Cloudstep",
+      "Naevys Brightthorn",
+      "Loriel Frostmere"
     ],
     "halfling": [
       "Pippa Greenhill",
@@ -45,7 +155,19 @@
       "Maribel Thistlewink",
       "Rolo Burrows",
       "Nessa Brightkettle",
-      "Willem Mossfoot"
+      "Willem Mossfoot",
+      "Pippa Underbough",
+      "Milo Bramblefoot",
+      "Tansy Goodbarrel",
+      "Bennett Tealeaf",
+      "Lottie Smallburrow",
+      "Jory Applebrook",
+      "Nedda Hearthside",
+      "Corbin Reedwhistle",
+      "Mara Buttonhill",
+      "Tobin Softstep",
+      "Elsie Cloverkin",
+      "Perrin Nettlewick"
     ],
     "half-elf": [
       "Arielle Crosswater",
@@ -54,351 +176,3139 @@
       "Lucan Fairwind",
       "Maelis Thorn",
       "Corin Ashvale"
+    ],
+    "gnome": [
+      "Fizzik Brassbutton",
+      "Nim Wobblegear",
+      "Tella Quillcap",
+      "Boddyn Sparkspanner",
+      "Merri Tinkertop",
+      "Orla Copperwink",
+      "Pimble Knotwhistle",
+      "Dena Quickglass",
+      "Rollo Mirthcoil",
+      "Sella Inkgear",
+      "Wizzle Pocketsprocket",
+      "Gimma Pebblepin"
+    ],
+    "half-orc": [
+      "Raska Ironjaw",
+      "Durn Wolfscar",
+      "Ketta Stoneblood",
+      "Mogren Ashfist",
+      "Vara Longstride",
+      "Thokk Greyhide",
+      "Sura Embertooth",
+      "Garn Blacktusk",
+      "Nera Stronghand",
+      "Hruk Mossback",
+      "Makka Redbraid",
+      "Vorin Oakbreaker"
+    ],
+    "tiefling": [
+      "Vesper Ashmark",
+      "Caligo Emberveil",
+      "Nyra Cinderstep",
+      "Marek Hollowhorn",
+      "Iris Sableflame",
+      "Riven Glass",
+      "Selka Nightbloom",
+      "Tavian Redwake",
+      "Mora Vex",
+      "Coris Blacklantern",
+      "Eris Duskthread",
+      "Kael Thornfire"
+    ],
+    "dragonborn": [
+      "Arjhan Embercrest",
+      "Kava Stormscale",
+      "Rhogar Flintclaw",
+      "Sora Dawnfang",
+      "Balasar Cinderhide",
+      "Nala Brightscale",
+      "Torinn Ironcrest",
+      "Mehen Riverclaw",
+      "Akra Skyspine",
+      "Kriv Ashhorn",
+      "Vezra Coldflame",
+      "Daar Bronzeeye"
+    ],
+    "goblin": [
+      "Nib Quickfinger",
+      "Skrik Lanternsnuff",
+      "Bokka Tinspoon",
+      "Miv Hooknose",
+      "Grib Velvetcap",
+      "Zikka Coppertooth",
+      "Pobble Ratchet",
+      "Nakka Stovepipe",
+      "Rikkit Mossboot",
+      "Vimble Knot",
+      "Sazza Brighteye",
+      "Kip Nettle"
     ]
   },
   "ageCategories": [
-    { "id": "young", "text": "young adult", "tags": ["adult"] },
-    { "id": "adult", "text": "adult in their prime", "tags": ["adult"] },
-    { "id": "middle-aged", "text": "middle-aged", "tags": ["mature"] },
-    { "id": "elderly", "text": "elderly", "tags": ["mature"] }
+    {
+      "id": "adult",
+      "text": "adult in their prime",
+      "tags": [
+        "adult"
+      ]
+    },
+    {
+      "id": "elderly",
+      "text": "elderly",
+      "tags": [
+        "mature"
+      ]
+    },
+    {
+      "id": "middle-aged",
+      "text": "middle-aged",
+      "tags": [
+        "mature"
+      ]
+    },
+    {
+      "id": "young",
+      "text": "young adult",
+      "tags": [
+        "adult"
+      ]
+    }
   ],
-  "genderPresentations": [
-    { "id": "masculine", "text": "masculine", "tags": [] },
-    { "id": "feminine", "text": "feminine", "tags": [] },
-    { "id": "androgynous", "text": "androgynous", "tags": [] }
+  "genders": [
+    {
+      "id": "masculine",
+      "text": "masculine",
+      "tags": []
+    },
+    {
+      "id": "feminine",
+      "text": "feminine",
+      "tags": []
+    },
+    {
+      "id": "unknown",
+      "text": "Unknown",
+      "tags": []
+    }
   ],
   "occupations": [
     {
-      "id": "innkeeper",
-      "label": "Innkeeper",
-      "tags": ["civilised", "service", "urban"],
-      "appearanceTags": ["practical", "work-worn"]
-    },
-    {
-      "id": "herbalist",
-      "label": "Herbalist",
-      "tags": ["civilised", "scholarly", "rural"],
-      "appearanceTags": ["practical", "natural"]
-    },
-    {
-      "id": "guard",
-      "label": "Town guard",
-      "tags": ["civilised", "authority", "urban"],
-      "appearanceTags": ["uniformed", "sturdy"]
-    },
-    {
-      "id": "ferryman",
-      "label": "Ferry operator",
-      "tags": ["travel", "rural", "service"],
-      "appearanceTags": ["weathered", "practical"]
-    },
-    {
-      "id": "itinerant-scribe",
-      "label": "Itinerant scribe",
-      "tags": ["scholarly", "travel", "urban"],
-      "appearanceTags": ["travel-worn", "neat"]
-    },
-    {
-      "id": "blacksmith",
-      "label": "Blacksmith",
-      "tags": ["civilised", "urban", "service"],
-      "appearanceTags": ["sturdy", "work-worn"]
-    },
-    {
-      "id": "merchant",
-      "label": "Traveling merchant",
-      "tags": ["civilised", "travel", "urban"],
-      "appearanceTags": ["travel-worn", "neat"]
-    },
-    {
-      "id": "priest",
-      "label": "Temple acolyte",
-      "tags": ["civilised", "scholarly", "service"],
-      "appearanceTags": ["neat", "practical"]
-    },
-    {
-      "id": "hunter",
-      "label": "Hunter",
-      "tags": ["rural", "travel", "weathered"],
-      "appearanceTags": ["weathered", "practical"]
-    },
-    {
-      "id": "midwife",
-      "label": "Midwife",
-      "tags": ["civilised", "rural", "service"],
-      "appearanceTags": ["practical", "work-worn"]
-    },
-    {
-      "id": "dockworker",
-      "label": "Dockworker",
-      "tags": ["urban", "travel", "service"],
-      "appearanceTags": ["sturdy", "weathered"]
-    },
-    {
-      "id": "baker",
-      "label": "Baker",
-      "tags": ["civilised", "service", "urban"],
-      "appearanceTags": ["work-worn", "practical"]
+      "id": "alchemist",
+      "label": "Alchemist",
+      "tags": [
+        "scholarly",
+        "craft",
+        "memorable"
+      ],
+      "appearanceTags": [
+        "stained",
+        "fine-work"
+      ]
     },
     {
       "id": "apothecary",
       "label": "Apothecary",
-      "tags": ["civilised", "scholarly", "urban"],
-      "appearanceTags": ["neat", "natural"]
+      "tags": [
+        "civilised",
+        "scholarly",
+        "urban"
+      ],
+      "appearanceTags": [
+        "neat",
+        "natural"
+      ]
     },
     {
-      "id": "rat-catcher",
-      "label": "Rat-catcher",
-      "tags": ["urban", "memorable", "service"],
-      "appearanceTags": ["weathered", "practical"]
+      "id": "baker",
+      "label": "Baker",
+      "tags": [
+        "civilised",
+        "service",
+        "urban"
+      ],
+      "appearanceTags": [
+        "work-worn",
+        "practical"
+      ]
     },
     {
-      "id": "mercenary",
-      "label": "Mercenary",
-      "tags": ["military", "travel", "authority"],
-      "appearanceTags": ["sturdy", "weathered"]
+      "id": "beekeeper",
+      "label": "Beekeeper",
+      "tags": [
+        "rural",
+        "natural",
+        "service"
+      ],
+      "appearanceTags": [
+        "practical",
+        "weathered"
+      ]
     },
     {
-      "id": "stable-hand",
-      "label": "Stable hand",
-      "tags": ["rural", "service", "travel"],
-      "appearanceTags": ["work-worn", "practical"]
+      "id": "blacksmith",
+      "label": "Blacksmith",
+      "tags": [
+        "civilised",
+        "urban",
+        "service"
+      ],
+      "appearanceTags": [
+        "sturdy",
+        "work-worn"
+      ]
     },
     {
-      "id": "fisher",
-      "label": "Fisher",
-      "tags": ["rural", "travel", "weathered"],
-      "appearanceTags": ["weathered", "practical"]
+      "id": "boatwright",
+      "label": "Boatwright",
+      "tags": [
+        "craft",
+        "rural",
+        "travel"
+      ],
+      "appearanceTags": [
+        "work-worn",
+        "weathered"
+      ]
     },
     {
-      "id": "miner",
-      "label": "Miner",
-      "tags": ["underground", "rural", "sturdy"],
-      "appearanceTags": ["sturdy", "weathered"]
+      "id": "bounty-hunter",
+      "label": "Bounty hunter",
+      "tags": [
+        "authority",
+        "travel",
+        "dangerous"
+      ],
+      "appearanceTags": [
+        "scarred",
+        "practical"
+      ]
+    },
+    {
+      "id": "brewer",
+      "label": "Brewer",
+      "tags": [
+        "service",
+        "civilised",
+        "rural"
+      ],
+      "appearanceTags": [
+        "practical",
+        "work-worn"
+      ]
+    },
+    {
+      "id": "caravan-master",
+      "label": "Caravan master",
+      "tags": [
+        "travel",
+        "authority",
+        "service"
+      ],
+      "appearanceTags": [
+        "travel-worn",
+        "neat"
+      ]
+    },
+    {
+      "id": "courier",
+      "label": "Courier",
+      "tags": [
+        "travel",
+        "service",
+        "urban"
+      ],
+      "appearanceTags": [
+        "travel-worn",
+        "practical"
+      ]
     },
     {
       "id": "court-scribe",
       "label": "Court scribe",
-      "tags": ["scholarly", "civilised", "authority"],
-      "appearanceTags": ["neat", "practical"]
+      "tags": [
+        "scholarly",
+        "civilised",
+        "authority"
+      ],
+      "appearanceTags": [
+        "neat",
+        "practical"
+      ]
+    },
+    {
+      "id": "dockworker",
+      "label": "Dockworker",
+      "tags": [
+        "urban",
+        "travel",
+        "service"
+      ],
+      "appearanceTags": [
+        "sturdy",
+        "weathered"
+      ]
+    },
+    {
+      "id": "dungeon-surveyor",
+      "label": "Dungeon surveyor",
+      "tags": [
+        "scholarly",
+        "travel",
+        "dangerous"
+      ],
+      "appearanceTags": [
+        "travel-worn",
+        "fine-work"
+      ]
+    },
+    {
+      "id": "exorcist",
+      "label": "Exorcist",
+      "tags": [
+        "scholarly",
+        "authority",
+        "dangerous"
+      ],
+      "appearanceTags": [
+        "ceremonial",
+        "severe"
+      ]
     },
     {
       "id": "fence",
       "label": "Fence",
-      "tags": ["urban", "secret", "service"],
-      "appearanceTags": ["neat", "memorable"]
+      "tags": [
+        "urban",
+        "secret",
+        "service"
+      ],
+      "appearanceTags": [
+        "neat",
+        "memorable"
+      ]
+    },
+    {
+      "id": "ferryman",
+      "label": "Ferry operator",
+      "tags": [
+        "travel",
+        "rural",
+        "service"
+      ],
+      "appearanceTags": [
+        "weathered",
+        "practical"
+      ]
+    },
+    {
+      "id": "fisher",
+      "label": "Fisher",
+      "tags": [
+        "rural",
+        "travel",
+        "weathered"
+      ],
+      "appearanceTags": [
+        "weathered",
+        "practical"
+      ]
+    },
+    {
+      "id": "fortune-teller",
+      "label": "Fortune-teller",
+      "tags": [
+        "urban",
+        "memorable",
+        "secret"
+      ],
+      "appearanceTags": [
+        "colourful",
+        "ornamented"
+      ]
+    },
+    {
+      "id": "goblin-tinker",
+      "label": "Goblin tinker",
+      "tags": [
+        "craft",
+        "memorable",
+        "travel"
+      ],
+      "appearanceTags": [
+        "patched",
+        "sooty"
+      ]
+    },
+    {
+      "id": "gravekeeper",
+      "label": "Gravekeeper",
+      "tags": [
+        "rural",
+        "service",
+        "secret"
+      ],
+      "appearanceTags": [
+        "weathered",
+        "somber"
+      ]
+    },
+    {
+      "id": "guard",
+      "label": "Town guard",
+      "tags": [
+        "civilised",
+        "authority",
+        "urban"
+      ],
+      "appearanceTags": [
+        "uniformed",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "herbalist",
+      "label": "Herbalist",
+      "tags": [
+        "civilised",
+        "scholarly",
+        "rural"
+      ],
+      "appearanceTags": [
+        "practical",
+        "natural"
+      ]
+    },
+    {
+      "id": "hunter",
+      "label": "Hunter",
+      "tags": [
+        "rural",
+        "travel",
+        "weathered"
+      ],
+      "appearanceTags": [
+        "weathered",
+        "practical"
+      ]
+    },
+    {
+      "id": "innkeeper",
+      "label": "Innkeeper",
+      "tags": [
+        "civilised",
+        "service",
+        "urban"
+      ],
+      "appearanceTags": [
+        "practical",
+        "work-worn"
+      ]
+    },
+    {
+      "id": "itinerant-scribe",
+      "label": "Itinerant scribe",
+      "tags": [
+        "scholarly",
+        "travel",
+        "urban"
+      ],
+      "appearanceTags": [
+        "travel-worn",
+        "neat"
+      ]
+    },
+    {
+      "id": "lamp-lighter",
+      "label": "Lamp-lighter",
+      "tags": [
+        "urban",
+        "service",
+        "travel"
+      ],
+      "appearanceTags": [
+        "sooty",
+        "weathered"
+      ]
+    },
+    {
+      "id": "locksmith",
+      "label": "Locksmith",
+      "tags": [
+        "craft",
+        "urban",
+        "scholarly"
+      ],
+      "appearanceTags": [
+        "neat",
+        "fine-work"
+      ]
+    },
+    {
+      "id": "mapmaker",
+      "label": "Mapmaker",
+      "tags": [
+        "scholarly",
+        "travel",
+        "civilised"
+      ],
+      "appearanceTags": [
+        "ink-stained",
+        "neat"
+      ]
+    },
+    {
+      "id": "mercenary",
+      "label": "Mercenary",
+      "tags": [
+        "military",
+        "travel",
+        "authority"
+      ],
+      "appearanceTags": [
+        "sturdy",
+        "weathered"
+      ]
+    },
+    {
+      "id": "merchant",
+      "label": "Traveling merchant",
+      "tags": [
+        "civilised",
+        "travel",
+        "urban"
+      ],
+      "appearanceTags": [
+        "travel-worn",
+        "neat"
+      ]
+    },
+    {
+      "id": "midwife",
+      "label": "Midwife",
+      "tags": [
+        "civilised",
+        "rural",
+        "service"
+      ],
+      "appearanceTags": [
+        "practical",
+        "work-worn"
+      ]
+    },
+    {
+      "id": "miner",
+      "label": "Miner",
+      "tags": [
+        "underground",
+        "rural",
+        "sturdy"
+      ],
+      "appearanceTags": [
+        "sturdy",
+        "weathered"
+      ]
+    },
+    {
+      "id": "minstrel",
+      "label": "Travelling minstrel",
+      "tags": [
+        "travel",
+        "service",
+        "memorable"
+      ],
+      "appearanceTags": [
+        "colourful",
+        "expressive"
+      ]
+    },
+    {
+      "id": "monster-guide",
+      "label": "Monster-country guide",
+      "tags": [
+        "travel",
+        "dangerous",
+        "rural"
+      ],
+      "appearanceTags": [
+        "scarred",
+        "weathered"
+      ]
+    },
+    {
+      "id": "mushroom-farmer",
+      "label": "Mushroom farmer",
+      "tags": [
+        "rural",
+        "underground",
+        "natural"
+      ],
+      "appearanceTags": [
+        "practical",
+        "earth-stained"
+      ]
+    },
+    {
+      "id": "priest",
+      "label": "Temple acolyte",
+      "tags": [
+        "civilised",
+        "scholarly",
+        "service"
+      ],
+      "appearanceTags": [
+        "neat",
+        "practical"
+      ]
+    },
+    {
+      "id": "rat-catcher",
+      "label": "Rat-catcher",
+      "tags": [
+        "urban",
+        "memorable",
+        "service"
+      ],
+      "appearanceTags": [
+        "weathered",
+        "practical"
+      ]
+    },
+    {
+      "id": "relic-broker",
+      "label": "Relic broker",
+      "tags": [
+        "urban",
+        "scholarly",
+        "secret"
+      ],
+      "appearanceTags": [
+        "neat",
+        "ornamented"
+      ]
+    },
+    {
+      "id": "retired-adventurer",
+      "label": "Retired adventurer",
+      "tags": [
+        "travel",
+        "memorable",
+        "dangerous"
+      ],
+      "appearanceTags": [
+        "scarred",
+        "practical"
+      ]
+    },
+    {
+      "id": "smuggler",
+      "label": "Smuggler",
+      "tags": [
+        "urban",
+        "travel",
+        "secret"
+      ],
+      "appearanceTags": [
+        "travel-worn",
+        "practical"
+      ]
+    },
+    {
+      "id": "stable-hand",
+      "label": "Stable hand",
+      "tags": [
+        "rural",
+        "service",
+        "travel"
+      ],
+      "appearanceTags": [
+        "work-worn",
+        "practical"
+      ]
+    },
+    {
+      "id": "storyteller",
+      "label": "Storyteller",
+      "tags": [
+        "travel",
+        "service",
+        "memorable"
+      ],
+      "appearanceTags": [
+        "colourful",
+        "expressive"
+      ]
+    },
+    {
+      "id": "tanner",
+      "label": "Tanner",
+      "tags": [
+        "craft",
+        "urban",
+        "service"
+      ],
+      "appearanceTags": [
+        "work-worn",
+        "stained"
+      ]
+    },
+    {
+      "id": "temple-attendant",
+      "label": "Temple attendant",
+      "tags": [
+        "civilised",
+        "scholarly",
+        "authority"
+      ],
+      "appearanceTags": [
+        "neat",
+        "ceremonial"
+      ]
+    },
+    {
+      "id": "village-priest",
+      "label": "Village priest",
+      "tags": [
+        "civilised",
+        "authority",
+        "service"
+      ],
+      "appearanceTags": [
+        "ceremonial",
+        "neat"
+      ]
+    },
+    {
+      "id": "wandering-cook",
+      "label": "Wandering cook",
+      "tags": [
+        "travel",
+        "service",
+        "memorable"
+      ],
+      "appearanceTags": [
+        "practical",
+        "colourful"
+      ]
+    },
+    {
+      "id": "witch-finder",
+      "label": "Witch-finder",
+      "tags": [
+        "authority",
+        "travel",
+        "dangerous"
+      ],
+      "appearanceTags": [
+        "severe",
+        "travel-worn"
+      ]
     }
   ],
   "appearances": [
     {
       "id": "broad-steady",
       "text": "Broad-shouldered and steady-looking, with sun-browned skin and short, practical hair.",
-      "tags": ["adult", "practical", "sturdy"]
+      "tags": [
+        "adult",
+        "practical",
+        "sturdy"
+      ]
     },
     {
-      "id": "lean-alert",
-      "text": "Lean and alert, with quick eyes and hands that look accustomed to fine work.",
-      "tags": ["adult", "urban", "scholarly"]
+      "id": "carefully-groomed",
+      "text": "Carefully groomed and immaculately dressed, with every fastening polished and every crease deliberate.",
+      "tags": [
+        "authority",
+        "neat"
+      ]
     },
     {
-      "id": "weathered-compact",
-      "text": "Compact and weathered, with cracked knuckles and a posture shaped by long outdoor labour.",
-      "tags": ["mature", "rural", "weathered"]
+      "id": "earth-stained",
+      "text": "Earth-stained and practical, with rough nails, sun-faded hair, and clothing repaired more often than replaced.",
+      "tags": [
+        "rural",
+        "natural"
+      ]
     },
     {
-      "id": "striking-unusual-eyes",
-      "text": "Otherwise unremarkable at a glance, except for unusually clear grey eyes that seem to notice everything.",
-      "tags": ["adult", "memorable"]
+      "id": "fey-touched",
+      "text": "Graceful but faintly uncanny, with reflective eyes and hair that seems to stir in still air.",
+      "tags": [
+        "fey-touched",
+        "memorable"
+      ]
     },
     {
-      "id": "tall-lantern-jaw",
-      "text": "Tall and long-limbed, with a lantern jaw and clothes kept cleaner than their work would suggest.",
-      "tags": ["adult", "authority", "neat"]
+      "id": "fine-boned-pale",
+      "text": "Fine-boned and pale, with elegant hands and dark hair worn longer than local fashion allows.",
+      "tags": [
+        "scholarly",
+        "fey-touched"
+      ]
     },
     {
-      "id": "round-cheerful",
-      "text": "Round-faced and sturdy, with an open expression and sleeves often rolled to the elbow.",
-      "tags": ["adult", "service", "work-worn"]
-    },
-    {
-      "id": "sharp-featured",
-      "text": "Sharp-featured and restless, with hair tied back and the look of someone who sleeps lightly.",
-      "tags": ["adult", "travel", "memorable"]
+      "id": "freckled-open",
+      "text": "Freckled and open-faced, with coppery hair, quick smiles, and the energetic posture of someone rarely still.",
+      "tags": [
+        "young",
+        "service"
+      ]
     },
     {
       "id": "grey-streaked",
       "text": "Grey-streaked hair and deep lines around the eyes, with hands still steady despite their age.",
-      "tags": ["mature", "scholarly", "service"]
+      "tags": [
+        "mature",
+        "scholarly",
+        "service"
+      ]
     },
     {
-      "id": "sun-freckled",
-      "text": "Sun-freckled skin and wind-chapped lips, with boots that have been resoled more than once.",
-      "tags": ["rural", "weathered", "travel"]
+      "id": "ink-and-spectacles",
+      "text": "Narrow-shouldered and intent, with ink-smudged spectacles and hair repeatedly pushed back by stained fingers.",
+      "tags": [
+        "scholarly",
+        "ink-stained"
+      ]
+    },
+    {
+      "id": "lean-alert",
+      "text": "Lean and alert, with quick eyes and hands that look accustomed to fine work.",
+      "tags": [
+        "adult",
+        "urban",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "massive-gentle",
+      "text": "Massive in build but gentle in movement, with broad hands and a surprisingly soft expression.",
+      "tags": [
+        "sturdy",
+        "service"
+      ]
+    },
+    {
+      "id": "one-eye-clouded",
+      "text": "Strongly built and weathered, with one clouded eye and the cautious balance of someone used to uneven ground.",
+      "tags": [
+        "travel",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "ornamented-confidence",
+      "text": "Confidently dressed in layered fabrics, with bright metal ornaments and a posture that expects attention.",
+      "tags": [
+        "memorable",
+        "colourful"
+      ]
     },
     {
       "id": "pale-indoor",
       "text": "Pale from long hours indoors, with ink-smudged cuffs and eyes accustomed to lamplight.",
-      "tags": ["urban", "scholarly", "neat"]
+      "tags": [
+        "urban",
+        "scholarly",
+        "neat"
+      ]
+    },
+    {
+      "id": "patched-eccentric",
+      "text": "Wrapped in patched layers of mismatched cloth, with curious tools hanging from every belt and strap.",
+      "tags": [
+        "craft",
+        "patched",
+        "memorable"
+      ]
+    },
+    {
+      "id": "quiet-severe",
+      "text": "Severe and composed, with close-cropped hair, a narrow face, and clothing chosen for discipline rather than comfort.",
+      "tags": [
+        "authority",
+        "severe"
+      ]
+    },
+    {
+      "id": "round-cheerful",
+      "text": "Round-faced and sturdy, with an open expression and sleeves often rolled to the elbow.",
+      "tags": [
+        "adult",
+        "service",
+        "work-worn"
+      ]
+    },
+    {
+      "id": "scarred-watchful",
+      "text": "Hard-muscled and watchful, with an old scar crossing one cheek and a habit of standing where every doorway is visible.",
+      "tags": [
+        "military",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "sharp-featured",
+      "text": "Sharp-featured and restless, with hair tied back and the look of someone who sleeps lightly.",
+      "tags": [
+        "adult",
+        "travel",
+        "memorable"
+      ]
+    },
+    {
+      "id": "silver-haired",
+      "text": "Silver-haired and upright despite advancing years, with clear skin and hands that remain remarkably steady.",
+      "tags": [
+        "mature",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "small-restless",
+      "text": "Small and restless, with darting eyes, quick fingers, and pockets that seem to hold far more than they should.",
+      "tags": [
+        "urban",
+        "unusual"
+      ]
+    },
+    {
+      "id": "soft-featured",
+      "text": "Soft-featured and calm, with warm brown eyes and a face that seems familiar even to strangers.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "soot-darkened",
+      "text": "Soot-darkened and muscular, with singed hair at the forearms and a permanent squint from years near open flame.",
+      "tags": [
+        "craft",
+        "sooty"
+      ]
+    },
+    {
+      "id": "striking-unusual-eyes",
+      "text": "Otherwise unremarkable at a glance, except for unusually clear grey eyes that seem to notice everything.",
+      "tags": [
+        "adult",
+        "memorable"
+      ]
+    },
+    {
+      "id": "sun-freckled",
+      "text": "Sun-freckled skin and wind-chapped lips, with boots that have been resoled more than once.",
+      "tags": [
+        "rural",
+        "weathered",
+        "travel"
+      ]
+    },
+    {
+      "id": "tall-lantern-jaw",
+      "text": "Tall and long-limbed, with a lantern jaw and clothes kept cleaner than their work would suggest.",
+      "tags": [
+        "adult",
+        "authority",
+        "neat"
+      ]
+    },
+    {
+      "id": "tall-stooped",
+      "text": "Tall but slightly stooped, with long limbs and the patient movements of someone accustomed to cramped workspaces.",
+      "tags": [
+        "scholarly",
+        "craft"
+      ]
+    },
+    {
+      "id": "tattooed-river",
+      "text": "Lean and river-weathered, with faded blue tattoos winding from wrist to shoulder.",
+      "tags": [
+        "travel",
+        "rural",
+        "memorable"
+      ]
+    },
+    {
+      "id": "weathered-compact",
+      "text": "Compact and weathered, with cracked knuckles and a posture shaped by long outdoor labour.",
+      "tags": [
+        "mature",
+        "rural",
+        "weathered"
+      ]
+    },
+    {
+      "id": "wind-burned",
+      "text": "Wind-burned and wiry, with salt-stiff hair and skin marked by years of bad weather.",
+      "tags": [
+        "travel",
+        "weathered"
+      ]
     }
   ],
   "distinctiveFeatures": [
-    { "id": "notched-ear", "text": "A neatly notched ear, old enough to pass for a forgotten shaving mishap.", "tags": [] },
-    { "id": "ink-stained-fingers", "text": "Ink-stained fingers that never quite wash clean.", "tags": ["scholarly"] },
-    { "id": "braided-beard-charms", "text": "A braided beard threaded with tiny brass charms.", "tags": ["dwarf", "memorable"] },
-    { "id": "faint-scent-herbs", "text": "A faint scent of dried herbs that clings to their clothes.", "tags": ["natural"] },
-    { "id": "missing-fingertip", "text": "A missing fingertip on the left hand, long healed and rarely mentioned.", "tags": ["work-worn", "sturdy"] },
-    { "id": "heterochromia", "text": "One brown eye and one green, noticed only when they look directly at someone.", "tags": ["memorable", "fey-touched"] },
-    { "id": "ritual-scar", "text": "A fine ritual scar along the forearm, partly hidden by rolled sleeves.", "tags": ["scholarly", "secret"] },
-    { "id": "gold-tooth", "text": "A glint of gold when they smile, conspicuous against otherwise plain dress.", "tags": ["urban", "service"] },
-    { "id": "crooked-nose", "text": "A nose set slightly crooked from an old break that never quite healed straight.", "tags": ["military", "weathered"] },
-    { "id": "woven-bracelet", "text": "A worn woven bracelet they touch when nervous.", "tags": ["rural", "travel"] },
-    { "id": "singed-eyebrows", "text": "Singed eyebrows that suggest a recent and poorly explained accident.", "tags": ["memorable", "scholarly"] },
-    { "id": "calloused-palms", "text": "Heavily calloused palms and forearms marked by hot metal or rope.", "tags": ["sturdy", "work-worn"] }
+    {
+      "id": "bird-companion",
+      "text": "A small black bird follows at a cautious distance and never seems to call.",
+      "tags": [
+        "natural",
+        "memorable"
+      ]
+    },
+    {
+      "id": "blackened-key",
+      "text": "A blackened iron key hangs from one ear as an earring.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "blue-tattoo",
+      "text": "A faded blue tattoo of an unknown constellation circles one wrist.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "braided-beard-charms",
+      "text": "A braided beard threaded with tiny brass charms.",
+      "tags": [
+        "dwarf",
+        "memorable"
+      ]
+    },
+    {
+      "id": "burned-palm",
+      "text": "A badly burned palm usually hidden beneath a fingerless glove.",
+      "tags": [
+        "craft",
+        "secret"
+      ]
+    },
+    {
+      "id": "calloused-palms",
+      "text": "Heavily calloused palms and forearms marked by hot metal or rope.",
+      "tags": [
+        "sturdy",
+        "work-worn"
+      ]
+    },
+    {
+      "id": "chalk-marks",
+      "text": "Sleeves and cuffs are always dusted with coloured chalk.",
+      "tags": [
+        "scholarly",
+        "craft"
+      ]
+    },
+    {
+      "id": "coin-trick",
+      "text": "A worn coin is constantly rolled across the knuckles.",
+      "tags": [
+        "urban"
+      ]
+    },
+    {
+      "id": "crooked-nose",
+      "text": "A nose set slightly crooked from an old break that never quite healed straight.",
+      "tags": [
+        "military",
+        "weathered"
+      ]
+    },
+    {
+      "id": "faint-scent-herbs",
+      "text": "A faint scent of dried herbs that clings to their clothes.",
+      "tags": [
+        "natural"
+      ]
+    },
+    {
+      "id": "frosted-breath",
+      "text": "Breath fogs faintly even in a warm room.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "glass-lens",
+      "text": "A folding glass lens is carried in a polished brass case.",
+      "tags": [
+        "scholarly",
+        "fine-work"
+      ]
+    },
+    {
+      "id": "gold-tooth",
+      "text": "A glint of gold when they smile, conspicuous against otherwise plain dress.",
+      "tags": [
+        "urban",
+        "service"
+      ]
+    },
+    {
+      "id": "heterochromia",
+      "text": "One brown eye and one green, noticed only when they look directly at someone.",
+      "tags": [
+        "memorable",
+        "fey-touched"
+      ]
+    },
+    {
+      "id": "ink-stained-fingers",
+      "text": "Ink-stained fingers that never quite wash clean.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "mismatched-eyes",
+      "text": "One eye is dark brown and the other an unsettling pale green.",
+      "tags": [
+        "memorable"
+      ]
+    },
+    {
+      "id": "missing-fingertip",
+      "text": "A missing fingertip on the left hand, long healed and rarely mentioned.",
+      "tags": [
+        "work-worn",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "notched-ear",
+      "text": "A neatly notched ear, old enough to pass for a forgotten shaving mishap.",
+      "tags": []
+    },
+    {
+      "id": "old-arrowhead",
+      "text": "An old arrowhead hangs on a cord at the throat.",
+      "tags": [
+        "military",
+        "secret"
+      ]
+    },
+    {
+      "id": "painted-nails",
+      "text": "Each fingernail is painted with a different tiny heraldic symbol.",
+      "tags": [
+        "colourful",
+        "memorable"
+      ]
+    },
+    {
+      "id": "pocket-hourglass",
+      "text": "A thumb-sized hourglass is checked at seemingly random moments.",
+      "tags": [
+        "scholarly",
+        "unusual"
+      ]
+    },
+    {
+      "id": "red-thread",
+      "text": "A length of red thread is tied around one wrist and never removed.",
+      "tags": [
+        "secret"
+      ]
+    },
+    {
+      "id": "ritual-scar",
+      "text": "A fine ritual scar along the forearm, partly hidden by rolled sleeves.",
+      "tags": [
+        "scholarly",
+        "secret"
+      ]
+    },
+    {
+      "id": "silver-tooth",
+      "text": "A single silver tooth that flashes whenever a smile escapes.",
+      "tags": [
+        "memorable"
+      ]
+    },
+    {
+      "id": "singed-eyebrows",
+      "text": "Singed eyebrows that suggest a recent and poorly explained accident.",
+      "tags": [
+        "memorable",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "tiny-bells",
+      "text": "Several tiny bells are sewn into the hem of the outer coat.",
+      "tags": [
+        "memorable",
+        "colourful"
+      ]
+    },
+    {
+      "id": "unblinking",
+      "text": "They seem to blink far less often than other people.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "voice-scar",
+      "text": "A thin scar crosses the throat where an old wound healed badly.",
+      "tags": [
+        "dangerous",
+        "memorable"
+      ]
+    },
+    {
+      "id": "wooden-hand",
+      "text": "One hand is a beautifully carved wooden replacement fitted with practical metal joints.",
+      "tags": [
+        "craft",
+        "memorable"
+      ]
+    },
+    {
+      "id": "woven-bracelet",
+      "text": "A worn woven bracelet they touch when nervous.",
+      "tags": [
+        "rural",
+        "travel"
+      ]
+    }
   ],
   "personalities": [
-    { "id": "warm-watchful", "text": "Warm with strangers but quietly watchful.", "tags": ["service"] },
-    { "id": "dry-precise", "text": "Dry, precise, and difficult to fluster.", "tags": ["scholarly", "authority"] },
-    { "id": "restless-curious", "text": "Restlessly curious, with a habit of turning conversations back to other people.", "tags": ["travel"] },
-    { "id": "guarded-kind", "text": "Guarded at first, but unexpectedly kind once trust is earned.", "tags": [] },
-    { "id": "blunt-honest", "text": "Blunt to the point of rudeness, but rarely dishonest.", "tags": ["rural", "sturdy"] },
-    { "id": "performative-cheer", "text": "Cheerful in public and sharper when they think no one important is listening.", "tags": ["service", "urban"] },
-    { "id": "methodical-calm", "text": "Methodical and calm, with little appetite for gossip unless it is useful.", "tags": ["scholarly", "authority"] },
-    { "id": "superstitious-practical", "text": "Superstitious in private and practical in public.", "tags": ["rural", "memorable"] }
+    {
+      "id": "absent-minded",
+      "text": "Absent-minded about ordinary matters but intensely focused on chosen interests.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "ambitious-polite",
+      "text": "Polite, ambitious, and constantly measuring what every acquaintance might be worth.",
+      "tags": [
+        "urban",
+        "civilised"
+      ]
+    },
+    {
+      "id": "bitter-idealistic",
+      "text": "Bitter about past failures but still unable to abandon old ideals.",
+      "tags": [
+        "mature",
+        "military"
+      ]
+    },
+    {
+      "id": "blunt-honest",
+      "text": "Blunt to the point of rudeness, but rarely dishonest.",
+      "tags": [
+        "rural",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "blunt-loyal",
+      "text": "Blunt, loyal, and more comfortable with deeds than explanations.",
+      "tags": [
+        "sturdy",
+        "military"
+      ]
+    },
+    {
+      "id": "boisterous-generous",
+      "text": "Boisterous, generous, and incapable of speaking quietly when excited.",
+      "tags": [
+        "service",
+        "memorable"
+      ]
+    },
+    {
+      "id": "calm-dangerous",
+      "text": "Calm, courteous, and faintly dangerous when contradicted.",
+      "tags": [
+        "dangerous",
+        "authority"
+      ]
+    },
+    {
+      "id": "cheerful-fatalist",
+      "text": "Cheerfully fatalistic, convinced that worrying merely wastes good daylight.",
+      "tags": [
+        "travel",
+        "rural"
+      ]
+    },
+    {
+      "id": "competitive-jovial",
+      "text": "Jovially competitive, turning almost any task into a friendly contest.",
+      "tags": [
+        "service"
+      ]
+    },
+    {
+      "id": "dramatic-storyteller",
+      "text": "Dramatic and expressive, unable to describe even a simple errand without embellishment.",
+      "tags": [
+        "service",
+        "memorable"
+      ]
+    },
+    {
+      "id": "dry-precise",
+      "text": "Dry, precise, and difficult to fluster.",
+      "tags": [
+        "scholarly",
+        "authority"
+      ]
+    },
+    {
+      "id": "earnest-naive",
+      "text": "Earnest and slightly naive, with complete faith that honesty will eventually win out.",
+      "tags": [
+        "young"
+      ]
+    },
+    {
+      "id": "eccentric-inventive",
+      "text": "Eccentric, inventive, and delighted by problems other people find alarming.",
+      "tags": [
+        "craft",
+        "memorable"
+      ]
+    },
+    {
+      "id": "guarded-kind",
+      "text": "Guarded at first, but unexpectedly kind once trust is earned.",
+      "tags": []
+    },
+    {
+      "id": "methodical-calm",
+      "text": "Methodical and calm, with little appetite for gossip unless it is useful.",
+      "tags": [
+        "scholarly",
+        "authority"
+      ]
+    },
+    {
+      "id": "mournful-humour",
+      "text": "Mournful in manner but gifted with a surprisingly sharp sense of humour.",
+      "tags": [
+        "mature"
+      ]
+    },
+    {
+      "id": "nervous-clever",
+      "text": "Nervous in crowds but quick-witted when given a practical problem.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "patient-listener",
+      "text": "Patient and attentive, remembering small details others assume were forgotten.",
+      "tags": [
+        "service",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "performative-cheer",
+      "text": "Cheerful in public and sharper when they think no one important is listening.",
+      "tags": [
+        "service",
+        "urban"
+      ]
+    },
+    {
+      "id": "protective-neighbour",
+      "text": "Protective of neighbours and quick to involve themselves in local disputes.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "quietly-devout",
+      "text": "Quietly devout, finding meaning in routine duties rather than grand declarations.",
+      "tags": [
+        "ceremonial",
+        "service"
+      ]
+    },
+    {
+      "id": "restless-curious",
+      "text": "Restlessly curious, with a habit of turning conversations back to other people.",
+      "tags": [
+        "travel"
+      ]
+    },
+    {
+      "id": "stern-fair",
+      "text": "Stern but fair, with little patience for excuses and a strong dislike of bullies.",
+      "tags": [
+        "authority"
+      ]
+    },
+    {
+      "id": "superstitious-practical",
+      "text": "Superstitious in private and practical in public.",
+      "tags": [
+        "rural",
+        "memorable"
+      ]
+    },
+    {
+      "id": "suspicious-courteous",
+      "text": "Suspicious of motives but unfailingly courteous in public.",
+      "tags": [
+        "authority",
+        "secret"
+      ]
+    },
+    {
+      "id": "vain-charming",
+      "text": "Vain, charming, and always aware of who is watching.",
+      "tags": [
+        "urban",
+        "memorable"
+      ]
+    },
+    {
+      "id": "warm-watchful",
+      "text": "Warm with strangers but quietly watchful.",
+      "tags": [
+        "service"
+      ]
+    }
   ],
   "mannerisms": [
-    { "id": "taps-counter", "text": "Taps the nearest flat surface once before answering a question.", "tags": [] },
-    { "id": "squints-recall", "text": "Squints slightly when trying to recall a detail.", "tags": ["scholarly"] },
-    { "id": "checks-exits", "text": "Glances toward exits and windows when entering a new room.", "tags": ["authority"] },
-    { "id": "hum-under-breath", "text": "Hums under their breath while working.", "tags": ["service", "rural"] },
-    { "id": "counts-coins", "text": "Quietly counts coins or beads when thinking.", "tags": ["urban", "service"] },
-    { "id": "sniffs-air", "text": "Sniffs the air on entering a room, as if checking for smoke or rot.", "tags": ["rural", "weathered"] },
-    { "id": "straightens-objects", "text": "Straightens cups, papers, or tools without seeming to notice.", "tags": ["neat", "service"] },
-    { "id": "speaks-to-animals", "text": "Murmurs to horses, dogs, or pigeons as if they might answer.", "tags": ["rural", "travel"] }
+    {
+      "id": "arranges-items",
+      "text": "Straightens nearby objects into neat rows while speaking.",
+      "tags": [
+        "neat",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "asks-date",
+      "text": "Asks the date at unexpected moments and records the answer.",
+      "tags": [
+        "scholarly",
+        "unusual"
+      ]
+    },
+    {
+      "id": "avoids-thresholds",
+      "text": "Steps carefully over thresholds rather than on them.",
+      "tags": [
+        "secret"
+      ]
+    },
+    {
+      "id": "checks-exits",
+      "text": "Glances toward exits and windows when entering a new room.",
+      "tags": [
+        "authority"
+      ]
+    },
+    {
+      "id": "chews-herb",
+      "text": "Chews a bitter-smelling leaf during long conversations.",
+      "tags": [
+        "natural"
+      ]
+    },
+    {
+      "id": "cleans-spectacles",
+      "text": "Cleans spectacles that are already spotless whenever challenged.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "counts-coins",
+      "text": "Quietly counts coins or beads when thinking.",
+      "tags": [
+        "urban",
+        "service"
+      ]
+    },
+    {
+      "id": "cracks-knuckles",
+      "text": "Cracks the knuckles before beginning any serious discussion.",
+      "tags": [
+        "sturdy"
+      ]
+    },
+    {
+      "id": "drums-rhythm",
+      "text": "Drums complex rhythms with the fingertips while waiting.",
+      "tags": [
+        "service",
+        "memorable"
+      ]
+    },
+    {
+      "id": "folds-paper",
+      "text": "Folds scraps of paper into tiny animals while listening.",
+      "tags": [
+        "scholarly",
+        "craft"
+      ]
+    },
+    {
+      "id": "hum-under-breath",
+      "text": "Hums under their breath while working.",
+      "tags": [
+        "service",
+        "rural"
+      ]
+    },
+    {
+      "id": "laughs-late",
+      "text": "Laughs a heartbeat later than everyone else.",
+      "tags": [
+        "memorable"
+      ]
+    },
+    {
+      "id": "leans-close",
+      "text": "Leans closer than necessary when sharing supposedly ordinary information.",
+      "tags": [
+        "secret"
+      ]
+    },
+    {
+      "id": "polishes-object",
+      "text": "Polishes the same small object whenever conversation becomes uncomfortable.",
+      "tags": [
+        "secret"
+      ]
+    },
+    {
+      "id": "quotes-proverbs",
+      "text": "Answers awkward questions with half-remembered proverbs.",
+      "tags": [
+        "rural",
+        "mature"
+      ]
+    },
+    {
+      "id": "repeats-name",
+      "text": "Repeats a person's name quietly after being introduced.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "rolls-shoulder",
+      "text": "Rolls one shoulder as though easing an old injury.",
+      "tags": [
+        "military",
+        "mature"
+      ]
+    },
+    {
+      "id": "sniffs-air",
+      "text": "Sniffs the air on entering a room, as if checking for smoke or rot.",
+      "tags": [
+        "rural",
+        "weathered"
+      ]
+    },
+    {
+      "id": "speaks-to-animals",
+      "text": "Murmurs to horses, dogs, or pigeons as if they might answer.",
+      "tags": [
+        "rural",
+        "travel"
+      ]
+    },
+    {
+      "id": "squints-recall",
+      "text": "Squints slightly when trying to recall a detail.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "stands-back-to-wall",
+      "text": "Chooses seats with a wall behind them whenever possible.",
+      "tags": [
+        "military",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "straightens-objects",
+      "text": "Straightens cups, papers, or tools without seeming to notice.",
+      "tags": [
+        "neat",
+        "service"
+      ]
+    },
+    {
+      "id": "taps-counter",
+      "text": "Taps the nearest flat surface once before answering a question.",
+      "tags": []
+    },
+    {
+      "id": "touches-charm",
+      "text": "Touches a charm at the throat before making a difficult decision.",
+      "tags": [
+        "ceremonial",
+        "secret"
+      ]
+    },
+    {
+      "id": "whispers-to-tools",
+      "text": "Whispers brief encouragement to tools before using them.",
+      "tags": [
+        "craft",
+        "memorable"
+      ]
+    },
+    {
+      "id": "winks-badly",
+      "text": "Attempts conspiratorial winks that are impossible to mistake for subtlety.",
+      "tags": [
+        "service",
+        "memorable"
+      ]
+    }
   ],
   "voices": [
-    { "id": "low-measured", "text": "Speaks in a low, measured voice.", "tags": ["mature", "authority"] },
-    { "id": "quick-warm", "text": "Talks quickly, with a warm regional lilt.", "tags": ["service", "rural"] },
-    { "id": "soft-careful", "text": "Uses soft, carefully chosen words, as if afraid of being overheard.", "tags": ["scholarly"] },
-    { "id": "gravelly-direct", "text": "Gravelly and direct, with little patience for evasion.", "tags": ["sturdy"] },
-    { "id": "bright-overloud", "text": "Louder than necessary in crowds, then suddenly quiet in private.", "tags": ["urban", "service"] },
-    { "id": "slow-deliberate", "text": "Slow and deliberate, leaving long pauses that unsettle hurried listeners.", "tags": ["mature", "scholarly"] },
-    { "id": "nasal-clipped", "text": "A clipped, nasal tone that sounds permanently unimpressed.", "tags": ["authority", "urban"] },
-    { "id": "hoarse-friendly", "text": "Hoarse but friendly, like someone used to shouting over wind or water.", "tags": ["travel", "weathered"] }
+    {
+      "id": "booming-friendly",
+      "text": "Has a booming, friendly voice that carries across crowded rooms.",
+      "tags": [
+        "service",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "breathy-intense",
+      "text": "Speaks breathlessly and with unsettling intensity.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "bright-overloud",
+      "text": "Louder than necessary in crowds, then suddenly quiet in private.",
+      "tags": [
+        "urban",
+        "service"
+      ]
+    },
+    {
+      "id": "bright-youthful",
+      "text": "Has a bright, youthful voice that rises whenever enthusiasm takes over.",
+      "tags": [
+        "young"
+      ]
+    },
+    {
+      "id": "clipped-official",
+      "text": "Speaks in clipped, official phrases even during casual conversation.",
+      "tags": [
+        "authority"
+      ]
+    },
+    {
+      "id": "dramatic-pauses",
+      "text": "Uses long dramatic pauses and clearly enjoys the effect.",
+      "tags": [
+        "memorable",
+        "service"
+      ]
+    },
+    {
+      "id": "flat-unreadable",
+      "text": "Speaks in a flat, unreadable tone that gives away almost nothing.",
+      "tags": [
+        "secret",
+        "authority"
+      ]
+    },
+    {
+      "id": "gentle-reassuring",
+      "text": "Uses a gentle, reassuring tone that encourages people to keep talking.",
+      "tags": [
+        "service"
+      ]
+    },
+    {
+      "id": "gravelly-direct",
+      "text": "Gravelly and direct, with little patience for evasion.",
+      "tags": [
+        "sturdy"
+      ]
+    },
+    {
+      "id": "hoarse-friendly",
+      "text": "Hoarse but friendly, like someone used to shouting over wind or water.",
+      "tags": [
+        "travel",
+        "weathered"
+      ]
+    },
+    {
+      "id": "hoarse-traveller",
+      "text": "Speaks with the hoarse rasp of someone accustomed to dust and cold nights.",
+      "tags": [
+        "travel",
+        "weathered"
+      ]
+    },
+    {
+      "id": "laughing-tone",
+      "text": "Sounds perpetually amused, even when discussing serious matters.",
+      "tags": [
+        "service",
+        "memorable"
+      ]
+    },
+    {
+      "id": "low-measured",
+      "text": "Speaks in a low, measured voice.",
+      "tags": [
+        "mature",
+        "authority"
+      ]
+    },
+    {
+      "id": "melodic-formal",
+      "text": "Uses a melodic, formal cadence that makes ordinary remarks sound ceremonial.",
+      "tags": [
+        "fey-touched",
+        "ceremonial"
+      ]
+    },
+    {
+      "id": "nasal-clipped",
+      "text": "A clipped, nasal tone that sounds permanently unimpressed.",
+      "tags": [
+        "authority",
+        "urban"
+      ]
+    },
+    {
+      "id": "precise-academic",
+      "text": "Pronounces every word with careful academic precision.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "quick-warm",
+      "text": "Talks quickly, with a warm regional lilt.",
+      "tags": [
+        "service",
+        "rural"
+      ]
+    },
+    {
+      "id": "rapid-mutter",
+      "text": "Mutters rapidly through chains of thought before arriving at the answer.",
+      "tags": [
+        "scholarly",
+        "craft"
+      ]
+    },
+    {
+      "id": "resonant-prayerful",
+      "text": "Speaks with a resonant, prayerful cadence even outside formal worship.",
+      "tags": [
+        "ceremonial"
+      ]
+    },
+    {
+      "id": "rough-whisper",
+      "text": "Rarely raises the voice above a rough whisper.",
+      "tags": [
+        "secret",
+        "mature"
+      ]
+    },
+    {
+      "id": "sharp-commanding",
+      "text": "Has a sharp, commanding voice that makes requests sound like orders.",
+      "tags": [
+        "authority",
+        "military"
+      ]
+    },
+    {
+      "id": "slow-deliberate",
+      "text": "Slow and deliberate, leaving long pauses that unsettle hurried listeners.",
+      "tags": [
+        "mature",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "slow-rural",
+      "text": "Speaks slowly in a broad rural accent, leaving long pauses for thought.",
+      "tags": [
+        "rural"
+      ]
+    },
+    {
+      "id": "soft-careful",
+      "text": "Uses soft, carefully chosen words, as if afraid of being overheard.",
+      "tags": [
+        "scholarly"
+      ]
+    }
   ],
   "backgrounds": [
     {
-      "id": "retired-soldier",
-      "text": "Once served in a border company and left after a mission went badly wrong.",
-      "tags": ["military", "mature", "guard"]
-    },
-    {
       "id": "apprentice-fled",
       "text": "Completed most of a respectable apprenticeship, then fled after discovering something unsettling in their master's records.",
-      "tags": ["scholarly", "secret"]
-    },
-    {
-      "id": "family-trade",
-      "text": "Inherited a modest family trade and has kept it alive through stubborn competence rather than ambition.",
-      "tags": ["service", "civilised"]
-    },
-    {
-      "id": "disgraced-clerk",
-      "text": "Lost a clerk's position after refusing to sign a document they knew was false.",
-      "tags": ["scholarly", "authority", "court-scribe"]
-    },
-    {
-      "id": "shipwreck-survivor",
-      "text": "Survived a shipwreck that killed several others and still dreams of the ones who did not come ashore.",
-      "tags": ["travel", "fisher", "dockworker"]
-    },
-    {
-      "id": "monastery-years",
-      "text": "Spent several years in a monastery before returning to ordinary life with more questions than answers.",
-      "tags": ["scholarly", "priest", "civilised"]
+      "tags": [
+        "scholarly",
+        "secret"
+      ]
     },
     {
       "id": "caravan-guard",
       "text": "Worked seasons as a caravan guard and learned more about people than about swordplay.",
-      "tags": ["travel", "merchant", "mercenary"]
+      "tags": [
+        "travel",
+        "merchant",
+        "mercenary"
+      ]
     },
     {
-      "id": "mine-collapse",
-      "text": "Was trapped briefly in a mine collapse and has refused deep tunnels ever since.",
-      "tags": ["underground", "miner", "mature"]
+      "id": "criminal-family",
+      "text": "Comes from a well-known criminal family but has spent years trying to live beyond its reputation.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
     },
     {
-      "id": "street-orphan",
-      "text": "Raised among city back alleys and learned early which adults could be trusted.",
-      "tags": ["urban", "rat-catcher", "fence"]
+      "id": "cult-escapee",
+      "text": "Escaped a secretive religious order and now avoids anyone displaying its symbols.",
+      "tags": [
+        "ceremonial",
+        "secret",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "disgraced-clerk",
+      "text": "Lost a clerk's position after refusing to sign a document they knew was false.",
+      "tags": [
+        "scholarly",
+        "authority",
+        "court-scribe"
+      ]
+    },
+    {
+      "id": "failed-adventurer",
+      "text": "Joined an adventuring company in youth but returned alone and refuses to discuss the final expedition.",
+      "tags": [
+        "travel",
+        "dangerous",
+        "secret"
+      ]
+    },
+    {
+      "id": "family-trade",
+      "text": "Inherited a modest family trade and has kept it alive through stubborn competence rather than ambition.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "fey-bargain",
+      "text": "Once accepted hospitality in a strange woodland court and returned to find several years had passed.",
+      "tags": [
+        "fey-touched",
+        "memorable"
+      ]
+    },
+    {
+      "id": "former-smuggler",
+      "text": "Spent several years moving forbidden goods across a difficult border before trying to settle honestly.",
+      "tags": [
+        "travel",
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "guild-expelled",
+      "text": "Was expelled from a respected guild for refusing an order that would have harmed innocent people.",
+      "tags": [
+        "craft",
+        "authority"
+      ]
     },
     {
       "id": "healer-apprentice",
       "text": "Trained under a practical healer who treated anyone who could pay or bargain.",
-      "tags": ["service", "midwife", "apothecary"]
+      "tags": [
+        "service",
+        "midwife",
+        "apothecary"
+      ]
+    },
+    {
+      "id": "mine-collapse",
+      "text": "Was trapped briefly in a mine collapse and has refused deep tunnels ever since.",
+      "tags": [
+        "underground",
+        "miner",
+        "mature"
+      ]
+    },
+    {
+      "id": "monastery-years",
+      "text": "Spent several years in a monastery before returning to ordinary life with more questions than answers.",
+      "tags": [
+        "scholarly",
+        "priest",
+        "civilised"
+      ]
+    },
+    {
+      "id": "monster-attack",
+      "text": "Lost a livelihood to a monster attack and rebuilt life around helping others avoid the same fate.",
+      "tags": [
+        "dangerous",
+        "service"
+      ]
+    },
+    {
+      "id": "mysterious-mentor",
+      "text": "Was trained by a wandering mentor who disappeared after leaving behind a locked iron box.",
+      "tags": [
+        "travel",
+        "scholarly",
+        "secret"
+      ]
+    },
+    {
+      "id": "noble-disgraced",
+      "text": "Was born into a minor noble household and left after a public disgrace.",
+      "tags": [
+        "civilised",
+        "authority",
+        "secret"
+      ]
+    },
+    {
+      "id": "retired-soldier",
+      "text": "Once served in a border company and left after a mission went badly wrong.",
+      "tags": [
+        "military",
+        "mature",
+        "guard"
+      ]
+    },
+    {
+      "id": "royal-servant",
+      "text": "Once served in a royal household and learned more than was ever intended.",
+      "tags": [
+        "authority",
+        "secret",
+        "civilised"
+      ]
+    },
+    {
+      "id": "shipwreck-survivor",
+      "text": "Survived a shipwreck that killed several others and still dreams of the ones who did not come ashore.",
+      "tags": [
+        "travel",
+        "fisher",
+        "dockworker"
+      ]
+    },
+    {
+      "id": "shipwrecked",
+      "text": "Was the only survivor of a river or coastal wreck whose cause remains unexplained.",
+      "tags": [
+        "travel",
+        "secret",
+        "memorable"
+      ]
+    },
+    {
+      "id": "street-orphan",
+      "text": "Raised among city back alleys and learned early which adults could be trusted.",
+      "tags": [
+        "urban",
+        "rat-catcher",
+        "fence"
+      ]
+    },
+    {
+      "id": "temple-raised",
+      "text": "Was raised by a small temple community and still measures time by its old bells.",
+      "tags": [
+        "ceremonial",
+        "civilised"
+      ]
+    },
+    {
+      "id": "village-survivor",
+      "text": "Survived the destruction of a remote settlement and has never found anyone else from the same place.",
+      "tags": [
+        "rural",
+        "dangerous",
+        "mature"
+      ]
+    },
+    {
+      "id": "wandering-scholar",
+      "text": "Spent years travelling between libraries, monasteries, and ruined sites in search of a single missing text.",
+      "tags": [
+        "scholarly",
+        "travel"
+      ]
+    },
+    {
+      "id": "war-refugee",
+      "text": "Fled a distant war with little more than a trade, a bundle of clothes, and one precious keepsake.",
+      "tags": [
+        "travel",
+        "mature"
+      ]
     }
   ],
   "motivations": [
-    { "id": "keep-home-safe", "text": "Keep their home and neighbours safe from trouble they understand but cannot ignore.", "tags": ["service", "civilised"] },
-    { "id": "pay-old-debt", "text": "Settle an old debt before it ruins someone they care about.", "tags": ["secret"] },
-    { "id": "find-missing-person", "text": "Find out what happened to someone who vanished without explanation.", "tags": ["travel", "secret"] },
-    { "id": "restore-name", "text": "Restore a ruined professional reputation before age makes it permanent.", "tags": ["scholarly", "authority"] },
-    { "id": "protect-family", "text": "Keep a younger relative from being pulled into the same dangerous work.", "tags": ["service", "civilised"] },
-    { "id": "leave-town", "text": "Earn enough to leave town cleanly, without owing favours to the wrong people.", "tags": ["urban", "travel"] },
-    { "id": "uncover-truth", "text": "Prove a story everyone dismisses is true before the evidence disappears.", "tags": ["memorable", "secret"] },
-    { "id": "atone-mistake", "text": "Make amends for a mistake that still haunts them in quiet moments.", "tags": ["military", "mature"] }
+    {
+      "id": "atone-mistake",
+      "text": "Make amends for a mistake that still haunts them in quiet moments.",
+      "tags": [
+        "military",
+        "mature"
+      ]
+    },
+    {
+      "id": "avenge-friend",
+      "text": "Identify the person responsible for a friend's death without becoming consumed by revenge.",
+      "tags": [
+        "dangerous",
+        "secret"
+      ]
+    },
+    {
+      "id": "build-masterwork",
+      "text": "Complete a masterwork that will prove their skill beyond question.",
+      "tags": [
+        "craft",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "contain-monster",
+      "text": "Keep a dangerous creature hidden and contained until a permanent solution can be found.",
+      "tags": [
+        "dangerous",
+        "secret"
+      ]
+    },
+    {
+      "id": "earn-freedom",
+      "text": "Earn enough money to buy freedom from an employer, creditor, or binding contract.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "escape-prophecy",
+      "text": "Avoid fulfilling a prophecy that others seem determined to force upon them.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "expose-corruption",
+      "text": "Gather enough proof to expose a corrupt local official without disappearing first.",
+      "tags": [
+        "authority",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "find-missing-person",
+      "text": "Find out what happened to someone who vanished without explanation.",
+      "tags": [
+        "travel",
+        "secret"
+      ]
+    },
+    {
+      "id": "keep-home-safe",
+      "text": "Keep their home and neighbours safe from trouble they understand but cannot ignore.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "leave-town",
+      "text": "Earn enough to leave town cleanly, without owing favours to the wrong people.",
+      "tags": [
+        "urban",
+        "travel"
+      ]
+    },
+    {
+      "id": "map-unknown",
+      "text": "Complete a reliable map of a place everyone else considers impossible to chart.",
+      "tags": [
+        "travel",
+        "scholarly",
+        "memorable"
+      ]
+    },
+    {
+      "id": "pay-old-debt",
+      "text": "Settle an old debt before it ruins someone they care about.",
+      "tags": [
+        "secret"
+      ]
+    },
+    {
+      "id": "preserve-tradition",
+      "text": "Keep an old local tradition alive before the last people who remember it are gone.",
+      "tags": [
+        "rural",
+        "mature"
+      ]
+    },
+    {
+      "id": "protect-child",
+      "text": "Protect a young relative from inheriting a dangerous obligation.",
+      "tags": [
+        "service",
+        "secret"
+      ]
+    },
+    {
+      "id": "protect-family",
+      "text": "Keep a younger relative from being pulled into the same dangerous work.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "prove-theory",
+      "text": "Prove a theory that respected scholars have publicly dismissed.",
+      "tags": [
+        "scholarly"
+      ]
+    },
+    {
+      "id": "reconcile-family",
+      "text": "Repair a family division before illness or age makes reconciliation impossible.",
+      "tags": [
+        "service",
+        "mature"
+      ]
+    },
+    {
+      "id": "recover-heirloom",
+      "text": "Recover a stolen heirloom whose sentimental value far exceeds its price.",
+      "tags": [
+        "civilised",
+        "secret"
+      ]
+    },
+    {
+      "id": "restore-name",
+      "text": "Restore a ruined professional reputation before age makes it permanent.",
+      "tags": [
+        "scholarly",
+        "authority"
+      ]
+    },
+    {
+      "id": "restore-reputation",
+      "text": "Restore a family or professional reputation damaged by an old scandal.",
+      "tags": [
+        "civilised",
+        "authority"
+      ]
+    },
+    {
+      "id": "retire-safely",
+      "text": "Make one final profitable deal and retire somewhere quiet.",
+      "tags": [
+        "urban",
+        "travel"
+      ]
+    },
+    {
+      "id": "uncover-truth",
+      "text": "Prove a story everyone dismisses is true before the evidence disappears.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "undo-bargain",
+      "text": "Find a way to escape the consequences of a bargain made in desperation.",
+      "tags": [
+        "secret",
+        "memorable"
+      ]
+    }
   ],
   "secrets": [
-    { "id": "smuggler-contact", "text": "Quietly passes messages for a smuggler in exchange for protection.", "tags": ["urban", "service"] },
-    { "id": "false-identity", "text": "Uses a false name because their real one would attract the wrong attention.", "tags": ["authority", "secret"] },
-    { "id": "hidden-heirloom", "text": "Hides a valuable heirloom that would be seized if discovered.", "tags": ["civilised"] },
-    { "id": "informant", "text": "Feeds information to a local captain and pretends the arrangement is temporary.", "tags": ["authority", "guard"] },
-    { "id": "forged-licence", "text": "Operates with a forged licence that would end their business if inspected.", "tags": ["urban", "merchant"] },
-    { "id": "witnessed-crime", "text": "Recognised a powerful criminal in passing and has never admitted it aloud.", "tags": ["secret", "memorable"] },
-    { "id": "illicit-relationship", "text": "Maintains a relationship that would cause scandal if exposed.", "tags": ["civilised", "service"] },
-    { "id": "stolen-goods", "text": "Sells a few items of uncertain provenance when regular trade is slow.", "tags": ["fence", "secret"] }
+    {
+      "id": "blackmail",
+      "text": "Is being blackmailed over a mistake that harmed no one but would destroy their reputation.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "cult-symbol",
+      "text": "Bears a concealed mark belonging to a cult thought long destroyed.",
+      "tags": [
+        "ceremonial",
+        "secret"
+      ]
+    },
+    {
+      "id": "cursed-object",
+      "text": "Carries a cursed object that cannot be discarded for long.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "dead-messenger",
+      "text": "Continues receiving letters from someone known to be dead.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "double-dealer",
+      "text": "Works for two rival factions and has nearly reached the point where both expect betrayal.",
+      "tags": [
+        "authority",
+        "dangerous",
+        "secret"
+      ]
+    },
+    {
+      "id": "escaped-prisoner",
+      "text": "Escaped from lawful imprisonment after being convicted of a crime they did not commit.",
+      "tags": [
+        "authority",
+        "travel",
+        "secret"
+      ]
+    },
+    {
+      "id": "false-identity",
+      "text": "Uses a false name because their real one would attract the wrong attention.",
+      "tags": [
+        "authority",
+        "secret"
+      ]
+    },
+    {
+      "id": "forbidden-magic",
+      "text": "Can perform a small piece of forbidden magic and has hidden the talent for years.",
+      "tags": [
+        "scholarly",
+        "secret",
+        "memorable"
+      ]
+    },
+    {
+      "id": "forged-licence",
+      "text": "Operates with a forged licence that would end their business if inspected.",
+      "tags": [
+        "urban",
+        "merchant"
+      ]
+    },
+    {
+      "id": "grave-robbery",
+      "text": "Once robbed a grave and found something that should not have been there.",
+      "tags": [
+        "secret",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "hidden-heirloom",
+      "text": "Hides a valuable heirloom that would be seized if discovered.",
+      "tags": [
+        "civilised"
+      ]
+    },
+    {
+      "id": "hidden-tunnel",
+      "text": "Knows of a hidden tunnel beneath the settlement and uses it for private errands.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "illicit-relationship",
+      "text": "Maintains a relationship that would cause scandal if exposed.",
+      "tags": [
+        "civilised",
+        "service"
+      ]
+    },
+    {
+      "id": "informant",
+      "text": "Feeds information to a local captain and pretends the arrangement is temporary.",
+      "tags": [
+        "authority",
+        "guard"
+      ]
+    },
+    {
+      "id": "memory-gap",
+      "text": "Cannot remember an entire year of life and has started finding evidence of what happened during it.",
+      "tags": [
+        "scholarly",
+        "secret",
+        "memorable"
+      ]
+    },
+    {
+      "id": "monster-kin",
+      "text": "Believes a feared local monster is a transformed relative and secretly leaves food for it.",
+      "tags": [
+        "rural",
+        "dangerous",
+        "memorable"
+      ]
+    },
+    {
+      "id": "royal-blood",
+      "text": "Has a genuine claim to a minor title and wants absolutely nothing to do with it.",
+      "tags": [
+        "authority",
+        "secret"
+      ]
+    },
+    {
+      "id": "secret-worship",
+      "text": "Privately worships a banned or forgotten deity.",
+      "tags": [
+        "ceremonial",
+        "secret"
+      ]
+    },
+    {
+      "id": "smuggler-contact",
+      "text": "Quietly passes messages for a smuggler in exchange for protection.",
+      "tags": [
+        "urban",
+        "service"
+      ]
+    },
+    {
+      "id": "stolen-credentials",
+      "text": "Built a respectable career using credentials stolen from someone who may still be alive.",
+      "tags": [
+        "scholarly",
+        "secret"
+      ]
+    },
+    {
+      "id": "stolen-goods",
+      "text": "Sells a few items of uncertain provenance when regular trade is slow.",
+      "tags": [
+        "fence",
+        "secret"
+      ]
+    },
+    {
+      "id": "witnessed-crime",
+      "text": "Recognised a powerful criminal in passing and has never admitted it aloud.",
+      "tags": [
+        "secret",
+        "memorable"
+      ]
+    }
   ],
   "problems": [
-    { "id": "debts-due", "text": "Owes money to someone impatient and well connected.", "tags": ["urban", "secret"] },
-    { "id": "sabotage-business", "text": "Someone is quietly sabotaging their livelihood.", "tags": ["service", "civilised"] },
-    { "id": "missing-shipment", "text": "An expected shipment or payment has failed to arrive.", "tags": ["travel", "rural"] },
-    { "id": "blackmail-note", "text": "Received a blackmail note with just enough detail to prove someone is watching.", "tags": ["secret", "urban"] },
-    { "id": "sick-patron", "text": "A key patron or relative is failing in health and cannot be moved safely.", "tags": ["service", "civilised"] },
-    { "id": "predatory-creditor", "text": "A creditor has begun sending people to loiter outside their home.", "tags": ["urban", "secret"] },
-    { "id": "spoiled-stock", "text": "A batch of stock, supplies, or tools has spoiled or broken at the worst possible time.", "tags": ["service", "rural"] },
-    { "id": "rumour-campaign", "text": "A rumour is spreading that makes ordinary customers avoid them.", "tags": ["civilised", "memorable"] }
+    {
+      "id": "accidental-relic",
+      "text": "An ordinary object in their possession has been identified as a powerful relic.",
+      "tags": [
+        "scholarly",
+        "dangerous",
+        "memorable"
+      ]
+    },
+    {
+      "id": "blackmail-note",
+      "text": "Received a blackmail note with just enough detail to prove someone is watching.",
+      "tags": [
+        "secret",
+        "urban"
+      ]
+    },
+    {
+      "id": "broken-ward",
+      "text": "A protective ward has begun failing for reasons no one can explain.",
+      "tags": [
+        "scholarly",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "cursed-weather",
+      "text": "Unnatural weather follows their movements and is becoming harder to conceal.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "debts-due",
+      "text": "Owes money to someone impatient and well connected.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "escaped-prisoner",
+      "text": "A dangerous prisoner escaped using information that could only have come from inside.",
+      "tags": [
+        "authority",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "failing-memory",
+      "text": "Important memories are fading and written notes no longer match recollection.",
+      "tags": [
+        "mature",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "guild-pressure",
+      "text": "A guild is demanding fees, loyalty, or silence that cannot be afforded.",
+      "tags": [
+        "urban",
+        "authority"
+      ]
+    },
+    {
+      "id": "haunted-workplace",
+      "text": "The workplace shows unmistakable signs of being haunted after dark.",
+      "tags": [
+        "memorable",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "lost-map",
+      "text": "A valuable map has been lost just before an expedition is due to leave.",
+      "tags": [
+        "travel",
+        "scholarly"
+      ]
+    },
+    {
+      "id": "missing-shipment",
+      "text": "A expected shipment or payment has failed to arrive.",
+      "tags": [
+        "travel",
+        "rural"
+      ]
+    },
+    {
+      "id": "missing-worker",
+      "text": "A trusted worker disappeared after claiming to have seen something beneath the building.",
+      "tags": [
+        "service",
+        "memorable"
+      ]
+    },
+    {
+      "id": "monster-tracks",
+      "text": "Fresh monster tracks have appeared nearby, but no one believes the warning.",
+      "tags": [
+        "rural",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "predatory-creditor",
+      "text": "A creditor has begun sending people to loiter outside their home.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "rival-rumours",
+      "text": "A rival is spreading believable rumours that threaten to ruin their standing.",
+      "tags": [
+        "civilised",
+        "urban"
+      ]
+    },
+    {
+      "id": "rumour-campaign",
+      "text": "A rumour is spreading that makes ordinary customers avoid them.",
+      "tags": [
+        "civilised",
+        "memorable"
+      ]
+    },
+    {
+      "id": "sabotage-business",
+      "text": "Someone is quietly sabotaging their livelihood.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "sick-patron",
+      "text": "A key patron or relative is failing in health and cannot be moved safely.",
+      "tags": [
+        "service",
+        "civilised"
+      ]
+    },
+    {
+      "id": "sick-relative",
+      "text": "A close relative is worsening from an illness local healers cannot identify.",
+      "tags": [
+        "service",
+        "secret"
+      ]
+    },
+    {
+      "id": "spoiled-stock",
+      "text": "A batch of stock, supplies, or tools has spoiled or broken at the worst possible time.",
+      "tags": [
+        "service",
+        "rural"
+      ]
+    },
+    {
+      "id": "stolen-ledger",
+      "text": "A ledger containing dangerous names and payments has been stolen.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "threatening-letters",
+      "text": "Anonymous letters have begun arriving with details no stranger should know.",
+      "tags": [
+        "secret",
+        "urban"
+      ]
+    },
+    {
+      "id": "wrong-body",
+      "text": "A recently buried body is not the person everyone believes it to be.",
+      "tags": [
+        "secret",
+        "memorable"
+      ]
+    }
   ],
   "questHooks": [
-    { "id": "ask-investigate-sabotage", "text": "Asks the party to watch their workplace for whoever is causing the trouble.", "tags": ["service"] },
-    { "id": "offer-information", "text": "Offers reliable local information if the party helps with a personal errand first.", "tags": ["urban"] },
-    { "id": "witnessed-strange-event", "text": "Claims to have witnessed something impossible near town and needs someone credible to investigate.", "tags": ["memorable", "secret"] },
-    { "id": "escort-payment", "text": "Needs escort while delivering a payment that cannot be trusted to normal guards.", "tags": ["travel", "merchant"] },
-    { "id": "retrieve-package", "text": "Offers to pay for retrieval of a package left in the wrong hands.", "tags": ["fence", "secret"] },
-    { "id": "identify-thief", "text": "Believes someone in a crowded event stole something vital and asks the party to identify the thief.", "tags": ["urban", "memorable"] },
-    { "id": "clear-name", "text": "Begs the party to speak to a magistrate or priest on their behalf before a hearing.", "tags": ["authority", "civilised"] },
-    { "id": "find-relative", "text": "Asks the party to find a relative who left town after an argument and never returned.", "tags": ["travel", "service"] }
+    {
+      "id": "ask-investigate-sabotage",
+      "text": "Asks the party to watch their workplace for whoever is causing the trouble.",
+      "tags": [
+        "service"
+      ]
+    },
+    {
+      "id": "break-curse",
+      "text": "Believes a family curse has awakened and needs outsiders untouched by it.",
+      "tags": [
+        "secret",
+        "memorable"
+      ]
+    },
+    {
+      "id": "clear-name",
+      "text": "Begs the party to speak to a magistrate or priest on their behalf before a hearing.",
+      "tags": [
+        "authority",
+        "civilised"
+      ]
+    },
+    {
+      "id": "deliver-message",
+      "text": "Needs a sealed message carried to someone who may refuse to receive it.",
+      "tags": [
+        "travel",
+        "secret"
+      ]
+    },
+    {
+      "id": "escort-delivery",
+      "text": "Needs a small but valuable delivery escorted through dangerous territory.",
+      "tags": [
+        "travel",
+        "service"
+      ]
+    },
+    {
+      "id": "escort-payment",
+      "text": "Needs escort while delivering a payment that cannot be trusted to normal guards.",
+      "tags": [
+        "travel",
+        "merchant"
+      ]
+    },
+    {
+      "id": "expose-official",
+      "text": "Wants proof of an official's corruption gathered without alerting the watch.",
+      "tags": [
+        "authority",
+        "urban"
+      ]
+    },
+    {
+      "id": "find-relative",
+      "text": "Asks the party to find a relative who left town after an argument and never returned.",
+      "tags": [
+        "travel",
+        "service"
+      ]
+    },
+    {
+      "id": "find-worker",
+      "text": "Wants help finding a missing worker whom the authorities have already dismissed as a runaway.",
+      "tags": [
+        "service",
+        "authority"
+      ]
+    },
+    {
+      "id": "guard-meeting",
+      "text": "Needs discreet protection during a meeting with someone considered an enemy.",
+      "tags": [
+        "secret",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "identify-relic",
+      "text": "Needs help identifying an object that has begun changing overnight.",
+      "tags": [
+        "scholarly",
+        "memorable"
+      ]
+    },
+    {
+      "id": "identify-thief",
+      "text": "Believes someone in a crowded event stole something vital and asks the party to identify the thief.",
+      "tags": [
+        "urban",
+        "memorable"
+      ]
+    },
+    {
+      "id": "inspect-cellar",
+      "text": "Offers payment for quietly investigating noises beneath the cellar after closing time.",
+      "tags": [
+        "urban",
+        "memorable"
+      ]
+    },
+    {
+      "id": "map-ruins",
+      "text": "Offers to share rare maps if the party surveys a nearby ruin and returns with accurate notes.",
+      "tags": [
+        "scholarly",
+        "travel"
+      ]
+    },
+    {
+      "id": "offer-information",
+      "text": "Offers reliable local information if the party helps with a personal errand first.",
+      "tags": [
+        "urban"
+      ]
+    },
+    {
+      "id": "protect-festival",
+      "text": "Asks the party to discreetly protect a local festival from a threat that has not been made public.",
+      "tags": [
+        "civilised",
+        "service"
+      ]
+    },
+    {
+      "id": "recover-ledger",
+      "text": "Asks the party to recover a stolen ledger before its contents are sold.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "retrieve-package",
+      "text": "Offers to pay for retrieval of a package left in the wrong hands.",
+      "tags": [
+        "fence",
+        "secret"
+      ]
+    },
+    {
+      "id": "seal-breach",
+      "text": "Knows of a damaged seal beneath the settlement and needs capable people to inspect it.",
+      "tags": [
+        "dangerous",
+        "memorable"
+      ]
+    },
+    {
+      "id": "track-monster",
+      "text": "Offers local guidance if the party agrees to track a creature preying on nearby livestock.",
+      "tags": [
+        "rural",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "witnessed-strange-event",
+      "text": "Claims to have witnessed something impossible near town and needs someone credible to investigate.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    }
   ],
   "dangers": [
-    { "id": "connected-creditor", "text": "Their creditor has ties to violent people.", "tags": ["urban", "secret"] },
-    { "id": "draws-attention", "text": "Helping them may draw attention from local authorities.", "tags": ["authority"] },
-    { "id": "unknown-enemy", "text": "An unknown enemy already knows the party spoke with them.", "tags": ["memorable"] },
-    { "id": "criminal-interest", "text": "A local gang considers them useful property and may intervene if the party gets involved.", "tags": ["urban", "fence"] },
-    { "id": "false-accusation", "text": "Helping them could make the party look complicit in an accusation already circulating.", "tags": ["authority", "secret"] },
-    { "id": "supernatural-attention", "text": "Their problem may have attracted something that does not care about city walls.", "tags": ["memorable", "fey-touched"] },
-    { "id": "rival-mercenary", "text": "A rival sellsword crew has been paid to ensure the matter stays unresolved.", "tags": ["military", "mercenary"] },
-    { "id": "public-scandal", "text": "Success may expose a scandal that damages people the party still needs.", "tags": ["civilised", "secret"] }
+    {
+      "id": "connected-creditor",
+      "text": "Their creditor has ties to violent people.",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "criminal-interest",
+      "text": "A local gang considers them useful property and may intervene if the party gets involved.",
+      "tags": [
+        "urban",
+        "fence"
+      ]
+    },
+    {
+      "id": "cursed-reward",
+      "text": "The promised reward is cursed or dangerously recognisable.",
+      "tags": [
+        "memorable",
+        "secret"
+      ]
+    },
+    {
+      "id": "double-cross",
+      "text": "The person who hired them intends to betray everyone involved.",
+      "tags": [
+        "secret",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "draws-attention",
+      "text": "Helping them may draw attention from local authorities.",
+      "tags": [
+        "authority"
+      ]
+    },
+    {
+      "id": "false-accusation",
+      "text": "Helping them could make the party look complicit in an accusation already circulating.",
+      "tags": [
+        "authority",
+        "secret"
+      ]
+    },
+    {
+      "id": "family-involved",
+      "text": "A beloved family member is secretly involved on the wrong side.",
+      "tags": [
+        "service",
+        "secret"
+      ]
+    },
+    {
+      "id": "hidden-cult",
+      "text": "A hidden cult has been monitoring the same events for much longer.",
+      "tags": [
+        "ceremonial",
+        "secret"
+      ]
+    },
+    {
+      "id": "innocent-hostage",
+      "text": "An innocent person is being used as leverage by those responsible.",
+      "tags": [
+        "secret",
+        "service"
+      ]
+    },
+    {
+      "id": "location-collapsing",
+      "text": "The location itself is unstable and may collapse, flood, or burn.",
+      "tags": [
+        "dangerous",
+        "travel"
+      ]
+    },
+    {
+      "id": "monster-hunting",
+      "text": "A dangerous creature is already hunting anyone connected to the matter.",
+      "tags": [
+        "dangerous",
+        "rural"
+      ]
+    },
+    {
+      "id": "npc-unreliable",
+      "text": "They are concealing one crucial fact that may put the party at risk.",
+      "tags": [
+        "secret"
+      ]
+    },
+    {
+      "id": "official-coverup",
+      "text": "Powerful officials have already arranged a convincing cover story.",
+      "tags": [
+        "authority",
+        "urban"
+      ]
+    },
+    {
+      "id": "old-curse",
+      "text": "The problem is part of an older curse that will not end with a simple victory.",
+      "tags": [
+        "memorable",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "public-scandal",
+      "text": "Success may expose a scandal that damages people the party still needs.",
+      "tags": [
+        "civilised",
+        "secret"
+      ]
+    },
+    {
+      "id": "rival-mercenary",
+      "text": "A rival sellsword crew has been paid to ensure the matter stays unresolved.",
+      "tags": [
+        "military",
+        "mercenary"
+      ]
+    },
+    {
+      "id": "rival-party",
+      "text": "Another adventuring group has accepted the opposite side of the job.",
+      "tags": [
+        "travel",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "supernatural-attention",
+      "text": "Their problem may have attracted something that does not care about city walls.",
+      "tags": [
+        "memorable",
+        "fey-touched"
+      ]
+    },
+    {
+      "id": "time-limit",
+      "text": "The situation will become much worse if it is not resolved before the next sunrise.",
+      "tags": [
+        "dangerous"
+      ]
+    },
+    {
+      "id": "unknown-enemy",
+      "text": "An unknown enemy already knows the party spoke with them.",
+      "tags": [
+        "memorable"
+      ]
+    },
+    {
+      "id": "unstable-magic",
+      "text": "Unstable magic is altering the area in unpredictable ways.",
+      "tags": [
+        "scholarly",
+        "memorable",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "watch-corrupt",
+      "text": "Several members of the local watch are involved in the problem.",
+      "tags": [
+        "authority",
+        "urban"
+      ]
+    }
   ],
   "imageEnvironments": [
-    { "id": "tavern-interior", "text": "a warm tavern interior with muted lantern light", "tags": ["service", "urban"] },
-    { "id": "market-stall", "text": "a busy market stall at dusk", "tags": ["civilised", "urban"] },
-    { "id": "river-crossing", "text": "a misty river crossing at early morning", "tags": ["rural", "travel"] },
-    { "id": "workshop-shelves", "text": "a cluttered workshop lined with shelves and jars", "tags": ["scholarly", "natural"] },
-    { "id": "forge-glow", "text": "a smithy interior lit by forge glow and drifting embers", "tags": ["blacksmith", "urban"] },
-    { "id": "harbour-dawn", "text": "a foggy harbour at dawn with moored boats and wet rope", "tags": ["dockworker", "fisher", "travel"] },
-    { "id": "forest-track", "text": "a narrow forest track with filtered green light", "tags": ["hunter", "rural"] },
-    { "id": "temple-courtyard", "text": "a quiet temple courtyard with stone columns and incense smoke", "tags": ["priest", "civilised"] },
-    { "id": "guard-barracks", "text": "a plain guard barracks with armour racks and morning light through high windows", "tags": ["guard", "authority"] },
-    { "id": "mine-lamp", "text": "a mine tunnel entrance with a single lamp and damp stone walls", "tags": ["miner", "underground"] },
-    { "id": "bakery-steam", "text": "a small bakery back room warm with steam and flour dust", "tags": ["baker", "service"] },
-    { "id": "back-alley-rain", "text": "a rain-slick back alley with stacked crates and distant lantern light", "tags": ["fence", "rat-catcher", "urban"] }
+    {
+      "id": "alley",
+      "text": "a narrow city alley after rain",
+      "tags": [
+        "urban",
+        "secret"
+      ]
+    },
+    {
+      "id": "back-alley-rain",
+      "text": "a rain-slick back alley with stacked crates and distant lantern light",
+      "tags": [
+        "fence",
+        "rat-catcher",
+        "urban"
+      ]
+    },
+    {
+      "id": "bakery-steam",
+      "text": "a small bakery back room warm with steam and flour dust",
+      "tags": [
+        "baker",
+        "service"
+      ]
+    },
+    {
+      "id": "caravan",
+      "text": "a colourful caravan halted on a windswept road",
+      "tags": [
+        "travel",
+        "memorable"
+      ]
+    },
+    {
+      "id": "dockside",
+      "text": "a rain-darkened dockside crowded with ropes and cargo",
+      "tags": [
+        "urban",
+        "travel"
+      ]
+    },
+    {
+      "id": "forest-path",
+      "text": "a damp forest path beneath ancient trees",
+      "tags": [
+        "natural",
+        "travel"
+      ]
+    },
+    {
+      "id": "forest-track",
+      "text": "a narrow forest track with filtered green light",
+      "tags": [
+        "hunter",
+        "rural"
+      ]
+    },
+    {
+      "id": "forge",
+      "text": "a glowing forge filled with sparks and heavy tools",
+      "tags": [
+        "craft",
+        "sturdy"
+      ]
+    },
+    {
+      "id": "forge-glow",
+      "text": "a smithy interior lit by forge glow and drifting embers",
+      "tags": [
+        "blacksmith",
+        "urban"
+      ]
+    },
+    {
+      "id": "graveyard",
+      "text": "an old graveyard under pale moonlight",
+      "tags": [
+        "secret",
+        "rural"
+      ]
+    },
+    {
+      "id": "guard-barracks",
+      "text": "a plain guard barracks with armour racks and morning light through high windows",
+      "tags": [
+        "guard",
+        "authority"
+      ]
+    },
+    {
+      "id": "guardhouse",
+      "text": "a worn stone guardhouse lit by a brazier",
+      "tags": [
+        "authority",
+        "urban"
+      ]
+    },
+    {
+      "id": "harbour-dawn",
+      "text": "a foggy harbour at dawn with moored boats and wet rope",
+      "tags": [
+        "dockworker",
+        "fisher",
+        "travel"
+      ]
+    },
+    {
+      "id": "library",
+      "text": "a shadowed library with towering shelves and floating dust",
+      "tags": [
+        "scholarly",
+        "civilised"
+      ]
+    },
+    {
+      "id": "market-stall",
+      "text": "a busy market stall at dusk",
+      "tags": [
+        "civilised",
+        "urban"
+      ]
+    },
+    {
+      "id": "mine-lamp",
+      "text": "a mine tunnel entrance with a single lamp and damp stone walls",
+      "tags": [
+        "miner",
+        "underground"
+      ]
+    },
+    {
+      "id": "mountain-pass",
+      "text": "a high mountain pass beneath gathering storm clouds",
+      "tags": [
+        "travel",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "river-crossing",
+      "text": "a misty river crossing at early morning",
+      "tags": [
+        "rural",
+        "travel"
+      ]
+    },
+    {
+      "id": "roadside-camp",
+      "text": "a roadside camp beneath a patched canvas awning",
+      "tags": [
+        "travel",
+        "rural"
+      ]
+    },
+    {
+      "id": "ruined-tower",
+      "text": "the interior of a ruined tower open to the night sky",
+      "tags": [
+        "scholarly",
+        "dangerous"
+      ]
+    },
+    {
+      "id": "ship-cabin",
+      "text": "a cramped ship cabin lit by a swinging oil lamp",
+      "tags": [
+        "travel",
+        "secret"
+      ]
+    },
+    {
+      "id": "tavern-interior",
+      "text": "a warm tavern interior with muted lantern light",
+      "tags": [
+        "service",
+        "urban"
+      ]
+    },
+    {
+      "id": "temple-courtyard",
+      "text": "a quiet temple courtyard with stone columns and incense smoke",
+      "tags": [
+        "priest",
+        "civilised"
+      ]
+    },
+    {
+      "id": "temple-hall",
+      "text": "a quiet temple hall filled with candle smoke",
+      "tags": [
+        "ceremonial",
+        "civilised"
+      ]
+    },
+    {
+      "id": "underground-hall",
+      "text": "a vast underground hall lit by blue mineral lamps",
+      "tags": [
+        "underground",
+        "memorable"
+      ]
+    },
+    {
+      "id": "village-green",
+      "text": "a busy village green on market day",
+      "tags": [
+        "rural",
+        "service"
+      ]
+    },
+    {
+      "id": "workshop-shelves",
+      "text": "a cluttered workshop lined with shelves and jars",
+      "tags": [
+        "scholarly",
+        "natural"
+      ]
+    }
   ]
 }
