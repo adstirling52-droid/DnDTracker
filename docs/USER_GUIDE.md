@@ -56,6 +56,8 @@ DnDTracker is focused on campaign inventory and NPC management. It does **not** 
 
 No installation is required to use the hosted app at [tracker.alanstirling.com](https://tracker.alanstirling.com).
 
+In the app, open **User Guide** from the sidebar or go to `/user-guide`.
+
 ### Create an account
 
 1. Open [https://tracker.alanstirling.com](https://tracker.alanstirling.com).

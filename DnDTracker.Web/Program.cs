@@ -55,6 +55,7 @@ builder.Services.AddScoped<RollTableService>();
 
 builder.Services.AddSingleton<NpcGenerationDataProvider>();
 builder.Services.AddScoped<NpcGeneratorService>();
+builder.Services.AddSingleton<UserGuideService>();
 
 builder.Services.Configure<FormOptions>(options =>
 {
