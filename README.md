@@ -4,6 +4,8 @@ A web application for Dungeon Masters to track D&D campaigns, characters, items,
 
 The live app is hosted at [tracker.alanstirling.com](https://tracker.alanstirling.com).
 
+**User guide:** see [docs/USER_GUIDE.md](docs/USER_GUIDE.md) for how to use the app.
+
 ## Web app
 
 The application lives in `DnDTracker.Web/`. It is an ASP.NET Core Blazor Server app with SQL Server persistence and ASP.NET Core Identity for multi-user access. Each user's data is kept separate.
