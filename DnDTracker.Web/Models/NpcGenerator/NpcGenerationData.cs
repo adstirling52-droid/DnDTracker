@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace DnDTracker.Web.Models.NpcGenerator;
 
 public sealed class NpcGenerationData
@@ -15,7 +13,6 @@ public sealed class NpcGenerationData
 
     public List<NpcTaggedTextEntry> AgeCategories { get; set; } = [];
 
-    [JsonPropertyName("genders")]
     public List<NpcTaggedTextEntry> GenderPresentations { get; set; } = [];
 
     public List<NpcOccupationEntry> Occupations { get; set; } = [];

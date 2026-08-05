@@ -278,7 +278,7 @@
       ]
     }
   ],
-  "genders": [
+  "genderPresentations": [
     {
       "id": "masculine",
       "text": "masculine",

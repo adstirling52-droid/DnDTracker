@@ -138,7 +138,7 @@ public sealed class NpcGenerationDataProvider
         var requiredLists = new (string Name, int Count)[]
         {
             ("AgeCategories", data.AgeCategories.Count),
-            ("Genders", data.GenderPresentations.Count),
+            ("GenderPresentations", data.GenderPresentations.Count),
             ("Occupations", data.Occupations.Count),
             ("Appearances", data.Appearances.Count),
             ("DistinctiveFeatures", data.DistinctiveFeatures.Count),
@@ -178,7 +178,7 @@ public sealed class NpcGenerationDataProvider
         var taggedLists = new (string Name, List<NpcTaggedTextEntry> Entries)[]
         {
             ("AgeCategories", data.AgeCategories),
-            ("Genders", data.GenderPresentations),
+            ("GenderPresentations", data.GenderPresentations),
             ("Appearances", data.Appearances),
             ("DistinctiveFeatures", data.DistinctiveFeatures),
             ("Personalities", data.Personalities),
