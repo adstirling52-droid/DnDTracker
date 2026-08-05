@@ -28,9 +28,9 @@ public class NpcGenerationDataProviderTests
         Assert.Equal(
             "Grounded, system-neutral fantasy with occasional unusual or memorable details.",
             data.Tone);
-        Assert.Equal(3, data.Ancestries.Count);
-        Assert.Equal(3, data.NamesByAncestry["human"].Count);
-        Assert.Equal(5, data.Occupations.Count);
+        Assert.Equal(5, data.Ancestries.Count);
+        Assert.True(data.NamesByAncestry["human"].Count >= 3);
+        Assert.True(data.Occupations.Count >= 5);
     }
 
     [Fact]
