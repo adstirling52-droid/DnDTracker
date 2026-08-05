@@ -84,7 +84,10 @@ else
                     @foreach (var npc in currentNpcs)
                     {
                         <div class="list-group-item py-2">
-                            <div class="fw-semibold">@npc.Name</div>
+                            <a class="fw-semibold link-underline-opacity-0 link-underline-opacity-100-hover"
+                               href="campaigns/@CampaignId/npcs?selected=@npc.Id">
+                                @npc.Name
+                            </a>
                             <div class="small text-muted">@DisplayValue(npc.Occupation)</div>
                             <div class="small text-muted">@DisplayValue(npc.Location)</div>
                         </div>
