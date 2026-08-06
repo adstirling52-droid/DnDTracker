@@ -1,10 +1,16 @@
 using Markdig;
+using Markdig.Extensions.AutoIdentifiers;
 
 namespace DnDTracker.Web.Services;
 
 public class UserGuideService
 {
     private static readonly string RelativePath = Path.Combine("Data", "UserGuide", "USER_GUIDE.md");
+
+    private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
+        .UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
+        .Build();
+
     private readonly IWebHostEnvironment environment;
     private string? cachedHtml;
 
@@ -27,7 +33,7 @@ public class UserGuideService
         }
 
         var markdown = await File.ReadAllTextAsync(path);
-        cachedHtml = Markdown.ToHtml(markdown);
+        cachedHtml = Markdown.ToHtml(markdown, MarkdownPipeline);
         return (cachedHtml, null);
     }
 }
