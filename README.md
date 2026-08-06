@@ -4,7 +4,7 @@ A web application for Dungeon Masters to track D&D campaigns, characters, items,
 
 The live app is hosted at [tracker.alanstirling.com](https://tracker.alanstirling.com).
 
-**User guide:** see [docs/USER_GUIDE.md](docs/USER_GUIDE.md) for how to use the app.
+**User guide:** see [DnDTracker.Web/Data/UserGuide/USER_GUIDE.md](DnDTracker.Web/Data/UserGuide/USER_GUIDE.md) for how to use the app (also available at `/user-guide` in the running app).
 
 ## Web app
 
