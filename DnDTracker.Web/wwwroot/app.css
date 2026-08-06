@@ -72,6 +72,7 @@ h1:focus {
 .user-guide h3 {
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
+    scroll-margin-top: 1rem;
 }
 
 .user-guide h1:first-child {
