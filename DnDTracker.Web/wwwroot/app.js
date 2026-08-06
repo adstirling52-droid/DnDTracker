@@ -43,43 +43,48 @@ window.dndUnregisterVisibilityRefresh = (dotNetRef) => {
     dndVisibilityHandlers.delete(dotNetRef);
 };
 
-window.dndInitUserGuideAnchors = () => {
-    const container = document.querySelector('.user-guide');
-    if (!container || container.dataset.anchorsInit === 'true') {
+const dndScrollUserGuideToId = (id) => {
+    if (!id || !document.querySelector('.user-guide')) {
+        return false;
+    }
+
+    const target = document.getElementById(id);
+    if (!target) {
+        return false;
+    }
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    history.replaceState(null, '', `/user-guide#${id}`);
+    return true;
+};
+
+const dndInitUserGuideAnchors = () => {
+    const hash = window.location.hash;
+    if (hash.length > 1) {
+        requestAnimationFrame(() => {
+            dndScrollUserGuideToId(decodeURIComponent(hash.slice(1)));
+        });
+    }
+};
+
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('.user-guide a[href^="#"], .user-guide a[href^="/user-guide#"]');
+    if (!link) {
         return;
     }
 
-    container.dataset.anchorsInit = 'true';
-
-    const scrollToId = (id) => {
-        if (!id) {
-            return false;
-        }
-
-        const target = document.getElementById(id);
-        if (!target) {
-            return false;
-        }
-
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        history.replaceState(null, '', `/user-guide#${id}`);
-        return true;
-    };
-
-    container.addEventListener('click', (event) => {
-        const link = event.target.closest('a[href^="#"]');
-        if (!link) {
-            return;
-        }
-
-        const id = decodeURIComponent(link.getAttribute('href').slice(1));
-        if (scrollToId(id)) {
-            event.preventDefault();
-        }
-    });
-
-    const hash = window.location.hash;
-    if (hash.length > 1) {
-        scrollToId(decodeURIComponent(hash.slice(1)));
+    const href = link.getAttribute('href') ?? '';
+    const hashIndex = href.indexOf('#');
+    if (hashIndex < 0) {
+        return;
     }
-};
+
+    const id = decodeURIComponent(href.slice(hashIndex + 1));
+    if (dndScrollUserGuideToId(id)) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}, true);
+
+document.addEventListener('DOMContentLoaded', dndInitUserGuideAnchors);
+document.addEventListener('blazor:enhanced:load', dndInitUserGuideAnchors);

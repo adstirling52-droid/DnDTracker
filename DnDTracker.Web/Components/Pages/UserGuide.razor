@@ -3,7 +3,6 @@
 @attribute [AllowAnonymous]
 
 @inject UserGuideService UserGuideService
-@inject IJSRuntime JS
 
 <PageTitle>User Guide</PageTitle>
 
@@ -27,19 +26,9 @@ else
 @code {
     private string? guideHtml;
     private string? errorMessage;
-    private bool anchorsInitialized;
 
     protected override async Task OnInitializedAsync()
     {
         (guideHtml, errorMessage) = await UserGuideService.GetHtmlAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (guideHtml is not null && !anchorsInitialized)
-        {
-            await JS.InvokeVoidAsync("dndInitUserGuideAnchors");
-            anchorsInitialized = true;
-        }
     }
 }
