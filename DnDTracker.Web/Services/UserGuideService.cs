@@ -1,5 +1,6 @@
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
+using System.Text.RegularExpressions;
 
 namespace DnDTracker.Web.Services;
 
@@ -10,6 +11,10 @@ public class UserGuideService
     private static readonly MarkdownPipeline MarkdownPipeline = new MarkdownPipelineBuilder()
         .UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
         .Build();
+
+    private static readonly Regex HashOnlyLinkRegex = new(
+        @"href=""#([^""]+)""",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private readonly IWebHostEnvironment environment;
     private string? cachedHtml;
@@ -33,7 +38,13 @@ public class UserGuideService
         }
 
         var markdown = await File.ReadAllTextAsync(path);
-        cachedHtml = Markdown.ToHtml(markdown, MarkdownPipeline);
+        var html = Markdown.ToHtml(markdown, MarkdownPipeline);
+        cachedHtml = PostProcessHtml(html);
         return (cachedHtml, null);
     }
+
+    private static string PostProcessHtml(string html) =>
+        HashOnlyLinkRegex.Replace(
+            html,
+            match => $@"href=""/user-guide#{match.Groups[1].Value}"" data-enhance-nav=""false""");
 }
