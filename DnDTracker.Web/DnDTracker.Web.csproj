@@ -13,7 +13,7 @@
     <Content Update="Data/NpcGenerator/**/*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\docs\USER_GUIDE.md" Link="Data\UserGuide\USER_GUIDE.md">
+    <Content Update="Data/UserGuide/USER_GUIDE.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
