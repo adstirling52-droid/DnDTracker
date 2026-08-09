@@ -2,6 +2,7 @@
 
 @using System.ComponentModel.DataAnnotations
 @using DnDTracker.Web.Models
+@using DnDTracker.Web.Services
 @using Microsoft.AspNetCore.Authorization
 
 @attribute [AllowAnonymous]
@@ -11,6 +12,8 @@
 @inject NavigationManager NavigationManager
 @inject ILogger<Register> Logger
 @inject SiteHostService SiteHost
+@inject IHttpContextAccessor HttpContextAccessor
+@inject RegistrationRateLimitService RegistrationRateLimit
 
 <PageTitle>Register</PageTitle>
 
@@ -78,6 +81,17 @@
     {
         if (Input is null)
         {
+            return;
+        }
+
+        var clientKey = RegistrationRateLimitService.GetClientKey(HttpContextAccessor.HttpContext);
+        var (allowed, retryAfter) = await RegistrationRateLimit.TryAcquireAsync(clientKey);
+        if (!allowed)
+        {
+            message = retryAfter.HasValue
+                ? $"Too many registration attempts from this location. Please try again in about {RegistrationRateLimitService.FormatRetryAfter(retryAfter.Value)}."
+                : "Too many registration attempts from this location. Please try again later.";
+            Logger.LogWarning("Registration rate limit exceeded for client key {ClientKey}.", clientKey);
             return;
         }
 
