@@ -20,6 +20,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection("SiteSettings"));
 builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
+builder.Services.Configure<RegistrationRateLimitOptions>(
+    builder.Configuration.GetSection(RegistrationRateLimitOptions.SectionName));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SiteHostService>();
 
@@ -42,6 +44,7 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddSingleton<SendGridEmailSender>();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>>(sp => sp.GetRequiredService<SendGridEmailSender>());
+builder.Services.AddSingleton<RegistrationRateLimitService>();
 
 builder.Services.AddScoped<CampaignService>();
 builder.Services.AddScoped<CampaignImportExportService>();
