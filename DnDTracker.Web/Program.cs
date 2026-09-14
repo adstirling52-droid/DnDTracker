@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -56,6 +57,7 @@ builder.Services.AddScoped<ItemImageService>();
 builder.Services.AddScoped<CampaignNpcService>();
 builder.Services.AddScoped<CampaignNpcImageService>();
 builder.Services.AddScoped<RollTableService>();
+builder.Services.AddScoped<PasswordResetLinkService>();
 
 builder.Services.AddSingleton<NpcGenerationDataProvider>();
 builder.Services.AddScoped<NpcGeneratorService>();
@@ -73,15 +75,20 @@ builder.Services.AddRazorComponents()
 
 var app = builder.Build();
 
-if (app.Environment.IsProduction())
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<DnDTrackerDbContext>();
-    db.Database.Migrate();
+    if (app.Environment.IsProduction())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<DnDTrackerDbContext>();
+        db.Database.Migrate();
 
-    var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
-    Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "item-images"));
-    Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "npc-images"));
+        var contentRoot = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>().ContentRootPath;
+        Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "item-images"));
+        Directory.CreateDirectory(Path.Combine(contentRoot, "Data", "npc-images"));
+    }
+
+    var siteSettings = scope.ServiceProvider.GetRequiredService<IOptions<SiteSettings>>().Value;
+    await AdminRoleSeeder.SeedAsync(scope.ServiceProvider, siteSettings.AdminUsername);
 }
 
 // Configure the HTTP request pipeline.

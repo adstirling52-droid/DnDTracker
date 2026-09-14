@@ -13,7 +13,8 @@
   "SiteSettings": {
     "PublicSiteUrl": "https://www.alanstirling.com",
     "TrackerUrl": "https://tracker.alanstirling.com",
-    "PasswordResetEmail": "passwordreset@alanstirling.com"
+    "PasswordResetEmail": "passwordreset@alanstirling.com",
+    "AdminUsername": "Randywine"
   },
   "SendGrid": {
     "ApiKey": "YOUR_SENDGRID_API_KEY",
