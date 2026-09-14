@@ -7,4 +7,6 @@ public class SiteSettings
     public string TrackerUrl { get; set; } = "https://tracker.alanstirling.com";
 
     public string PasswordResetEmail { get; set; } = "passwordreset@alanstirling.com";
+
+    public string AdminUsername { get; set; } = "Randywine";
 }
