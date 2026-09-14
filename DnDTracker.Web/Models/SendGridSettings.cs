@@ -1,5 +1,7 @@
 namespace DnDTracker.Web.Models;
 
+// Preserved for optional re-enable in Program.cs (SendGrid registration is currently commented out).
+
 public class SendGridSettings
 {
     public string ApiKey { get; set; } = "";

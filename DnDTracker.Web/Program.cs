@@ -19,7 +19,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection("SiteSettings"));
-builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
+// SendGrid (disabled — password reset is manual via SiteSettings.PasswordResetEmail):
+// builder.Services.Configure<SendGridSettings>(builder.Configuration.GetSection("SendGrid"));
 builder.Services.Configure<RegistrationRateLimitOptions>(
     builder.Configuration.GetSection(RegistrationRateLimitOptions.SectionName));
 builder.Services.AddHttpContextAccessor();
@@ -42,8 +43,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<SendGridEmailSender>();
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>>(sp => sp.GetRequiredService<SendGridEmailSender>());
+// builder.Services.AddSingleton<SendGridEmailSender>();
+// builder.Services.AddSingleton<IEmailSender<ApplicationUser>>(sp => sp.GetRequiredService<SendGridEmailSender>());
 builder.Services.AddSingleton<RegistrationRateLimitService>();
 
 builder.Services.AddScoped<CampaignService>();
@@ -173,22 +174,22 @@ app.MapGet("/api/campaigns/{campaignId:guid}/export", async (
         fileName);
 }).RequireAuthorization();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapGet("/dev/send-test-email", async (string to, SendGridEmailSender emailSender) =>
-    {
-        if (string.IsNullOrWhiteSpace(to))
-        {
-            return Results.BadRequest("Provide a 'to' query parameter with the recipient email address.");
-        }
-
-        await emailSender.SendEmailAsync(
-            to.Trim(),
-            "DnD Tracker SendGrid test",
-            "<p>If you received this message, SendGrid is configured correctly in the DnD Tracker app.</p>");
-
-        return Results.Text($"Test email sent to {to.Trim()}.");
-    });
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.MapGet("/dev/send-test-email", async (string to, SendGridEmailSender emailSender) =>
+//     {
+//         if (string.IsNullOrWhiteSpace(to))
+//         {
+//             return Results.BadRequest("Provide a 'to' query parameter with the recipient email address.");
+//         }
+//
+//         await emailSender.SendEmailAsync(
+//             to.Trim(),
+//             "DnD Tracker SendGrid test",
+//             "<p>If you received this message, SendGrid is configured correctly in the DnD Tracker app.</p>");
+//
+//         return Results.Text($"Test email sent to {to.Trim()}.");
+//     });
+// }
 
 app.Run();

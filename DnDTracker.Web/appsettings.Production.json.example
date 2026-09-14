@@ -12,7 +12,8 @@
   "AllowedHosts": "www.alanstirling.com;alanstirling.com;tracker.alanstirling.com",
   "SiteSettings": {
     "PublicSiteUrl": "https://www.alanstirling.com",
-    "TrackerUrl": "https://tracker.alanstirling.com"
+    "TrackerUrl": "https://tracker.alanstirling.com",
+    "PasswordResetEmail": "passwordreset@alanstirling.com"
   },
   "SendGrid": {
     "ApiKey": "YOUR_SENDGRID_API_KEY",
