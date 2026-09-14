@@ -1,3 +1,5 @@
+// Preserved for optional re-enable in Program.cs (SendGrid registration is currently commented out).
+
 using System.Text.RegularExpressions;
 using DnDTracker.Web.Models;
 using Microsoft.AspNetCore.Identity;
